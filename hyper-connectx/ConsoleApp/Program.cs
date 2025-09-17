@@ -2,9 +2,9 @@
 
 Console.WriteLine("Hello, ConnectX!");
 
-var mainMenu = new Menu()
-{
-    MenuItems =
+var mainMenu = new Menu();
+
+mainMenu.AddMenuItems(
     [
         new MenuItem
         {
@@ -13,10 +13,10 @@ var mainMenu = new Menu()
         },
         new MenuItem
         {
-        Label = "Label2",
-        Key = "2"
-        },
+            Label = "Label2",
+            Key = "2"
+        }
     ]
-};
+    );
 
 mainMenu.Run();
