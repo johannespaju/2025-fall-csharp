@@ -2,41 +2,95 @@
 
 public class Menu
 {
-    private List<MenuItem> MenuItems { get; set; } = [];
 
-    public void AddMenuItems(List<MenuItem> items)
+    private string Title { get; set; } = default!;
+    private Dictionary<string, MenuItem> MenuItems { get; set; } = new();
+    
+    private EMenuLevel Level { get; set; }
+
+    public Menu(string title, EMenuLevel level)
     {
-        foreach (var item in items)
+        Title = title;
+        Level = level;
+        switch (level)
         {
-            // control
-            MenuItems.Add(item);
+            case EMenuLevel.Root:
+                MenuItems["x"] = new MenuItem() {Key = "x",  Value = "Exit", MethodToRun = () => "x"};
+                break;
+            case EMenuLevel.Second:
+                MenuItems["x"] = new MenuItem() {Key = "x",  Value = "Exit", MethodToRun = () => "x" };
+                MenuItems["m"] = new MenuItem() {Key = "m",  Value = "Back to Main Menu", MethodToRun = () => "m" };
+                break;
+            case EMenuLevel.Deep:
+                MenuItems["b"] = new MenuItem() {Key = "b", Value = "Back to Previous Menu", MethodToRun = () => "b" };
+                MenuItems["m"] = new MenuItem() {Key = "m",  Value = "Back to Main Menu", MethodToRun = () => "m" };
+                MenuItems["x"] = new MenuItem() {Key = "x",  Value = "Exit", MethodToRun = () => "x" };
+                break;
         }
     }
-    
-    public void Run()
+
+    public void AddMenuItem(string key, string value, Func<string>? methodToRun)
     {
-        var menuIsDone = false;
+        if (MenuItems.ContainsKey(key))
+        {
+            throw new ArgumentException($"Menu item with '{key}' already exists");
+        }
+        MenuItems[key] = new MenuItem() { Key = key, Value = value, MethodToRun = methodToRun };
+    }
+    
+    public string Run()
+    {
+        Console.Clear();
+        var menuRunning = true;
+        var userChoice = "";
         do
         {
             DisplayMenu();
-            Console.Write("Please make a selection: ");
-            var userInput = Console.ReadLine();
-            // validate
-            // execute choice
-
-            if (userInput == "X")
+            Console.Write("Select an option: ");
+            var input = Console.ReadLine();
+            if (input == null)
             {
-                menuIsDone = true;
+                Console.WriteLine("Invalid input. Please try again.");
+                continue;
             }
-        } while (!menuIsDone);
+
+            userChoice = input.Trim().ToLower();
+            
+            if (MenuItems.ContainsKey(userChoice))
+            {
+                var returnValueFromMethodToRun = MenuItems[userChoice].MethodToRun?.Invoke();
+
+                if (returnValueFromMethodToRun == "b" && Level  == EMenuLevel.Deep)
+                {
+                    menuRunning = false;
+                } else if (returnValueFromMethodToRun == "m" && Level != EMenuLevel.Root)
+                {
+                    menuRunning = false;
+                    userChoice = "m";
+                } else if (returnValueFromMethodToRun == "x")
+                {
+                    menuRunning = false;
+                    userChoice = "x";
+                }
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please try again.");
+            }
+        } while (menuRunning);
+        return userChoice;
     }
 
     private void DisplayMenu()
     {
-        foreach (MenuItem item in MenuItems)
+        Console.WriteLine(Title);
+        Console.WriteLine("--------------------");
+        foreach (var item in MenuItems.Values)
         {
-            Console.WriteLine(item.ToString());
+            Console.WriteLine(item);
         }
+        Console.WriteLine();
     }
     
 }
