@@ -13,6 +13,6 @@ public class MenuItem
     
     public override string ToString()
     {
-        return $"{Key}: {Label}";
+        return $"{Key}) {Label}";
     }
 }
