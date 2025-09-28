@@ -77,6 +77,7 @@ public class Menu
             else
             {
                 Console.WriteLine("Invalid input. Please try again.");
+                Thread.Sleep(1000);
             }
         } while (menuRunning);
         return userChoice;
@@ -84,6 +85,7 @@ public class Menu
 
     private void DisplayMenu()
     {
+        Console.Clear();
         Console.WriteLine(Title);
         Console.WriteLine("--------------------");
         foreach (var item in MenuItems.Values)
