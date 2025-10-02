@@ -29,10 +29,16 @@ menu3.AddMenuItem("a", "Level3 - Option A, returns z", () =>
     return "z";
 });
 
+var settingsMenu = new Menu("Settings", EMenuLevel.Second);
+
+
 
 menu0.AddMenuItem("1", "Level0 - Go to level1", menu1.Run);
+menu0.AddMenuItem("s", "Level0 - Go to Settings", settingsMenu.Run);
 menu1.AddMenuItem("2", "Level1 - Go to level2", menu2.Run);
 menu2.AddMenuItem("3", "Level2 - Go to level3", menu3.Run);
+
+
 
 
 menu0.Run();

@@ -12,6 +12,11 @@ public class Menu
     {
         Title = title;
         Level = level;
+        AddBackOptions(level);
+    }
+
+    private void AddBackOptions(EMenuLevel level)
+    {
         switch (level)
         {
             case EMenuLevel.Root:
@@ -63,6 +68,7 @@ public class Menu
                 if (returnValueFromMethodToRun == "b" && Level  == EMenuLevel.Deep)
                 {
                     menuRunning = false;
+                    userChoice = "";
                 } else if (returnValueFromMethodToRun == "m" && Level != EMenuLevel.Root)
                 {
                     menuRunning = false;

@@ -1,0 +1,29 @@
+namespace MenuSystem;
+
+public class GameSettings
+{
+    // Board dimensions
+    public int BoardWidth { get; set; } = 7;
+    public int BoardHeight { get; set; } = 6;
+    
+    // How many needed to win
+    public int ConnectHow { get; set; } = 4;
+    
+    // Player information
+    public string P1Name { get; set; } = "Player 1";
+    public string P2Name { get; set; } = "Player 2";
+    
+    // Game mode (PvP, PvAi, AivAi)
+    public GameMode Mode { get; set; } = GameMode.PvP;
+    
+    // Reset to default settings
+    public void ResetToDefault()
+    {
+        BoardWidth = 7;
+        BoardHeight = 6;
+        ConnectHow = 4;
+        P1Name = "Player 1";
+        P2Name = "Player 2";
+        Mode = GameMode.PvP;
+    }
+}
