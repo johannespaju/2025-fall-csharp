@@ -1,7 +1,9 @@
-namespace MenuSystem;
+namespace BLL;
 
-public class GameSettings
+public class GameConfiguration
 {
+    public string Name { get; set; } = "Classical 7x6";
+    
     // Board dimensions
     public int BoardWidth { get; set; } = 7;
     public int BoardHeight { get; set; } = 6;

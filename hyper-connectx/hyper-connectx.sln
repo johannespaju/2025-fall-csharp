@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{1B88CA73-DF5F-46FF-A48E-3B1AA69EDAAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{8008FC5F-9CEA-4557-BDAF-83C59C3258C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "ConsoleUI\ConsoleUI.csproj", "{EB84D244-9687-4B7D-AD6A-F49515562015}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{1B88CA73-DF5F-46FF-A48E-3B1AA69EDAAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B88CA73-DF5F-46FF-A48E-3B1AA69EDAAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B88CA73-DF5F-46FF-A48E-3B1AA69EDAAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8008FC5F-9CEA-4557-BDAF-83C59C3258C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8008FC5F-9CEA-4557-BDAF-83C59C3258C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8008FC5F-9CEA-4557-BDAF-83C59C3258C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8008FC5F-9CEA-4557-BDAF-83C59C3258C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB84D244-9687-4B7D-AD6A-F49515562015}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB84D244-9687-4B7D-AD6A-F49515562015}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB84D244-9687-4B7D-AD6A-F49515562015}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB84D244-9687-4B7D-AD6A-F49515562015}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
