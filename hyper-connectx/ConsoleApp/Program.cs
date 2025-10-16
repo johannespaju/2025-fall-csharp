@@ -1,9 +1,9 @@
 ﻿using ConsoleApp;
 using MenuSystem;
 
-Console.WriteLine("Hello, TIC-TAC-TOE!");
+Console.WriteLine("Hello, ConnectX!");
 
-var menu0 = new Menu("Tic-Tac-Toe Main Menu", EMenuLevel.Root);
+var menu0 = new Menu("ConnectX Main Menu", EMenuLevel.Root);
 menu0.AddMenuItem("n", "New game", () =>
 {
     var controller = new GameController();
@@ -12,21 +12,21 @@ menu0.AddMenuItem("n", "New game", () =>
     return "nothing";
 });
 
-var menu1 = new Menu("Tic-Tac-Toe Level1 Menu", EMenuLevel.Second);
+var menu1 = new Menu("ConnectX Level1 Menu", EMenuLevel.Second);
 menu1.AddMenuItem("a", "Level1 - Option A, returns b", () =>
 {
     Console.WriteLine("Level1 - Option A was called");
     return "b";
 });
 
-var menu2 = new Menu("Tic-Tac-Toe Level2 Menu", EMenuLevel.Deep);
+var menu2 = new Menu("ConnectX Level2 Menu", EMenuLevel.Deep);
 menu2.AddMenuItem("a", "Level2 - Option A, returns m", () =>
 {
     Console.WriteLine("Level2 - Option A was called");
     return "m";
 });
 
-var menu3 = new Menu("Tic-Tac-Toe Level3 Menu", EMenuLevel.Deep);
+var menu3 = new Menu("ConnectX Level3 Menu", EMenuLevel.Deep);
 menu3.AddMenuItem("a", "Level3 - Option A, returns z", () =>
 {
     Console.WriteLine("Level3 - Option A was called");

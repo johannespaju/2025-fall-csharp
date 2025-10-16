@@ -14,50 +14,70 @@ public class GameController
 
     public void GameLoop()
     {
-        // Game loop logic here
-
-        // get the player move
-        // update gamebrain state
-        // draw out the ui
-        // when game over, stop
-
         var gameOver = false;
         do
         {
             Console.Clear();
 
             // draw the board
+            Ui.GetPlayerNames(GameBrain.GetPlayerNames());
+            Console.WriteLine();
             Ui.DrawBoard(GameBrain.GetBoard());
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
-            Console.Write("Choice (x,y):");
+            Console.WriteLine("Choice x:");
+            Console.WriteLine("Write x to exit");
             var input = Console.ReadLine();
             if (input?.ToLower() == "x")
             {
                 gameOver = true;
+                continue;
             }
 
-            // TODO: validate input
+            // Validate input
             if (input == null) continue;
-            var parts = input.Split(",");
-            if (parts.Length == 2)
-            {
-                if (int.TryParse(parts[0], out var x) && int.TryParse(parts[1], out var y))
-                {
-                    GameBrain.ProcessMove(x - 1, y - 1);
 
-                    var winner = GameBrain.GetWinner(x - 1, y - 1);
-                    if (winner != ECellState.Empty)
-                    {
-                        // TODO: move to ui
-                        Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
-                        Console.WriteLine("Press any key to continue...");
-                        Thread.Sleep(200);
-                        Console.ReadKey();
-                        break;
-                    }
+            if (int.TryParse(input, out var x))
+            {
+                // Adjust for 1-based user input to 0-based array index
+                var columnIndex = x - 1;
+
+                // Validate column is within bounds
+                if (columnIndex < 0 || columnIndex >= GameBrain.GetBoard().GetLength(0))
+                {
+                    Console.WriteLine("Invalid column! Press any key to continue...");
+                    Console.ReadKey();
+                    continue;
+                }
+
+                var rowIndex = GameBrain.ProcessMove(columnIndex);
+
+                // Check if column was full
+                if (rowIndex == -1)
+                {
+                    Console.WriteLine("Column is full! Press any key to continue...");
+                    Console.ReadKey();
+                    continue;
+                }
+
+                var winner = GameBrain.GetWinner(columnIndex, rowIndex);
+                if (winner != ECellState.Empty)
+                {
+                    Console.Clear();
+                    Ui.DrawBoard(GameBrain.GetBoard());
+                    Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
+                    Console.WriteLine("Press any key to continue...");
+                    Thread.Sleep(200);
+                    Console.ReadKey();
+                    break;
                 }
             }
+            else
+            {
+                Console.WriteLine("Invalid input! Press any key to continue...");
+                Console.ReadKey();
+            }
+
         } while (gameOver == false);
     }
 }

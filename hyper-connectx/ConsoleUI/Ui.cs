@@ -54,4 +54,8 @@ public static class Ui
             _ => " ? "
         };
 
+    public static void GetPlayerNames(string getPlayerNames)
+    {
+        Console.WriteLine(getPlayerNames);
+    }
 }

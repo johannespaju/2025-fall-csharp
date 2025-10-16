@@ -17,6 +17,11 @@ public class GameBrain
         GameBoard = new ECellState[configuration.BoardWidth, configuration.BoardHeight];
     }
 
+    public string GetPlayerNames()
+    {
+        return P1Name + "(x) vs " + P2Name + " (o)";
+    }
+
     public ECellState[,] GetBoard()
     {
         var gameBoardCopy = new ECellState[GameConfiguration.BoardWidth, GameConfiguration.BoardHeight];
@@ -26,18 +31,67 @@ public class GameBrain
     
     public bool IsNextPlayerX() => NextMoveByX;
 
-    public void ProcessMove(int x, int y)
+    public int ProcessMove(int x)
     {
-        // TODO: validate input
-        
-        // TODO: Make it follow ConnectX not tic-tac-toe logic
-        if (GameBoard[x, y] == ECellState.Empty)
+        // Find the lowest empty cell in column x
+        int targetY = -1;
+        for (int y = GameConfiguration.BoardHeight - 1; y >= 0; y--)
         {
-            GameBoard[x, y] = NextMoveByX ? ECellState.X :  ECellState.O;
-            NextMoveByX = !NextMoveByX;
-        } 
-    }
+            if (GameBoard[x, y] == ECellState.Empty)
+            {
+                targetY = y;
+                break;
+            }
+        }
     
+        if (targetY == -1) return -1; // Column is full
+    
+        // Place the piece at the target position
+        GameBoard[x, targetY] = NextMoveByX ? ECellState.X : ECellState.O;
+        NextMoveByX = !NextMoveByX;
+        return targetY;
+    }
+
+// Add a new method for animated move
+    public int ProcessMoveWithAnimation(int x, Action<ECellState[,], int, int> drawCallback)
+    {
+        // Find the lowest empty cell in column x
+        int targetY = -1;
+        for (int y = GameConfiguration.BoardHeight - 1; y >= 0; y--)
+        {
+            if (GameBoard[x, y] == ECellState.Empty)
+            {
+                targetY = y;
+                break;
+            }
+        }
+    
+        if (targetY == -1) return -1; // Column is full
+    
+        var pieceState = NextMoveByX ? ECellState.X : ECellState.O;
+    
+        // Animate the piece falling
+        for (int y = 0; y <= targetY; y++)
+        {
+            // Temporarily place piece at current position
+            GameBoard[x, y] = pieceState;
+        
+            // Callback to redraw the board
+            drawCallback(GetBoard(), x, y);
+        
+            // Small delay for animation
+            Thread.Sleep(50); // Adjust speed as needed
+        
+            // Clear the temporary position (unless it's the final position)
+            if (y < targetY)
+            {
+                GameBoard[x, y] = ECellState.Empty;
+            }
+        }
+    
+        NextMoveByX = !NextMoveByX;
+        return targetY;
+    }
     
     
     private (int dirX, int dirY) GetDirection(int directionIndex) =>
@@ -54,11 +108,10 @@ public class GameBrain
     private (int dirX, int dirY) FlipDirection((int dirX, int dirY) direction) =>
         (-direction.dirX, -direction.dirY);
     
-    public bool BoardCoordinatesAreValid(int x, int y)
+    private bool BoardCoordinatesAreValid(int x, int y)
     {
-        if (x < 0 || x >= (GameConfiguration.BoardWidth - 1)) return false;
-        if (y < 0 || y >= (GameConfiguration.BoardHeight - 1)) return false;
-        return true;
+        return x >= 0 && x < GameConfiguration.BoardWidth && 
+               y >= 0 && y < GameConfiguration.BoardHeight;
     }
     
     public ECellState GetWinner(int x, int y)
@@ -74,7 +127,8 @@ public class GameBrain
             
             var nextX = x;
             var nextY = y;
-            while (BoardCoordinatesAreValid(nextX, nextY) && GameBoard[x, y] == GameBoard[nextX, nextY] &&
+            while (BoardCoordinatesAreValid(nextX, nextY) && 
+                   GameBoard[x, y] == GameBoard[nextX, nextY] &&
                    count <= GameConfiguration.ConnectHow)
             {
                 count++;
@@ -87,7 +141,8 @@ public class GameBrain
                 (dirX, dirY) = FlipDirection((dirX, dirY));
                 nextX = x + dirX;
                 nextY = y + dirY;
-                while (BoardCoordinatesAreValid(nextX, nextY) && GameBoard[x, y] == GameBoard[nextX, nextY] &&
+                while (BoardCoordinatesAreValid(nextX, nextY) && 
+                       GameBoard[x, y] == GameBoard[nextX, nextY] &&
                        count <= GameConfiguration.ConnectHow)
                 {
                     count++;
