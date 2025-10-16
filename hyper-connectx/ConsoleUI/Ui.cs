@@ -9,8 +9,12 @@ public static class Ui
         Console.WriteLine("Next Player: " + (isNextPlayerX ? "X" : "O"));
     }
 
-    public static void DrawBoard(ECellState[,] gameBoard)
+    public static void DrawBoard(ECellState[,] gameBoard, bool isCylindrical)
     {
+        if (isCylindrical)
+        {
+            Console.WriteLine("=== CYLINDRICAL MODE (edges wrap around) ===");
+        }
         Console.Write("   ");
         for (int x = 0; x < gameBoard.GetLength(0); x++)
         {
@@ -54,7 +58,7 @@ public static class Ui
             _ => " ? "
         };
 
-    public static void GetPlayerNames(string getPlayerNames)
+    public static void ShowPlayerNames(string getPlayerNames)
     {
         Console.WriteLine(getPlayerNames);
     }

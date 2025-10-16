@@ -16,7 +16,9 @@ public class GameConfiguration
     public string P2Name { get; set; } = "Player 2";
     
     // Game mode (PvP, PvAi, AivAi)
-    public GameMode Mode { get; set; } = GameMode.PvP;
+    public EGameMode Mode { get; set; } = EGameMode.PvP;
+    
+    public bool IsCylindrical { get; set; } = true;
     
     // Reset to default settings
     public void ResetToDefault()
@@ -26,6 +28,6 @@ public class GameConfiguration
         ConnectHow = 4;
         P1Name = "Player 1";
         P2Name = "Player 2";
-        Mode = GameMode.PvP;
+        Mode = EGameMode.PvP;
     }
 }

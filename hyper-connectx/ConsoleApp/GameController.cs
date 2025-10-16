@@ -20,9 +20,9 @@ public class GameController
             Console.Clear();
 
             // draw the board
-            Ui.GetPlayerNames(GameBrain.GetPlayerNames());
+            Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(GameBrain.GetBoard());
+            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             Console.WriteLine("Choice x:");
@@ -50,7 +50,15 @@ public class GameController
                     continue;
                 }
 
-                var rowIndex = GameBrain.ProcessMove(columnIndex);
+                var rowIndex = GameBrain.ProcessMoveWithAnimation(columnIndex, (board, x, y) =>
+                {
+                    Console.Clear();
+                    Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
+                    Console.WriteLine();
+                    Ui.DrawBoard(board, GameBrain.GameConfiguration.IsCylindrical); // Use the passed board
+                    Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
+                    // Optionally highlight the falling piece position at (x, y)
+                });
 
                 // Check if column was full
                 if (rowIndex == -1)
@@ -64,7 +72,7 @@ public class GameController
                 if (winner != ECellState.Empty)
                 {
                     Console.Clear();
-                    Ui.DrawBoard(GameBrain.GetBoard());
+                    Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
                     Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
                     Console.WriteLine("Press any key to continue...");
                     Thread.Sleep(200);
@@ -78,6 +86,6 @@ public class GameController
                 Console.ReadKey();
             }
 
-        } while (gameOver == false);
+        } while (!gameOver);
     }
 }

@@ -1,6 +1,6 @@
 namespace BLL;
 
-public enum GameMode
+public enum EGameMode
 {
     PvP,
     PvC,

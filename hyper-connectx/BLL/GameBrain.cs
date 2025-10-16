@@ -3,7 +3,7 @@
 public class GameBrain
 {
     private ECellState[,] GameBoard { get; set; }
-    private GameConfiguration GameConfiguration { get; set; }
+    public GameConfiguration GameConfiguration { get; set; }
     private string P1Name { get; set; }
     private string P2Name { get; set; }
 
@@ -31,28 +31,7 @@ public class GameBrain
     
     public bool IsNextPlayerX() => NextMoveByX;
 
-    public int ProcessMove(int x)
-    {
-        // Find the lowest empty cell in column x
-        int targetY = -1;
-        for (int y = GameConfiguration.BoardHeight - 1; y >= 0; y--)
-        {
-            if (GameBoard[x, y] == ECellState.Empty)
-            {
-                targetY = y;
-                break;
-            }
-        }
-    
-        if (targetY == -1) return -1; // Column is full
-    
-        // Place the piece at the target position
-        GameBoard[x, targetY] = NextMoveByX ? ECellState.X : ECellState.O;
-        NextMoveByX = !NextMoveByX;
-        return targetY;
-    }
-
-// Add a new method for animated move
+    // Add a new method for animated move
     public int ProcessMoveWithAnimation(int x, Action<ECellState[,], int, int> drawCallback)
     {
         // Find the lowest empty cell in column x
@@ -80,7 +59,7 @@ public class GameBrain
             drawCallback(GetBoard(), x, y);
         
             // Small delay for animation
-            Thread.Sleep(50); // Adjust speed as needed
+            Thread.Sleep(100); // Adjust speed as needed
         
             // Clear the temporary position (unless it's the final position)
             if (y < targetY)
@@ -114,50 +93,59 @@ public class GameBrain
                y >= 0 && y < GameConfiguration.BoardHeight;
     }
     
+    private int WrapX(int x)
+    {
+        if (!GameConfiguration.IsCylindrical)
+        {
+            return x; // No wrapping for non-cylindrical boards
+        }
+    
+        // Wrap x coordinate around the board width for cylindrical boards
+        while (x < 0) x += GameConfiguration.BoardWidth;
+        while (x >= GameConfiguration.BoardWidth) x -= GameConfiguration.BoardWidth;
+        return x;
+    }
+    
     public ECellState GetWinner(int x, int y)
     {
         if (GameBoard[x, y] == ECellState.Empty) return ECellState.Empty;
 
-        
         for (int directionIndex = 0; directionIndex < 4; directionIndex++)
         {
             var (dirX, dirY) = GetDirection(directionIndex);
 
-            var count = 0;
-            
-            var nextX = x;
-            var nextY = y;
+            var count = 1; // Start at 1 to count the current cell
+        
+            // Check in positive direction
+            var nextX = WrapX(x + dirX);
+            var nextY = y + dirY;
             while (BoardCoordinatesAreValid(nextX, nextY) && 
                    GameBoard[x, y] == GameBoard[nextX, nextY] &&
-                   count <= GameConfiguration.ConnectHow)
+                   count < GameConfiguration.ConnectHow)
             {
                 count++;
-                nextX += dirX;
+                nextX = WrapX(nextX + dirX);
                 nextY += dirY;
             }
 
-            if (count < GameConfiguration.ConnectHow)
+            // Check in negative direction
+            var (flipDirX, flipDirY) = FlipDirection((dirX, dirY));
+            nextX = WrapX(x + flipDirX);
+            nextY = y + flipDirY;
+            while (BoardCoordinatesAreValid(nextX, nextY) && 
+                   GameBoard[x, y] == GameBoard[nextX, nextY] &&
+                   count < GameConfiguration.ConnectHow)
             {
-                (dirX, dirY) = FlipDirection((dirX, dirY));
-                nextX = x + dirX;
-                nextY = y + dirY;
-                while (BoardCoordinatesAreValid(nextX, nextY) && 
-                       GameBoard[x, y] == GameBoard[nextX, nextY] &&
-                       count <= GameConfiguration.ConnectHow)
-                {
-                    count++;
-                    nextX += dirX;
-                    nextY += dirY;
-                }
+                count++;
+                nextX = WrapX(nextX + flipDirX);
+                nextY += flipDirY;
             }
-            
-            if (count == GameConfiguration.ConnectHow)
+        
+            if (count >= GameConfiguration.ConnectHow)
             {
                 return GameBoard[x, y] == ECellState.X ? ECellState.XWin : ECellState.OWin;
             }
-
         }
-
 
         return ECellState.Empty;
     }
