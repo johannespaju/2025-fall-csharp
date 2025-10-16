@@ -7,9 +7,9 @@ public class GameController
 {
     private GameBrain GameBrain { get; set; }
 
-    public GameController()
+    public GameController(GameConfiguration configuration)
     {
-        GameBrain = new GameBrain(new GameConfiguration(), "Player 1", "Player 2");
+        GameBrain = new GameBrain(configuration, configuration.P1Name, configuration.P2Name);
     }
 
     public void GameLoop()

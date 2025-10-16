@@ -45,60 +45,85 @@ public class Menu
     
     public string Run()
     {
-        Console.Clear();
+        ConsoleKey keyPressed;
         var menuRunning = true;
         var userChoice = "";
+        int selectedIndex = 0;
+
+        var menuItemsList = MenuItems.Values.ToList();
+
         do
         {
-            DisplayMenu();
-            Console.Write("Select an option: ");
-            var input = Console.ReadLine();
-            if (input == null)
-            {
-                Console.WriteLine("Invalid input. Please try again.");
-                continue;
-            }
+            DisplayMenu(menuItemsList, selectedIndex);
 
-            userChoice = input.Trim().ToLower();
-            
-            if (MenuItems.ContainsKey(userChoice))
-            {
-                var returnValueFromMethodToRun = MenuItems[userChoice].MethodToRun?.Invoke();
+            keyPressed = Console.ReadKey(true).Key;
 
-                if (returnValueFromMethodToRun == "b" && Level  == EMenuLevel.Deep)
-                {
-                    menuRunning = false;
-                    userChoice = "";
-                } else if (returnValueFromMethodToRun == "m" && Level != EMenuLevel.Root)
-                {
-                    menuRunning = false;
-                    userChoice = "m";
-                } else if (returnValueFromMethodToRun == "x")
-                {
+            switch (keyPressed)
+            {
+                case ConsoleKey.UpArrow:
+                    selectedIndex--;
+                    if (selectedIndex < 0) selectedIndex = menuItemsList.Count - 1;
+                    break;
+
+                case ConsoleKey.DownArrow:
+                    selectedIndex++;
+                    if (selectedIndex >= menuItemsList.Count) selectedIndex = 0;
+                    break;
+
+                case ConsoleKey.Enter:
+                    var selectedItem = menuItemsList[selectedIndex];
+                    var returnValue = selectedItem.MethodToRun?.Invoke();
+
+                    if (returnValue == "b" && Level == EMenuLevel.Deep)
+                    {
+                        menuRunning = false;
+                        userChoice = "";
+                    }
+                    else if (returnValue == "m" && Level != EMenuLevel.Root)
+                    {
+                        menuRunning = false;
+                        userChoice = "m";
+                    }
+                    else if (returnValue == "x")
+                    {
+                        menuRunning = false;
+                        userChoice = "x";
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    // Optional: pressing ESC exits
                     menuRunning = false;
                     userChoice = "x";
-                }
-                Console.WriteLine();
+                    break;
             }
-            else
-            {
-                Console.WriteLine("Invalid input. Please try again.");
-                Thread.Sleep(1000);
-            }
+
         } while (menuRunning);
+
         return userChoice;
     }
 
-    private void DisplayMenu()
+    private void DisplayMenu(List<MenuItem> items, int selectedIndex)
     {
         Console.Clear();
         Console.WriteLine(Title);
         Console.WriteLine("--------------------");
-        foreach (var item in MenuItems.Values)
+
+        for (int i = 0; i < items.Count; i++)
         {
-            Console.WriteLine(item);
+            if (i == selectedIndex)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine($"> {items[i].Value}");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.WriteLine($"  {items[i].Value}");
+            }
         }
-        Console.WriteLine();
+
+        Console.WriteLine("\nUse up and down arrow to navigate, Enter to select");
     }
     
 }
