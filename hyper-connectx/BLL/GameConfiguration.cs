@@ -18,7 +18,7 @@ public class GameConfiguration
     // Game mode (PvP, PvAi, AivAi)
     public EGameMode Mode { get; set; } = EGameMode.PvP;
     
-    public bool IsCylindrical { get; set; } = true;
+    public bool IsCylindrical { get; set; } = false;
     
     // Reset to default settings
     public void ResetToDefault()

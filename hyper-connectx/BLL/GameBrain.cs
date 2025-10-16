@@ -19,7 +19,7 @@ public class GameBrain
 
     public string GetPlayerNames()
     {
-        return P1Name + "(x) vs " + P2Name + " (o)";
+        return P1Name + "(X) vs " + P2Name + " (O)";
     }
 
     public ECellState[,] GetBoard()
@@ -31,58 +31,54 @@ public class GameBrain
     
     public bool IsNextPlayerX() => NextMoveByX;
 
-    // Add a new method for animated move
-    public int ProcessMoveWithAnimation(int x, Action<ECellState[,], int, int> drawCallback)
+    // Calculate move without executing it - for validation and animation planning
+    public MoveResult CalculateMove(int column)
     {
-        // Find the lowest empty cell in column x
-        int targetY = -1;
+        // Find the lowest empty cell in column
+        int targetRow = -1;
         for (int y = GameConfiguration.BoardHeight - 1; y >= 0; y--)
         {
-            if (GameBoard[x, y] == ECellState.Empty)
+            if (GameBoard[column, y] == ECellState.Empty)
             {
-                targetY = y;
+                targetRow = y;
                 break;
             }
         }
     
-        if (targetY == -1) return -1; // Column is full
-    
-        var pieceState = NextMoveByX ? ECellState.X : ECellState.O;
-    
-        // Animate the piece falling
-        for (int y = 0; y <= targetY; y++)
+        if (targetRow == -1)
         {
-            // Temporarily place piece at current position
-            GameBoard[x, y] = pieceState;
-        
-            // Callback to redraw the board
-            drawCallback(GetBoard(), x, y);
-        
-            // Small delay for animation
-            Thread.Sleep(100); // Adjust speed as needed
-        
-            // Clear the temporary position (unless it's the final position)
-            if (y < targetY)
-            {
-                GameBoard[x, y] = ECellState.Empty;
-            }
+            return MoveResult.Invalid(); // Column is full
         }
     
-        NextMoveByX = !NextMoveByX;
-        return targetY;
-    }
+        // Build the animation path (all rows from 0 to target)
+        var animationPath = new List<int>();
+        for (int y = 0; y <= targetRow; y++)
+        {
+            animationPath.Add(y);
+        }
     
+        var pieceToPlace = NextMoveByX ? ECellState.X : ECellState.O;
+        
+        return MoveResult.Valid(column, targetRow, animationPath, pieceToPlace);
+    }
+
+    // NEW: Execute a move (after validation/animation is done)
+    public void ExecuteMove(int column, int row)
+    {
+        var pieceState = NextMoveByX ? ECellState.X : ECellState.O;
+        GameBoard[column, row] = pieceState;
+        NextMoveByX = !NextMoveByX;
+    }
     
     private (int dirX, int dirY) GetDirection(int directionIndex) =>
         directionIndex switch
         {
             0 => (-1, -1),  // Diagonal up-left
-            1 => (0, -1),  // Vertical
-            2 => (1, -1),  // Diagonal up-right
-            3 => (1, 0), // horizontal
+            1 => (0, -1),   // Vertical
+            2 => (1, -1),   // Diagonal up-right
+            3 => (1, 0),    // horizontal
             _ => (0, 0)
         };
-    
     
     private (int dirX, int dirY) FlipDirection((int dirX, int dirY) direction) =>
         (-direction.dirX, -direction.dirY);
@@ -97,10 +93,9 @@ public class GameBrain
     {
         if (!GameConfiguration.IsCylindrical)
         {
-            return x; // No wrapping for non-cylindrical boards
+            return x;
         }
     
-        // Wrap x coordinate around the board width for cylindrical boards
         while (x < 0) x += GameConfiguration.BoardWidth;
         while (x >= GameConfiguration.BoardWidth) x -= GameConfiguration.BoardWidth;
         return x;
@@ -149,5 +144,4 @@ public class GameBrain
 
         return ECellState.Empty;
     }
-
 }
