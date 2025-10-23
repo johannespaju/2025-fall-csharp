@@ -98,6 +98,46 @@ main.AddMenuItem("del", "Delete Configuration", () =>
     return "";
 });
 
+main.AddMenuItem("loadgame", "Load Saved Game", () =>
+{
+    var gameRepo = new GameRepositoryJson();
+    var saves = gameRepo.List();
+
+    if (saves.Count == 0)
+    {
+        Console.WriteLine("No saved games found.");
+        Console.ReadKey();
+        return "";
+    }
+
+    Console.Clear();
+    Console.WriteLine("=== Saved Games ===");
+    for (int i = 0; i < saves.Count; i++)
+        Console.WriteLine($"{i + 1}) {saves[i]}");
+
+    Console.Write("\nSelect number to load: ");
+    var input = Console.ReadLine();
+
+    if (int.TryParse(input, out int index) && index >= 1 && index <= saves.Count)
+    {
+        var loaded = gameRepo.Load(saves[index - 1]);
+        var brain = new GameBrain(loaded.Configuration, loaded.Configuration.P1Name, loaded.Configuration.P2Name);
+        brain.LoadGameState(loaded);
+        var controller = new GameController(loaded.Configuration)
+        {
+            GameBrain = brain // you might need to make GameBrain public/internal for this line
+        };
+        controller.GameLoop();
+    }
+    else
+    {
+        Console.WriteLine("Invalid choice.");
+        Console.ReadKey();
+    }
+
+    return "";
+});
+
 main.Run();
 
 Console.WriteLine("We are DONE.......");

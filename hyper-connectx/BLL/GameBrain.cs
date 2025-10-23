@@ -144,4 +144,56 @@ public class GameBrain
 
         return ECellState.Empty;
     }
+    
+    private static ECellState[][] ConvertToJagged(ECellState[,] board)
+    {
+        int width = board.GetLength(0);
+        int height = board.GetLength(1);
+        var jagged = new ECellState[width][];
+
+        for (int x = 0; x < width; x++)
+        {
+            jagged[x] = new ECellState[height];
+            for (int y = 0; y < height; y++)
+            {
+                jagged[x][y] = board[x, y];
+            }
+        }
+
+        return jagged;
+    }
+
+    private static ECellState[,] ConvertToRectangular(ECellState[][] jagged)
+    {
+        int width = jagged.Length;
+        int height = jagged[0].Length;
+        var rectangular = new ECellState[width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                rectangular[x, y] = jagged[x][y];
+            }
+        }
+
+        return rectangular;
+    }
+    
+    public GameState GetGameState()
+    {
+        return new GameState
+        {
+            Configuration = GameConfiguration,
+            Board = ConvertToJagged(GameBoard),
+            NextMoveByX = NextMoveByX
+        };
+    }
+
+    public void LoadGameState(GameState state)
+    {
+        GameConfiguration = state.Configuration;
+        GameBoard = ConvertToRectangular(state.Board);
+        NextMoveByX = state.NextMoveByX;
+    }
 }

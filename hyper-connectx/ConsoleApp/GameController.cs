@@ -1,11 +1,12 @@
 using BLL;
 using ConsoleUI;
+using DLL;
 
 namespace ConsoleApp;
 
 public class GameController
 {
-    private GameBrain GameBrain { get; set; }
+    internal GameBrain GameBrain { get; set; }
 
     public GameController(GameConfiguration configuration)
     {
@@ -25,12 +26,28 @@ public class GameController
             Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
-            Console.WriteLine("Choice x:");
             Console.WriteLine("Write x to exit");
+            Console.WriteLine("Write 'save' to save game");
+            Console.WriteLine("Choice x:");
             var input = Console.ReadLine();
             if (input?.ToLower() == "x")
             {
                 gameOver = true;
+                continue;
+            }
+            if (input?.ToLower() == "save")
+            {
+                var repo = new GameRepositoryJson();
+                var state = GameBrain.GetGameState();
+
+                Console.Write("Enter a name for this save: ");
+                var name = Console.ReadLine()?.Trim();
+                if (!string.IsNullOrWhiteSpace(name))
+                    state.SaveName = name;
+
+                repo.Save(state);
+                Console.WriteLine($"Game saved as '{state.SaveName}'.");
+                Thread.Sleep(1000);
                 continue;
             }
 
