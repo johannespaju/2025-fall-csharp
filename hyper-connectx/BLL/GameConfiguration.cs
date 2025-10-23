@@ -31,4 +31,16 @@ public class GameConfiguration
         Mode = EGameMode.PvP;
         IsCylindrical = false;
     }
+    
+    public void ApplyFrom(GameConfiguration other)
+    {
+        Name = other.Name;
+        BoardWidth = other.BoardWidth;
+        BoardHeight = other.BoardHeight;
+        ConnectHow = other.ConnectHow;
+        P1Name = other.P1Name;
+        P2Name = other.P2Name;
+        Mode = other.Mode;
+        IsCylindrical = other.IsCylindrical;
+    }
 }
