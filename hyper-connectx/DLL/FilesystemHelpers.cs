@@ -2,7 +2,7 @@ namespace DLL;
 
 public static class FilesystemHelpers
 {
-    private const string AppName = "TicTacToe";
+    private const string AppName = "ConnectX";
 
     public static string GetConfigDirectory()
     {
