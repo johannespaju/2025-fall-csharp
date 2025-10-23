@@ -29,5 +29,6 @@ public class GameConfiguration
         P1Name = "Player 1";
         P2Name = "Player 2";
         Mode = EGameMode.PvP;
+        IsCylindrical = false;
     }
 }

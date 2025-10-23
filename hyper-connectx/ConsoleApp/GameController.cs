@@ -75,7 +75,7 @@ public class GameController
                     Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
                     Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
                     Console.WriteLine("Press any key to continue...");
-                    Thread.Sleep(200);
+                    Thread.Sleep(150);
                     Console.ReadKey();
                     break;
                 }
@@ -108,7 +108,7 @@ public class GameController
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             // Animation delay
-            Thread.Sleep(100); // Adjust speed as needed
+            Thread.Sleep(200); // Adjust speed as needed
 
             // Clear the position for next frame (unless it's the final position)
             if (row < moveResult.FinalRow)

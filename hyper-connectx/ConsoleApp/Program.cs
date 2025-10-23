@@ -1,7 +1,9 @@
 ﻿using BLL;
 using ConsoleApp;
+using DLL;
 using MenuSystem;
 
+var configRepo = new ConfigRepositoryJson();
 var config = new GameConfiguration();
 
 Console.WriteLine("Hello, ConnectX!");
