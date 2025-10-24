@@ -69,7 +69,8 @@ public class Menu
                     selectedIndex++;
                     if (selectedIndex >= menuItemsList.Count) selectedIndex = 0;
                     break;
-
+                
+                case ConsoleKey.RightArrow:
                 case ConsoleKey.Enter:
                     var selectedItem = menuItemsList[selectedIndex];
                     var returnValue = selectedItem.MethodToRun?.Invoke();

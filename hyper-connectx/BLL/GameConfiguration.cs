@@ -2,7 +2,7 @@ namespace BLL;
 
 public class GameConfiguration
 {
-    public string Name { get; set; } = "Classical 7x6";
+    public string Name { get; set; } = "Classical";
     
     // Board dimensions
     public int BoardWidth { get; set; } = 7;
@@ -23,6 +23,7 @@ public class GameConfiguration
     // Reset to default settings
     public void ResetToDefault()
     {
+        Name = "Classical";
         BoardWidth = 7;
         BoardHeight = 6;
         ConnectHow = 4;

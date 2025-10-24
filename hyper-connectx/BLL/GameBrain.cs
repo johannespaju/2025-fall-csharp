@@ -19,7 +19,7 @@ public class GameBrain
 
     public string GetPlayerNames()
     {
-        return P1Name + "(X) vs " + P2Name + " (O)";
+        return P1Name + "(X) vs " + P2Name + "(O)";
     }
 
     public ECellState[,] GetBoard()

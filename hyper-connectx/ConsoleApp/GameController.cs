@@ -28,7 +28,7 @@ public class GameController
 
             Console.WriteLine("Write x to exit");
             Console.WriteLine("Write 'save' to save game");
-            Console.WriteLine("Choice x:");
+            Console.WriteLine("Choose column:");
             var input = Console.ReadLine();
             if (input?.ToLower() == "x")
             {
