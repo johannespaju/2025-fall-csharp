@@ -27,7 +27,7 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
         
         var safeName = Regex.Replace(data.Name.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
         
-        var fileName = $"{safeName} - {data.BoardWidth}x{data.BoardHeight} - win: {data.ConnectHow}" + ".json";
+        var fileName = $"{safeName} - {data.BoardWidth}x{data.BoardHeight} - connect{data.ConnectHow}" + ".json";
         var dir = FilesystemHelpers.GetConfigDirectory();
         var fullFileName = Path.Combine(dir, fileName);
         
