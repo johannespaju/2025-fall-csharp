@@ -15,29 +15,43 @@ public class GameController
 
     public void GameLoop()
     {
+        int selectedIndex = 0;
         var gameOver = false;
         do
         {
             Console.Clear();
-            
+
             // Draw the board
             Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
+            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, selectedIndex);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
-            Console.WriteLine("Write x to exit");
-            Console.WriteLine("Write 'save' to save game");
-            Console.WriteLine("Choose column:");
-            var input = Console.ReadLine();
-            if (input?.ToLower() == "x")
+            Console.WriteLine("Press escape to leave game");
+            Console.WriteLine("Press \"s\" to save game");
+            var keyPressed = Console.ReadKey(true).Key;
+            switch (keyPressed)
             {
-                gameOver = true;
-                continue;
-            }
-            if (input?.ToLower() == "save")
-            {
-                var repo = new GameRepositoryJson();
+                case ConsoleKey.LeftArrow:
+                    selectedIndex--;
+                    if (selectedIndex < 0)
+                    {
+                        selectedIndex = GameBrain.GetBoard().GetLength(0) - 1;
+                    }
+                    break;
+                case ConsoleKey.RightArrow:
+                    selectedIndex++;
+                    if (selectedIndex > GameBrain.GetBoard().GetLength(0))
+                    {
+                        selectedIndex = 0;
+                    }
+                    break;
+                case ConsoleKey.Escape:
+                    gameOver = true;
+                    break;
+                
+                case ConsoleKey.S:
+                    var repo = new GameRepositoryJson();
                 var state = GameBrain.GetGameState();
 
                 Console.Write("Enter a name for this save: ");
@@ -49,60 +63,41 @@ public class GameController
                 Console.WriteLine($"Game saved as '{state.SaveName}'.");
                 Thread.Sleep(1000);
                 continue;
-            }
 
-            // Validate input
-            if (input == null) continue;
+                
+                case ConsoleKey.Spacebar:
+                case ConsoleKey.Enter:
+                    // Calculate the move (without executing it yet)
+                    var moveResult = GameBrain.CalculateMove(selectedIndex);
 
-            if (int.TryParse(input, out var x))
-            {
-                // Adjust for 1-based user input to 0-based array index
-                var columnIndex = x - 1;
+                    // Check if column was full
+                    if (!moveResult.IsValid)
+                    {
+                        Console.WriteLine("Column is full! Press any key to continue...");
+                        Console.ReadKey();
+                        continue;
+                    }
 
-                // Validate column is within bounds
-                if (columnIndex < 0 || columnIndex >= GameBrain.GetBoard().GetLength(0))
-                {
-                    Console.WriteLine("Invalid column! Press any key to continue...");
-                    Console.ReadKey();
-                    continue;
-                }
+                    // Animate the piece falling (UI layer responsibility)
+                    AnimatePieceFalling(moveResult);
 
-                // Calculate the move (without executing it yet)
-                var moveResult = GameBrain.CalculateMove(columnIndex);
+                    // Execute the move in the game brain
+                    GameBrain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
 
-                // Check if column was full
-                if (!moveResult.IsValid)
-                {
-                    Console.WriteLine("Column is full! Press any key to continue...");
-                    Console.ReadKey();
-                    continue;
-                }
-
-                // Animate the piece falling (UI layer responsibility)
-                AnimatePieceFalling(moveResult);
-
-                // Execute the move in the game brain
-                GameBrain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
-
-                // Check for winner
-                var winner = GameBrain.GetWinner(moveResult.Column, moveResult.FinalRow);
-                if (winner != ECellState.Empty)
-                {
-                    Console.Clear();
-                    Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
-                    Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
-                    Console.WriteLine("Press any key to continue...");
-                    Thread.Sleep(150);
-                    Console.ReadKey();
+                    // Check for winner
+                    var winner = GameBrain.GetWinner(moveResult.Column, moveResult.FinalRow);
+                    if (winner != ECellState.Empty)
+                    {
+                        Console.Clear();
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
+                        Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
+                        Console.WriteLine("Press any key to continue...");
+                        Thread.Sleep(150);
+                        Console.ReadKey();
+                        gameOver = true;
+                    }
                     break;
-                }
             }
-            else
-            {
-                Console.WriteLine("Invalid input! Press any key to continue...");
-                Console.ReadKey();
-            }
-
         } while (!gameOver);
     }
 

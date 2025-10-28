@@ -9,12 +9,32 @@ public static class Ui
         Console.WriteLine("Next Player: " + (isNextPlayerX ? "X" : "O"));
     }
 
-    public static void DrawBoard(ECellState[,] gameBoard, bool isCylindrical)
+    public static void DrawBoard(ECellState[,] gameBoard, bool isCylindrical, int? selectedColumn = null)
     {
         if (isCylindrical)
         {
             Console.WriteLine("=== CYLINDRICAL MODE (edges wrap around) ===");
         }
+        
+        // Draw the pointer row above column numbers
+        if (selectedColumn.HasValue)
+        {
+            Console.Write("   ");
+            for (int x = 0; x < gameBoard.GetLength(0); x++)
+            {
+                if (x == selectedColumn.Value)
+                {
+                    Console.Write("| X ");
+                }
+                else
+                {
+                    Console.Write("|   ");
+                }
+            }
+            Console.WriteLine();
+        }
+        
+        // Draw column numbers
         Console.Write("   ");
         for (int x = 0; x < gameBoard.GetLength(0); x++)
         {
@@ -22,6 +42,7 @@ public static class Ui
         }
         Console.WriteLine();
         
+        // Draw the board
         for (int y = 0; y < gameBoard.GetLength(1); y++)
         {
             for (int x = 0; x < gameBoard.GetLength(0); x++)
