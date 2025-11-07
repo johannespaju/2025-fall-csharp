@@ -65,7 +65,6 @@ main.AddMenuItem("load", "Load Configuration", () =>
     return "";
 });
 
-// Optional: delete
 main.AddMenuItem("del", "Delete Configuration", () =>
 {
     Console.Clear();
@@ -135,6 +134,44 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
         Console.ReadKey();
     }
 
+    return "";
+});
+
+main.AddMenuItem("delgame", "Delete Saved Game", () =>
+{
+    var gameRepo = new GameRepositoryJson();
+    Console.Clear();
+    Console.WriteLine("=== Delete Saved Game ===");
+    var saves = gameRepo.List();
+    
+    if (saves.Count == 0)
+    {
+        Console.WriteLine("No saved games found.");
+        Console.ReadKey();
+        return "";
+    }
+
+    for (int i = 0; i < saves.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}) {saves[i]}");
+    }
+    
+    Console.Write("\nEnter number to delete: ");
+    var input = Console.ReadLine();
+
+    if (int.TryParse(input, out var idx) && idx >= 1 && idx <= saves.Count)
+    {
+        var id = saves[idx - 1];
+        gameRepo.Delete(id);
+        Console.WriteLine($"Deleted '{id}'.");
+    }
+    else
+    {
+        Console.WriteLine("Invalid choice.");
+    }
+
+    Console.WriteLine("Press any key to continue...");
+    Console.ReadKey();
     return "";
 });
 
