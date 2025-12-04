@@ -32,6 +32,7 @@ main.AddMenuItem("save", "Save Current Configuration", () =>
     return "";
 });
 
+// TODO: Vii UI asjad UI klassi kõigil alumistel ja varki
 // Load config -> mutate existing instance (DON'T reassign)
 main.AddMenuItem("load", "Load Configuration", () =>
 {
@@ -64,6 +65,7 @@ main.AddMenuItem("load", "Load Configuration", () =>
     Console.ReadKey();
     return "";
 });
+
 
 main.AddMenuItem("del", "Delete Configuration", () =>
 {

@@ -9,7 +9,7 @@ public static class Ui
         Console.WriteLine("Next Player: " + (isNextPlayerX ? "X" : "O"));
     }
 
-    public static void DrawBoard(ECellState[,] gameBoard, bool isCylindrical, int? selectedColumn = null)
+    public static void DrawBoard(ECellState[,] gameBoard, bool isCylindrical, bool isNextPlayerX ,int? selectedColumn = null)
     {
         if (isCylindrical)
         {
@@ -24,7 +24,7 @@ public static class Ui
             {
                 if (x == selectedColumn.Value)
                 {
-                    Console.Write("| X ");
+                    Console.Write("| "+(isNextPlayerX ? "X" : "O")+" ");
                 }
                 else
                 {

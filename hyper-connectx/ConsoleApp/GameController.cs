@@ -24,7 +24,7 @@ public class GameController
             // Draw the board
             Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, selectedIndex);
+            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX(), selectedIndex);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             Console.WriteLine("Press escape to leave game");
@@ -41,7 +41,7 @@ public class GameController
                     break;
                 case ConsoleKey.RightArrow:
                     selectedIndex++;
-                    if (selectedIndex > GameBrain.GetBoard().GetLength(0))
+                    if (selectedIndex > GameBrain.GetBoard().GetLength(0) - 1)
                     {
                         selectedIndex = 0;
                     }
@@ -77,8 +77,12 @@ public class GameController
                         Console.ReadKey();
                         continue;
                     }
-
-                    // Animate the piece falling (UI layer responsibility)
+                    
+                    while (Console.KeyAvailable)
+                    {
+                        Console.ReadKey(true);
+                    }
+                    
                     AnimatePieceFalling(moveResult);
 
                     // Execute the move in the game brain
@@ -89,7 +93,7 @@ public class GameController
                     if (winner != ECellState.Empty)
                     {
                         Console.Clear();
-                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical);
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX());
                         Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
                         Console.WriteLine("Press any key to continue...");
                         Thread.Sleep(150);
@@ -109,6 +113,11 @@ public class GameController
 
         foreach (var row in moveResult.AnimationPath)
         {
+            if (Console.KeyAvailable)
+            {
+                Console.ReadKey(true); // Consume and discard the key
+            }
+            
             // Place piece at current animation position
             animatedBoard[moveResult.Column, row] = moveResult.PiecePlaced;
 
@@ -116,16 +125,21 @@ public class GameController
             Console.Clear();
             Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(animatedBoard, GameBrain.GameConfiguration.IsCylindrical);
+            Ui.DrawBoard(animatedBoard, GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX());
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             // Animation delay
-            Thread.Sleep(200); // Adjust speed as needed
+            Thread.Sleep(100); // Adjust speed as needed
 
             // Clear the position for next frame (unless it's the final position)
             if (row < moveResult.FinalRow)
             {
                 animatedBoard[moveResult.Column, row] = ECellState.Empty;
+            }
+            
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(true);
             }
         }
     }
