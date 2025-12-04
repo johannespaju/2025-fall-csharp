@@ -1,4 +1,4 @@
-﻿namespace DLL;
+﻿namespace DAL;
 
 public interface IRepository<TData>
 {

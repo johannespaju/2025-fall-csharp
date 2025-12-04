@@ -1,4 +1,4 @@
-namespace DLL;
+namespace DAL;
 
 public static class FilesystemHelpers
 {

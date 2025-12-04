@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using BLL;
 
-namespace DLL;
+namespace DAL;
 
 public class ConfigRepositoryJson : IRepository<GameConfiguration>
 {

@@ -1,6 +1,6 @@
 ﻿using BLL;
 using ConsoleApp;
-using DLL;
+using DAL;
 using MenuSystem;
 
 var repo = new ConfigRepositoryJson();
@@ -101,7 +101,7 @@ main.AddMenuItem("del", "Delete Configuration", () =>
 
 main.AddMenuItem("loadgame", "Load Saved Game", () =>
 {
-    var gameRepo = new GameRepositoryJson();
+    IRepository<GameState> gameRepo = new GameRepositoryJson();
     var saves = gameRepo.List();
 
     if (saves.Count == 0)
@@ -141,7 +141,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
 
 main.AddMenuItem("delgame", "Delete Saved Game", () =>
 {
-    var gameRepo = new GameRepositoryJson();
+    IRepository<GameState> gameRepo = new GameRepositoryJson();
     Console.Clear();
     Console.WriteLine("=== Delete Saved Game ===");
     var saves = gameRepo.List();

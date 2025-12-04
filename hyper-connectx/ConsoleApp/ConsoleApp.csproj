@@ -10,7 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BLL\BLL.csproj" />
       <ProjectReference Include="..\ConsoleUI\ConsoleUI.csproj" />
-      <ProjectReference Include="..\DLL\DLL.csproj" />
+      <ProjectReference Include="..\DAL\DAL.csproj" />
       <ProjectReference Include="..\MenuSystem\MenuSystem.csproj" />
     </ItemGroup>
 

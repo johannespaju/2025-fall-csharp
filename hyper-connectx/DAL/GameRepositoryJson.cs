@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using BLL;
 
-namespace DLL;
+namespace DAL;
 
 
 public class GameRepositoryJson : IRepository<GameState>
