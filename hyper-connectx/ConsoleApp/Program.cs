@@ -122,7 +122,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
     if (int.TryParse(input, out int index) && index >= 1 && index <= saves.Count)
     {
         var loaded = gameRepo.Load(saves[index - 1]);
-        var brain = new GameBrain(loaded.Configuration, loaded.Configuration.P1Name, loaded.Configuration.P2Name);
+        var brain = new GameBrain(loaded.Configuration);
         brain.LoadGameState(loaded);
         var controller = new GameController(loaded.Configuration)
         {

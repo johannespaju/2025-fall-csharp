@@ -10,7 +10,7 @@ public class GameController
 
     public GameController(GameConfiguration configuration)
     {
-        GameBrain = new GameBrain(configuration, configuration.P1Name, configuration.P2Name);
+        GameBrain = new GameBrain(configuration);
     }
 
     public void GameLoop()
@@ -24,7 +24,7 @@ public class GameController
             // Draw the board
             Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX(), selectedIndex);
+            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX(), selectedIndex);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             Console.WriteLine("Press escape to leave game");
@@ -93,7 +93,7 @@ public class GameController
                     if (winner != ECellState.Empty)
                     {
                         Console.Clear();
-                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX());
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
                         Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
                         Console.WriteLine("Press any key to continue...");
                         Thread.Sleep(150);
@@ -125,7 +125,7 @@ public class GameController
             Console.Clear();
             Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
             Console.WriteLine();
-            Ui.DrawBoard(animatedBoard, GameBrain.GameConfiguration.IsCylindrical, GameBrain.IsNextPlayerX());
+            Ui.DrawBoard(animatedBoard, GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
             // Animation delay

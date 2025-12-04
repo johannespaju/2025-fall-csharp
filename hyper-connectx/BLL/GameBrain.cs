@@ -3,17 +3,17 @@
 public class GameBrain
 {
     private ECellState[,] GameBoard { get; set; }
-    public GameConfiguration GameConfiguration { get; set; }
+    private GameConfiguration GameConfiguration { get; set; }
     private string P1Name { get; set; }
     private string P2Name { get; set; }
 
     private bool NextMoveByX { get; set; } = true;
 
-    public GameBrain(GameConfiguration configuration, string p1Name, string p2Name)
+    public GameBrain(GameConfiguration configuration)
     {
         GameConfiguration = configuration;
-        P1Name = p1Name;
-        P2Name = p2Name;
+        P1Name = GameConfiguration.P1Name;
+        P2Name = GameConfiguration.P2Name;
         GameBoard = new ECellState[configuration.BoardWidth, configuration.BoardHeight];
     }
 
@@ -195,5 +195,10 @@ public class GameBrain
         GameConfiguration = state.Configuration;
         GameBoard = ConvertToRectangular(state.Board);
         NextMoveByX = state.NextMoveByX;
+    }
+
+    public bool GetIsCylindrical()
+    {
+        return GameConfiguration.IsCylindrical;
     }
 }
