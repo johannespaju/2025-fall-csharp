@@ -52,17 +52,17 @@ public class GameController
                 
                 case ConsoleKey.S:
                     var repo = new GameRepositoryJson();
-                var state = GameBrain.GetGameState();
+                    var state = GameBrain.GetGameState();
 
-                Console.Write("Enter a name for this save: ");
-                var name = Console.ReadLine()?.Trim();
-                if (!string.IsNullOrWhiteSpace(name))
-                    state.SaveName = name + "_" + DateTime.UtcNow.ToString("MM-dd_hh_mm");
+                    Console.Write("Enter a name for this save: ");
+                    var name = Console.ReadLine()?.Trim();
+                    if (!string.IsNullOrWhiteSpace(name))
+                        state.SaveName = name + "_" + DateTime.UtcNow.ToString("MM-dd_hh_mm");
 
-                repo.Save(state);
-                Console.WriteLine($"Game saved as '{state.SaveName}'.");
-                Thread.Sleep(1000);
-                continue;
+                    repo.Save(state);
+                    Console.WriteLine($"Game saved as '{state.SaveName}'.");
+                    Thread.Sleep(1000);
+                    continue;
 
                 
                 case ConsoleKey.Spacebar:
