@@ -27,7 +27,7 @@ public class GameController
             Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX(), selectedIndex);
             Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
 
-            Console.WriteLine("Press escape to leave game");
+            Console.WriteLine("Press \"escape\" or \"q\" to leave game");
             Console.WriteLine("Press \"s\" to save game");
             var keyPressed = Console.ReadKey(true).Key;
             switch (keyPressed)
@@ -46,7 +46,7 @@ public class GameController
                         selectedIndex = 0;
                     }
                     break;
-                case ConsoleKey.Escape:
+                case ConsoleKey.Escape or ConsoleKey.Q:
                     gameOver = true;
                     break;
                 

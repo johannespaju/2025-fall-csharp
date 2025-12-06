@@ -1,5 +1,9 @@
 ﻿namespace BLL;
 
+
+// TODO: Missing draw detection
+
+
 public class GameBrain
 {
     private ECellState[,] GameBoard { get; set; }
