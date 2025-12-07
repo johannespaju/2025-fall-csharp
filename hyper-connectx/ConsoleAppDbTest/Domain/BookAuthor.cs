@@ -9,4 +9,9 @@ public class BookAuthor : BaseEntity
     
     public int AuthorId { get; set; }
     public Author? Author { get; set; }
+    
+    public override string ToString()
+    {
+        return Id + " BookId:" + BookId + " AuthorId:" + AuthorId;
+    }
 }

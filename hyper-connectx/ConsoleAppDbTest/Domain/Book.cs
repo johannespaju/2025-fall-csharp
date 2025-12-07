@@ -10,4 +10,11 @@ public class Book : BaseEntity
 
     public int? PersonId { get; set; }
     public Person? Person { get; set; }
+    
+    public ICollection<BookAuthor>? BookAuthors { get; set; }
+
+    public override string ToString()
+    {
+        return Id + " " + Title;
+    }
 }

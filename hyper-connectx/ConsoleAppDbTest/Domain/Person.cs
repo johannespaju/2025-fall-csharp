@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleAppDbTest.Domain;
 
+[Index(nameof(FirstName), nameof(LastName), IsUnique =  true)]
 public class Person : BaseEntity
 {
     [MaxLength(128)]
