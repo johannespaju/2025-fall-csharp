@@ -4,9 +4,27 @@ namespace DAL;
 
 public class ConfigRepositoryEF : IRepository<GameConfiguration>
 {
+    private readonly AppDbContext _dbContext;
+    
+    public ConfigRepositoryEF(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public List<string> List()
     {
-        throw new NotImplementedException();
+        var res = new List<(string id, string description)>();
+        foreach (var dbConf in _dbContext.GameConfigurations)
+        {
+            res.Add(
+                (
+                    dbConf.Id.ToString(),
+                    dbConf.Name
+                )
+            );
+        }
+
+        return res;
     }
 
     public string Save(GameConfiguration data)

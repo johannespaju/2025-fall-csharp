@@ -2,9 +2,32 @@
 using ConsoleApp;
 using DAL;
 using MenuSystem;
+using Microsoft.EntityFrameworkCore;
 
-var repo = new ConfigRepositoryJson();
+// json config repository
+//var repo = new ConfigRepositoryJson();
 var config = new GameConfiguration();
+
+var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+homeDirectory = homeDirectory + Path.DirectorySeparatorChar;
+
+var connectionString = $"Data Source={homeDirectory}app.db";
+
+var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
+    .UseSqlite(connectionString)
+    .EnableDetailedErrors()
+    .EnableSensitiveDataLogging()
+    .Options;
+
+using var dbContext = new AppDbContext(contextOptions);
+
+// drop the db
+// dbContext.Database.EnsureDeleted();
+
+// apply any pending migrations
+dbContext.Database.Migrate();
+
+var repo = new ConfigRepositoryEF(dbContext);
 
 Console.WriteLine("Hello, ConnectX!");
 
