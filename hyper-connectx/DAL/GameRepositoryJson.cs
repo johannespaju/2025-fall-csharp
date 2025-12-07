@@ -6,12 +6,12 @@ namespace DAL;
 
 public class GameRepositoryJson : IRepository<GameState>
 {
-    public List<string> List()
+    public List<(string id, string description)> List()
     {
         var dir = FilesystemHelpers.GetGameDirectory();
         return Directory.EnumerateFiles(dir, "*.json")
-            .Select(f => Path.GetFileNameWithoutExtension(f))
-            .ToList();
+            .Select<string, (string id, string description)>(f => Path.GetFileNameWithoutExtension(f))
+            .ToList<(string id, string description)>();
     }
 
     public string Save(GameState data)

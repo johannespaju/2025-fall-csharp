@@ -5,7 +5,7 @@ using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 
 // json config repository
-//var repo = new ConfigRepositoryJson();
+var repo = new ConfigRepositoryJson();
 var config = new GameConfiguration();
 
 var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -27,7 +27,7 @@ using var dbContext = new AppDbContext(contextOptions);
 // apply any pending migrations
 dbContext.Database.Migrate();
 
-var repo = new ConfigRepositoryEF(dbContext);
+// var repo = new ConfigRepositoryEF(dbContext);
 
 Console.WriteLine("Hello, ConnectX!");
 
@@ -75,7 +75,7 @@ main.AddMenuItem("load", "Load Configuration", () =>
 
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
-        var loaded = repo.Load(ids[idx - 1]);
+        var loaded = repo.Load(ids[idx - 1].description);
         config.ApplyFrom(loaded); // <<< key line
         Console.WriteLine($"Loaded '{config.Name}'.");
     }
@@ -109,7 +109,7 @@ main.AddMenuItem("del", "Delete Configuration", () =>
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
         var id = ids[idx - 1];
-        repo.Delete(id);
+        repo.Delete(id.id);
         Console.WriteLine($"Deleted '{id}'.");
     }
     else
@@ -144,7 +144,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
 
     if (int.TryParse(input, out int index) && index >= 1 && index <= saves.Count)
     {
-        var loaded = gameRepo.Load(saves[index - 1]);
+        var loaded = gameRepo.Load(saves[index - 1].id);
         var brain = new GameBrain(loaded.Configuration);
         brain.LoadGameState(loaded);
         var controller = new GameController(loaded.Configuration)
@@ -187,7 +187,7 @@ main.AddMenuItem("delgame", "Delete Saved Game", () =>
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= saves.Count)
     {
         var id = saves[idx - 1];
-        gameRepo.Delete(id);
+        gameRepo.Delete(id.id);
         Console.WriteLine($"Deleted '{id}'.");
     }
     else

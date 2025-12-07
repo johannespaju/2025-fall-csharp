@@ -11,7 +11,7 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
         _dbContext = dbContext;
     }
 
-    public List<string> List()
+    public List<(string id, string description)> List()
     {
         var res = new List<(string id, string description)>();
         foreach (var dbConf in _dbContext.GameConfigurations)
@@ -23,7 +23,7 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
                 )
             );
         }
-
+        
         return res;
     }
 

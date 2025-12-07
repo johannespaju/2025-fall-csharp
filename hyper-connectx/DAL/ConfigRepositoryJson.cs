@@ -6,16 +6,20 @@ namespace DAL;
 
 public class ConfigRepositoryJson : IRepository<GameConfiguration>
 {
-    public List<string> List()
+    public List<(string id, string description)> List()
     {
         var dir = FilesystemHelpers.GetConfigDirectory();
-        var result = new List<string>();
+        var result = new List<(string id, string description)>();
 
         foreach (var fullFileName in Directory.EnumerateFiles(dir))
         {  
             var fileName = Path.GetFileName(fullFileName);
             if (!fileName.EndsWith(".json")) continue;
-            result.Add(Path.GetFileNameWithoutExtension(fileName));
+            result.Add(
+                (
+                    Path.GetFileNameWithoutExtension(fileName),
+                    Path.GetFileNameWithoutExtension(fileName))
+            );
         }
 
         return result;
