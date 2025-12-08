@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 using BLL;
 
 namespace DAL;
@@ -9,15 +10,26 @@ public class GameRepositoryJson : IRepository<GameState>
     public List<(string id, string description)> List()
     {
         var dir = FilesystemHelpers.GetGameDirectory();
-        return Directory.EnumerateFiles(dir, "*.json")
-            .Select<string, (string id, string description)>(f => Path.GetFileNameWithoutExtension(f))
-            .ToList<(string id, string description)>();
+        var result = new List<(string id, string description)>();
+
+        foreach (var fullFileName in Directory.EnumerateFiles(dir))
+        {  
+            var fileName = Path.GetFileName(fullFileName);
+            if (!fileName.EndsWith(".json")) continue;
+            result.Add(
+                (
+                    Path.GetFileNameWithoutExtension(fileName),
+                    Path.GetFileNameWithoutExtension(fileName))
+            );
+        }
+
+        return result;
     }
 
     public string Save(GameState data)
     {
         var dir = FilesystemHelpers.GetGameDirectory();
-        var safeName = data.SaveName.Replace(":", "_").Replace("/", "_").Replace("\\", "_");
+        var safeName = Regex.Replace(data.SaveName.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
         var fileName = $"{safeName}.json";
         var fullPath = Path.Combine(dir, fileName);
         var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });

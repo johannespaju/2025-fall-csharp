@@ -4,30 +4,16 @@ using DAL;
 using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 
+IRepository<GameConfiguration> configRepo;
+
 // json config repository
-var repo = new ConfigRepositoryJson();
-var config = new GameConfiguration();
+configRepo = new ConfigRepositoryJson();
+// ef config repository
+// using var dbContext = GetDbContext();
+// configRepo = new ConfigRepositoryEF(dbContext);
 
-var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-homeDirectory = homeDirectory + Path.DirectorySeparatorChar;
+var gameConfig = new GameConfiguration();
 
-var connectionString = $"Data Source={homeDirectory}app.db";
-
-var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
-    .UseSqlite(connectionString)
-    .EnableDetailedErrors()
-    .EnableSensitiveDataLogging()
-    .Options;
-
-using var dbContext = new AppDbContext(contextOptions);
-
-// drop the db
-// dbContext.Database.EnsureDeleted();
-
-// apply any pending migrations
-dbContext.Database.Migrate();
-
-// var repo = new ConfigRepositoryEF(dbContext);
 
 Console.WriteLine("Hello, ConnectX!");
 
@@ -36,19 +22,19 @@ var main = new Menu("ConnectX Main Menu", EMenuLevel.Root);
 // New game uses the SAME instance
 main.AddMenuItem("n", "Start New Game", () =>
 {
-    var controller = new GameController(config);
+    var controller = new GameController(gameConfig);
     controller.GameLoop();
     return "";
 });
 
 // Settings edits the SAME instance
-var settingsMenu = new SettingsMenu(config);
+var settingsMenu = new SettingsMenu(gameConfig);
 main.AddMenuItem("s", "Settings", settingsMenu.Run);
 
 // Save current config
 main.AddMenuItem("save", "Save Current Configuration", () =>
 {
-    var savedId = repo.Save(config);
+    var savedId = configRepo.Save(gameConfig);
     Console.WriteLine($"Configuration saved as '{savedId}'.");
     Console.WriteLine("Press any key to continue...");
     Console.ReadKey();
@@ -61,7 +47,7 @@ main.AddMenuItem("load", "Load Configuration", () =>
 {
     Console.Clear();
     Console.WriteLine("=== Available Configurations ===");
-    var ids = repo.List();
+    var ids = configRepo.List();
     if (ids.Count == 0)
     {
         Console.WriteLine("No configurations found.");
@@ -75,9 +61,9 @@ main.AddMenuItem("load", "Load Configuration", () =>
 
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
-        var loaded = repo.Load(ids[idx - 1].description);
-        config.ApplyFrom(loaded); // <<< key line
-        Console.WriteLine($"Loaded '{config.Name}'.");
+        var loaded = configRepo.Load(ids[idx - 1].description);
+        gameConfig.ApplyFrom(loaded); // <<< key line
+        Console.WriteLine($"Loaded '{gameConfig.Name}'.");
     }
     else
     {
@@ -94,7 +80,7 @@ main.AddMenuItem("del", "Delete Configuration", () =>
 {
     Console.Clear();
     Console.WriteLine("=== Delete Configuration ===");
-    var ids = repo.List();
+    var ids = configRepo.List();
     if (ids.Count == 0)
     {
         Console.WriteLine("No configurations found.");
@@ -109,7 +95,7 @@ main.AddMenuItem("del", "Delete Configuration", () =>
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
         var id = ids[idx - 1];
-        repo.Delete(id.id);
+        configRepo.Delete(id.id);
         Console.WriteLine($"Deleted '{id}'.");
     }
     else
@@ -203,3 +189,28 @@ main.AddMenuItem("delgame", "Delete Saved Game", () =>
 main.Run();
 
 Console.WriteLine("We are DONE.......");
+
+
+AppDbContext GetDbContext()
+{
+    // ========================= DB STUFF ========================
+    var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    homeDirectory = homeDirectory + Path.DirectorySeparatorChar;
+
+// We are using SQLite
+    var connectionString = $"Data Source={homeDirectory}app.db";
+
+    var contextOptions = new DbContextOptionsBuilder<AppDbContext>()
+        .UseSqlite(connectionString)
+        .EnableDetailedErrors()
+        .EnableSensitiveDataLogging()
+        //.LogTo(Console.WriteLine)
+        .Options;
+
+    var resultdbContext = new AppDbContext(contextOptions);
+    
+    // apply any pending migrations (recreates db as needed)
+    resultdbContext.Database.Migrate();
+    
+    return resultdbContext;
+}
