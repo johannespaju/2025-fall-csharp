@@ -61,7 +61,7 @@ main.AddMenuItem("load", "Load Configuration", () =>
 
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
-        var loaded = configRepo.Load(ids[idx - 1].description);
+        var loaded = configRepo.Load(ids[idx - 1].id);
         gameConfig.ApplyFrom(loaded); // <<< key line
         Console.WriteLine($"Loaded '{gameConfig.Name}'.");
     }

@@ -1,11 +1,21 @@
-﻿namespace BLL;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
+
+namespace BLL;
 
 public class GameState : BaseEntity
 {
     public Guid GameConfigurationId { get; set; }
     public GameConfiguration? Configuration { get; set; } = new();
     
-    public ECellState[][] Board { get; set; } = default!;
+    public string BoardJson { get; set; } = default!;
+    
+    [NotMapped]
+    public ECellState[][] Board
+    {
+        get => JsonSerializer.Deserialize<ECellState[][]>(BoardJson) ?? Array.Empty<ECellState[]>();
+        set => BoardJson = JsonSerializer.Serialize(value);
+    }
     public bool NextMoveByX { get; set; }
     public string SaveName { get; set; } = $"Save_{DateTime.UtcNow:MM-dd_hh_mm}";
 }
