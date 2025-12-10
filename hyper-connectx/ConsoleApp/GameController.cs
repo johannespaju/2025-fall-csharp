@@ -6,11 +6,13 @@ namespace ConsoleApp;
 
 public class GameController
 {
+    private IRepository<GameState> Repo {get; set;}
     internal GameBrain GameBrain { get; set; }
 
-    public GameController(GameConfiguration configuration)
+    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository)
     {
         GameBrain = new GameBrain(configuration);
+        Repo = gameRepository;
     }
 
     public void GameLoop()
@@ -51,7 +53,6 @@ public class GameController
                     break;
                 
                 case ConsoleKey.S:
-                    var repo = new GameRepositoryJson();
                     var state = GameBrain.GetGameState();
 
                     Console.Write("Enter a name for this save: ");
@@ -59,7 +60,7 @@ public class GameController
                     if (!string.IsNullOrWhiteSpace(name))
                         state.SaveName = name + "_" + DateTime.UtcNow.ToString("MM-dd_hh_mm");
 
-                    repo.Save(state);
+                    Repo.Save(state);
                     Console.WriteLine($"Game saved as '{state.SaveName}'.");
                     Thread.Sleep(1000);
                     continue;

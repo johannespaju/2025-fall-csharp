@@ -5,12 +5,15 @@ using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 
 IRepository<GameConfiguration> configRepo;
+IRepository<GameState> gameRepo;
 
 // json config repository
-configRepo = new ConfigRepositoryJson();
+// configRepo = new ConfigRepositoryJson();
+// gameRepo = new  GameRepositoryJson();
 // ef config repository
-// using var dbContext = GetDbContext();
-// configRepo = new ConfigRepositoryEF(dbContext);
+using var dbContext = GetDbContext();
+configRepo = new ConfigRepositoryEF(dbContext);
+gameRepo = new GameRepositoryEF(dbContext);
 
 var gameConfig = new GameConfiguration();
 
@@ -22,7 +25,7 @@ var main = new Menu("ConnectX Main Menu", EMenuLevel.Root);
 // New game uses the SAME instance
 main.AddMenuItem("n", "Start New Game", () =>
 {
-    var controller = new GameController(gameConfig);
+    var controller = new GameController(gameConfig, gameRepo);
     controller.GameLoop();
     return "";
 });
@@ -110,7 +113,6 @@ main.AddMenuItem("del", "Delete Configuration", () =>
 
 main.AddMenuItem("loadgame", "Load Saved Game", () =>
 {
-    IRepository<GameState> gameRepo = new GameRepositoryJson();
     var saves = gameRepo.List();
 
     if (saves.Count == 0)
@@ -133,7 +135,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
         var loaded = gameRepo.Load(saves[index - 1].id);
         var brain = new GameBrain(loaded.Configuration);
         brain.LoadGameState(loaded);
-        var controller = new GameController(loaded.Configuration)
+        var controller = new GameController(loaded.Configuration, gameRepo)
         {
             GameBrain = brain // you might need to make GameBrain public/internal for this line
         };
@@ -150,7 +152,6 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
 
 main.AddMenuItem("delgame", "Delete Saved Game", () =>
 {
-    IRepository<GameState> gameRepo = new GameRepositoryJson();
     Console.Clear();
     Console.WriteLine("=== Delete Saved Game ===");
     var saves = gameRepo.List();
