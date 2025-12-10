@@ -2,6 +2,8 @@ namespace BLL;
 
 public class GameConfiguration : BaseEntity
 {
+    public ICollection<GameState>?  GameStates { get; set; }
+    
     public string Name { get; set; } = "Classical";
     
     public int BoardWidth { get; set; } = 7;

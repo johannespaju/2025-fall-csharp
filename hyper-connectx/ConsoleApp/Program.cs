@@ -207,10 +207,10 @@ AppDbContext GetDbContext()
         //.LogTo(Console.WriteLine)
         .Options;
 
-    var resultdbContext = new AppDbContext(contextOptions);
+    var resultDbContext = new AppDbContext(contextOptions);
     
     // apply any pending migrations (recreates db as needed)
-    resultdbContext.Database.Migrate();
+    resultDbContext.Database.Migrate();
     
-    return resultdbContext;
+    return resultDbContext;
 }
