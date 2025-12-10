@@ -8,11 +8,26 @@ public class GameController
 {
     private IRepository<GameState> Repo {get; set;}
     internal GameBrain GameBrain { get; set; }
+    private MinimaxAI? _aiPlayer;
+    private GameConfiguration _config;
 
     public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository)
     {
         GameBrain = new GameBrain(configuration);
         Repo = gameRepository;
+        _config = configuration;
+        
+        // Initialize AI if needed
+        if (configuration.Mode == EGameMode.PvC)
+        {
+            // AI plays as O (second player)
+            _aiPlayer = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
+        }
+        else if (configuration.Mode == EGameMode.CvC)
+        {
+            // For CvC, create AI for X player (can add second AI later)
+            _aiPlayer = new MinimaxAI(configuration, isPlayerX: true, maxDepth: 6);
+        }
     }
 
     public void GameLoop()
@@ -21,6 +36,34 @@ public class GameController
         var gameOver = false;
         do
         {
+            // Check if it's AI's turn
+            bool isAiTurn = ShouldAiMove();
+            
+            if (isAiTurn)
+            {
+                // AI makes a move
+                Thread.Sleep(500); // Small delay so user can see board
+                MakeAiMove();
+                
+                // Check for winner after AI move
+                var lastMove = GetLastMove();
+                if (lastMove.col != -1)
+                {
+                    var winner = GameBrain.GetWinner(lastMove.col, lastMove.row);
+                    if (winner != ECellState.Empty)
+                    {
+                        Console.Clear();
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
+                        Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? GameBrain.GetPlayerNames().Split(" vs ")[0] : GameBrain.GetPlayerNames().Split(" vs ")[1]));
+                        Console.WriteLine("Press any key to continue...");
+                        Thread.Sleep(150);
+                        Console.ReadKey();
+                        gameOver = true;
+                    }
+                }
+                continue; // Skip to next iteration
+            }
+            
             Console.Clear();
 
             // Draw the board
@@ -95,7 +138,7 @@ public class GameController
                     {
                         Console.Clear();
                         Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
-                        Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? "X" : "O"));
+                        Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? GameBrain.GetPlayerNames().Split(" vs ")[0] : GameBrain.GetPlayerNames().Split(" vs ")[1]));
                         Console.WriteLine("Press any key to continue...");
                         Thread.Sleep(150);
                         Console.ReadKey();
@@ -104,6 +147,77 @@ public class GameController
                     break;
             }
         } while (!gameOver);
+    }
+
+    private bool ShouldAiMove()
+    {
+        if (_config.Mode == EGameMode.PvP)
+            return false;
+        
+        if (_config.Mode == EGameMode.PvC)
+        {
+            // AI is O (second player), so moves when NextMoveByX is false
+            return !GameBrain.IsNextPlayerX();
+        }
+        
+        if (_config.Mode == EGameMode.CvC)
+        {
+            // For now, AI controls both - you can extend this
+            return true;
+        }
+        
+        return false;
+    }
+
+    private void MakeAiMove()
+    {
+        if (_aiPlayer == null) return;
+        
+        var board = GameBrain.GetBoard();
+        int bestColumn = _aiPlayer.GetBestMove(board, GameBrain.IsNextPlayerX());
+        
+        // Calculate and execute the move
+        var moveResult = GameBrain.CalculateMove(bestColumn);
+        if (!moveResult.IsValid)
+        {
+            // Fallback: find first valid column
+            for (int col = 0; col < _config.BoardWidth; col++)
+            {
+                moveResult = GameBrain.CalculateMove(col);
+                if (moveResult.IsValid) break;
+            }
+        }
+        
+        if (moveResult.IsValid)
+        {
+            Console.Clear();
+            Ui.ShowPlayerNames(GameBrain.GetPlayerNames());
+            Console.WriteLine();
+            Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
+            Ui.ShowNextPlayer(GameBrain.IsNextPlayerX());
+            Console.WriteLine("\nAI is thinking...");
+            
+            AnimatePieceFalling(moveResult);
+            GameBrain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+        }
+    }
+
+    private (int col, int row) GetLastMove()
+    {
+        // Find the last placed piece by scanning the board
+        var board = GameBrain.GetBoard();
+        for (int col = 0; col < _config.BoardWidth; col++)
+        {
+            for (int row = 0; row < _config.BoardHeight; row++)
+            {
+                if (board[col, row] != ECellState.Empty)
+                {
+                    // This is a heuristic - in a real implementation you'd track this
+                    return (col, row);
+                }
+            }
+        }
+        return (-1, -1);
     }
 
     // UI layer handles animation using the move result data
