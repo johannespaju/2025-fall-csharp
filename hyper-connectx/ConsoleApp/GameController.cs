@@ -58,7 +58,7 @@ public class GameController
                     Console.Write("Enter a name for this save: ");
                     var name = Console.ReadLine()?.Trim();
                     if (!string.IsNullOrWhiteSpace(name))
-                        state.SaveName = name + "_" + DateTime.UtcNow.ToString("MM-dd_hh_mm");
+                        state.SaveName = name + "_" + DateTime.Now.ToString("MM-dd_hh_mm");
 
                     Repo.Save(state);
                     Console.WriteLine($"Game saved as '{state.SaveName}'.");

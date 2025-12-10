@@ -58,14 +58,17 @@ main.AddMenuItem("load", "Load Configuration", () =>
         return "";
     }
 
-    for (int i = 0; i < ids.Count; i++) Console.WriteLine($"{i + 1}) {ids[i]}");
+    // Show only description, not the id
+    for (int i = 0; i < ids.Count; i++) 
+        Console.WriteLine($"{i + 1}) {ids[i].description}");
+    
     Console.Write("\nEnter number to load: ");
     var input = Console.ReadLine();
 
     if (int.TryParse(input, out var idx) && idx >= 1 && idx <= ids.Count)
     {
         var loaded = configRepo.Load(ids[idx - 1].id);
-        gameConfig.ApplyFrom(loaded); // <<< key line
+        gameConfig.ApplyFrom(loaded);
         Console.WriteLine($"Loaded '{gameConfig.Name}'.");
     }
     else
@@ -91,7 +94,10 @@ main.AddMenuItem("del", "Delete Configuration", () =>
         return "";
     }
 
-    for (int i = 0; i < ids.Count; i++) Console.WriteLine($"{i + 1}) {ids[i]}");
+    // Show only description, not the id
+    for (int i = 0; i < ids.Count; i++) 
+        Console.WriteLine($"{i + 1}) {ids[i].description}");
+    
     Console.Write("\nEnter number to delete: ");
     var input = Console.ReadLine();
 
@@ -99,7 +105,7 @@ main.AddMenuItem("del", "Delete Configuration", () =>
     {
         var id = ids[idx - 1];
         configRepo.Delete(id.id);
-        Console.WriteLine($"Deleted '{id}'.");
+        Console.WriteLine($"Deleted configuration.");
     }
     else
     {
@@ -124,8 +130,10 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
 
     Console.Clear();
     Console.WriteLine("=== Saved Games ===");
+    
+    // Show only description, not the id
     for (int i = 0; i < saves.Count; i++)
-        Console.WriteLine($"{i + 1}) {saves[i]}");
+        Console.WriteLine($"{i + 1}) {saves[i].description}");
 
     Console.Write("\nSelect number to load: ");
     var input = Console.ReadLine();
@@ -137,7 +145,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
         brain.LoadGameState(loaded);
         var controller = new GameController(loaded.Configuration, gameRepo)
         {
-            GameBrain = brain // you might need to make GameBrain public/internal for this line
+            GameBrain = brain
         };
         controller.GameLoop();
     }
@@ -163,9 +171,10 @@ main.AddMenuItem("delgame", "Delete Saved Game", () =>
         return "";
     }
 
+    // Show only description, not the id
     for (int i = 0; i < saves.Count; i++)
     {
-        Console.WriteLine($"{i + 1}) {saves[i]}");
+        Console.WriteLine($"{i + 1}) {saves[i].description}");
     }
     
     Console.Write("\nEnter number to delete: ");
@@ -175,7 +184,7 @@ main.AddMenuItem("delgame", "Delete Saved Game", () =>
     {
         var id = saves[idx - 1];
         gameRepo.Delete(id.id);
-        Console.WriteLine($"Deleted '{id}'.");
+        Console.WriteLine($"Deleted saved game.");
     }
     else
     {
