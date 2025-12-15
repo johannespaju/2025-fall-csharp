@@ -8,7 +8,8 @@ public class GameController
 {
     private IRepository<GameState> Repo {get; set;}
     internal GameBrain GameBrain { get; set; }
-    private MinimaxAI? _aiPlayer;
+    private MinimaxAI? _aiPlayerX;  // AI for X player
+    private MinimaxAI? _aiPlayerO;  // AI for O player
     private GameConfiguration _config;
 
     public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository)
@@ -21,12 +22,13 @@ public class GameController
         if (configuration.Mode == EGameMode.PvC)
         {
             // AI plays as O (second player)
-            _aiPlayer = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
+            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
         }
         else if (configuration.Mode == EGameMode.CvC)
         {
-            // For CvC, create AI for X player (can add second AI later)
-            _aiPlayer = new MinimaxAI(configuration, isPlayerX: true, maxDepth: 6);
+            // For CvC, create both AIs
+            _aiPlayerX = new MinimaxAI(configuration, isPlayerX: true, maxDepth: 6);
+            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
         }
     }
 
@@ -162,7 +164,7 @@ public class GameController
         
         if (_config.Mode == EGameMode.CvC)
         {
-            // For now, AI controls both - you can extend this
+            // Both players are AI
             return true;
         }
         
@@ -171,10 +173,13 @@ public class GameController
 
     private void MakeAiMove()
     {
-        if (_aiPlayer == null) return;
+        // Select the correct AI based on whose turn it is
+        MinimaxAI? currentAI = GameBrain.IsNextPlayerX() ? _aiPlayerX : _aiPlayerO;
+        
+        if (currentAI == null) return;
         
         var board = GameBrain.GetBoard();
-        int bestColumn = _aiPlayer.GetBestMove(board, GameBrain.IsNextPlayerX());
+        int bestColumn = currentAI.GetBestMove(board, GameBrain.IsNextPlayerX());
         
         // Calculate and execute the move
         var moveResult = GameBrain.CalculateMove(bestColumn);
