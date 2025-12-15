@@ -62,6 +62,17 @@ public class GameController
                         Console.ReadKey();
                         gameOver = true;
                     }
+                    // Check for draw after AI move
+                    else if (GameBrain.IsBoardFull())
+                    {
+                        Console.Clear();
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
+                        Console.WriteLine("It's a DRAW! The board is full with no winner.");
+                        Console.WriteLine("Press any key to continue...");
+                        Thread.Sleep(150);
+                        Console.ReadKey();
+                        gameOver = true;
+                    }
                 }
                 continue; // Skip to next iteration
             }
@@ -141,6 +152,17 @@ public class GameController
                         Console.Clear();
                         Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
                         Console.WriteLine("Winner is: " + (winner == ECellState.XWin ? GameBrain.GetPlayerNames().Split(" vs ")[0] : GameBrain.GetPlayerNames().Split(" vs ")[1]));
+                        Console.WriteLine("Press any key to continue...");
+                        Thread.Sleep(150);
+                        Console.ReadKey();
+                        gameOver = true;
+                    }
+                    // Check for draw
+                    else if (GameBrain.IsBoardFull())
+                    {
+                        Console.Clear();
+                        Ui.DrawBoard(GameBrain.GetBoard(), GameBrain.GetIsCylindrical(), GameBrain.IsNextPlayerX());
+                        Console.WriteLine("It's a DRAW! The board is full with no winner.");
                         Console.WriteLine("Press any key to continue...");
                         Thread.Sleep(150);
                         Console.ReadKey();

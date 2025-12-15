@@ -1,9 +1,5 @@
 ﻿namespace BLL;
 
-
-// TODO: Missing draw detection
-
-
 public class GameBrain
 {
     private ECellState[,] GameBoard { get; set; }
@@ -72,6 +68,20 @@ public class GameBrain
         var pieceState = NextMoveByX ? ECellState.X : ECellState.O;
         GameBoard[column, row] = pieceState;
         NextMoveByX = !NextMoveByX;
+    }
+    
+    // NEW: Check if the board is full (draw condition)
+    public bool IsBoardFull()
+    {
+        for (int x = 0; x < GameConfiguration.BoardWidth; x++)
+        {
+            // If any column has an empty cell in the top row, board is not full
+            if (GameBoard[x, 0] == ECellState.Empty)
+            {
+                return false;
+            }
+        }
+        return true;
     }
     
     private (int dirX, int dirY) GetDirection(int directionIndex) =>
