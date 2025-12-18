@@ -31,7 +31,7 @@
 
 ### Project References
 ```
-ConsoleApp                  WebApp (planned)
+ConsoleApp                  WebApp
 ├── BLL                     ├── BLL
 ├── ConsoleUI               └── DAL
 │   └── BLL                     └── BLL
@@ -54,6 +54,9 @@ dotnet build
 
 # Run the console application
 dotnet run --project ConsoleApp
+
+# Run the web application
+dotnet run --project WebApp
 ```
 
 ### Database

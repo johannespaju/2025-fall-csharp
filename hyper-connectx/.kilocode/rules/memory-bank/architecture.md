@@ -57,17 +57,29 @@ hyper-connectx/
 │   ├── MenuItem.cs         # Menu item definition
 │   ├── SettingsMenu.cs     # Settings UI
 │   └── EMenuLevel.cs       # Menu level enum
-├── WebApp/                 # ASP.NET Core Razor Pages (planned)
-│   ├── Pages/              # Razor pages
-│   │   ├── Index.cshtml        # Home page with game list
-│   │   ├── NewGame.cshtml      # Game creation form
-│   │   ├── Game.cshtml         # Game board view
-│   │   ├── Configurations/     # Config CRUD pages
-│   │   └── Shared/             # Layout, partials
-│   ├── wwwroot/            # Static assets
-│   │   ├── css/            # Stylesheets
-│   │   └── js/             # Minimal JavaScript
-│   └── Program.cs          # Web app entry point
+├── WebApp/                 # ASP.NET Core Razor Pages
+│   ├── ARCHITECTURE.md     # WebApp design document
+│   ├── Program.cs          # ASP.NET Core setup, DI, middleware
+│   ├── WebApp.csproj       # Project file with BLL/DAL references
+│   ├── appsettings.json    # App configuration
+│   ├── Pages/
+│   │   ├── _ViewImports.cshtml # Tag helpers, using directives
+│   │   ├── _ViewStart.cshtml   # Layout reference
+│   │   ├── Index.cshtml(.cs)   # Home page with game list
+│   │   ├── NewGame.cshtml(.cs) # Game creation form
+│   │   ├── Game.cshtml(.cs)    # Game board and gameplay
+│   │   ├── Configurations/     # Configuration CRUD
+│   │   │   ├── Index.cshtml(.cs)
+│   │   │   ├── Create.cshtml(.cs)
+│   │   │   ├── Edit.cshtml(.cs)
+│   │   │   └── Delete.cshtml(.cs)
+│   │   └── Shared/
+│   │       └── _Layout.cshtml  # Master layout template
+│   └── wwwroot/
+│       ├── css/
+│       │   └── site.css        # All styling including game board
+│       └── js/
+│           └── .gitkeep
 └── ConsoleAppDbTest/       # Database testing project
 ```
 
@@ -131,6 +143,28 @@ Arrow key-navigable menu system:
 - Three levels: Root, Second, Deep
 - Automatic back/exit navigation options
 - Visual highlighting of selected item
+
+### WebApp
+
+ASP.NET Core Razor Pages web application providing browser-based gameplay.
+
+#### [`Program.cs`](WebApp/Program.cs)
+Application entry point and configuration:
+- DI registration for DbContext and repositories (EF Core)
+- Middleware pipeline configuration
+- Razor Pages service registration
+
+#### Pages Structure
+- [`Index`](WebApp/Pages/Index.cshtml.cs) - Home page listing saved games with load/delete actions
+- [`NewGame`](WebApp/Pages/NewGame.cshtml.cs) - Game creation form with configuration selection
+- [`Game`](WebApp/Pages/Game.cshtml.cs) - Core gameplay page with board rendering and move handling
+- [`Configurations/`](WebApp/Pages/Configurations/) - Full CRUD for game configurations
+
+#### Styling
+- [`site.css`](WebApp/wwwroot/css/site.css) - Comprehensive styling including:
+  - CSS Grid-based responsive game board
+  - Form styling for configuration management
+  - Navigation and layout styles
 
 ## Design Patterns
 
