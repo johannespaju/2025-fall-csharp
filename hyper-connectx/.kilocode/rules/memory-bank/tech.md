@@ -31,10 +31,10 @@
 
 ### Project References
 ```
-ConsoleApp
-├── BLL
-├── ConsoleUI
-│   └── BLL
+ConsoleApp                  WebApp (planned)
+├── BLL                     ├── BLL
+├── ConsoleUI               └── DAL
+│   └── BLL                     └── BLL
 ├── DAL
 │   └── BLL
 └── MenuSystem

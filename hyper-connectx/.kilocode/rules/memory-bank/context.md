@@ -12,11 +12,17 @@ The project is a functional Connect X console game with:
 ## Recent Changes
 
 - Memory bank initialized on 2025-12-17
-- No recent code changes documented
+- 2025-12-18: Planning ASP.NET Core Razor Pages web application
 
 ## Active Work Focus
 
-None currently - project appears to be in a stable/complete state for the console application.
+**Implementing WebApp** - ASP.NET Core Razor Pages web application that:
+- Reuses existing BLL (GameBrain, MinimaxAI, GameConfiguration, GameState)
+- Reuses existing DAL (IRepository with both JSON and EF Core implementations)
+- Supports PvP (Player vs Player) and PvC (Player vs Computer) modes
+- Uses unique game URLs for access (no lobby system)
+- Page refresh for game state updates (no real-time WebSocket/SignalR)
+- Minimal JavaScript (only for essential interactions)
 
 ## Open Questions / Technical Debt
 
@@ -32,11 +38,10 @@ None currently - project appears to be in a stable/complete state for the consol
 
 ## Next Steps
 
-Potential enhancements that could be added:
-- Web application version (WebApp folder was mentioned but not present)
-- Configurable AI difficulty
-- Settings persistence between sessions
-- Network multiplayer support
+1. Create WebApp project with ASP.NET Core Razor Pages
+2. Implement game board rendering in HTML/CSS
+3. Add configuration management pages
+4. Add game state persistence integration
 
 ## Dependencies Status
 

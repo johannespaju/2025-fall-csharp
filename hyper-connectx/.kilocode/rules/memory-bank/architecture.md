@@ -2,32 +2,34 @@
 
 ## System Architecture Overview
 
-The project follows a layered architecture with clear separation of concerns:
+The project follows a layered architecture with clear separation of concerns. The architecture supports multiple front-ends (Console and Web) sharing the same business logic and data access layers.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    ConsoleApp                           │
-│              (Entry Point & Controllers)                │
-├─────────────────────────────────────────────────────────┤
-│      MenuSystem          │         ConsoleUI            │
-│   (Menu Navigation)      │     (Board Rendering)        │
-├─────────────────────────────────────────────────────────┤
-│                       BLL                               │
-│        (Business Logic Layer - Game Engine)             │
-├─────────────────────────────────────────────────────────┤
-│                       DAL                               │
-│       (Data Access Layer - Persistence)                 │
-├─────────────────────────────────────────────────────────┤
-│            SQLite           │        JSON Files         │
-│        (via EF Core)        │    (File System)          │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         Presentation Layer                                    │
+├─────────────────────────────────┬────────────────────────────────────────────┤
+│          ConsoleApp             │              WebApp                         │
+│    (Entry Point & Controllers)  │    (ASP.NET Core Razor Pages)              │
+├─────────────────────────────────┼────────────────────────────────────────────┤
+│  MenuSystem    │   ConsoleUI    │    Pages/     │   wwwroot/                 │
+│(Menu Nav)      │(Board Render)  │(Razor Pages)  │(CSS/JS Assets)             │
+├─────────────────────────────────┴────────────────────────────────────────────┤
+│                               BLL                                             │
+│                  (Business Logic Layer - Game Engine)                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                               DAL                                             │
+│                    (Data Access Layer - Persistence)                          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│               SQLite              │           JSON Files                      │
+│           (via EF Core)           │         (File System)                     │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Project Structure
 
 ```
 hyper-connectx/
-├── BLL/                    # Business Logic Layer
+├── BLL/                    # Business Logic Layer (shared)
 │   ├── BaseEntity.cs       # Base class with Guid Id
 │   ├── ECellState.cs       # Cell state enum (Empty/X/O/XWin/OWin)
 │   ├── EGameMode.cs        # Game mode enum (PvP/PvC/CvC)
@@ -36,7 +38,7 @@ hyper-connectx/
 │   ├── GameState.cs        # Game state entity
 │   ├── MinimaxAI.cs        # AI implementation
 │   └── MoveResult.cs       # Move calculation result
-├── DAL/                    # Data Access Layer
+├── DAL/                    # Data Access Layer (shared)
 │   ├── AppDbContext.cs     # EF Core DbContext
 │   ├── IRepository.cs      # Repository interface
 │   ├── ConfigRepositoryJson.cs
@@ -45,16 +47,27 @@ hyper-connectx/
 │   ├── GameRepositoryEF.cs
 │   ├── FilesystemHelpers.cs # Path utilities
 │   └── Migrations/         # EF Core migrations
-├── ConsoleApp/             # Main application
+├── ConsoleApp/             # Console application
 │   ├── Program.cs          # Entry point
 │   └── GameController.cs   # Game loop controller
-├── ConsoleUI/              # UI rendering
+├── ConsoleUI/              # Console UI rendering
 │   └── Ui.cs               # Board drawing methods
-├── MenuSystem/             # Menu framework
+├── MenuSystem/             # Console menu framework
 │   ├── Menu.cs             # Menu logic
 │   ├── MenuItem.cs         # Menu item definition
 │   ├── SettingsMenu.cs     # Settings UI
 │   └── EMenuLevel.cs       # Menu level enum
+├── WebApp/                 # ASP.NET Core Razor Pages (planned)
+│   ├── Pages/              # Razor pages
+│   │   ├── Index.cshtml        # Home page with game list
+│   │   ├── NewGame.cshtml      # Game creation form
+│   │   ├── Game.cshtml         # Game board view
+│   │   ├── Configurations/     # Config CRUD pages
+│   │   └── Shared/             # Layout, partials
+│   ├── wwwroot/            # Static assets
+│   │   ├── css/            # Stylesheets
+│   │   └── js/             # Minimal JavaScript
+│   └── Program.cs          # Web app entry point
 └── ConsoleAppDbTest/       # Database testing project
 ```
 
