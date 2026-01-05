@@ -135,9 +135,10 @@ public class GameModel : PageModel
         int width = board.GetLength(0);
         int height = board.GetLength(1);
         
+        // Find the last placed piece by scanning from bottom to top
         for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = height - 1; y >= 0; y--)
             {
                 if (board[x, y] != ECellState.Empty)
                 {
@@ -146,6 +147,8 @@ public class GameModel : PageModel
                     {
                         return winner;
                     }
+                    // Only check the topmost piece in each column
+                    break;
                 }
             }
         }
