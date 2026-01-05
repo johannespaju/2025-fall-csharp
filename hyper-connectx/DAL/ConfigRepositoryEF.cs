@@ -76,7 +76,7 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
 
     public GameConfiguration Load(string id)
     {
-        Console.WriteLine($"DEBUG: Trying to load ID: '{id}'");
+        //Console.WriteLine($"DEBUG: Trying to load ID: '{id}'");
     
         if (!Guid.TryParse(id, out var guidId))
         {

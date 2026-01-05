@@ -18,12 +18,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryEF>();
-// builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryJson>();
+// builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryEF>();
+builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryJson>();
 
 
-builder.Services.AddScoped<IRepository<GameState>, GameRepositoryEF>();
-// builder.Services.AddScoped<IRepository<GameState>, GameRepositoryJson>();
+// builder.Services.AddScoped<IRepository<GameState>, GameRepositoryEF>();
+builder.Services.AddScoped<IRepository<GameState>, GameRepositoryJson>();
 
 
 builder.Services.AddRazorPages();

@@ -13,14 +13,20 @@ public class GameRepositoryJson : IRepository<GameState>
         var result = new List<(string id, string description)>();
 
         foreach (var fullFileName in Directory.EnumerateFiles(dir))
-        {  
+        {
             var fileName = Path.GetFileName(fullFileName);
             if (!fileName.EndsWith(".json")) continue;
-            result.Add(
-                (
-                    Path.GetFileNameWithoutExtension(fileName),
-                    Path.GetFileNameWithoutExtension(fileName))
-            );
+            var id = Path.GetFileNameWithoutExtension(fileName);
+            if (!Guid.TryParse(id, out _)) continue; // Only load Guid-named files
+            try
+            {
+                var game = Load(id);
+                result.Add((id, game.SaveName));
+            }
+            catch
+            {
+                // Skip corrupted files
+            }
         }
 
         return result;
@@ -29,22 +35,26 @@ public class GameRepositoryJson : IRepository<GameState>
     public async Task<List<(string id, string description)>> ListAsync()
     {
         var dir = FilesystemHelpers.GetGameDirectory();
-    
+
         return await Task.Run(() =>
         {
             var result = new List<(string id, string description)>();
 
             foreach (var fullFileName in Directory.EnumerateFiles(dir))
-            {  
+            {
                 var fileName = Path.GetFileName(fullFileName);
                 if (!fileName.EndsWith(".json")) continue;
-            
-                result.Add(
-                    (
-                        Path.GetFileNameWithoutExtension(fileName),
-                        Path.GetFileNameWithoutExtension(fileName)
-                    )
-                );
+                var id = Path.GetFileNameWithoutExtension(fileName);
+                if (!Guid.TryParse(id, out _)) continue;
+                try
+                {
+                    var game = Load(id);
+                    result.Add((id, game.SaveName));
+                }
+                catch
+                {
+                    // Skip corrupted files
+                }
             }
 
             return result;
@@ -55,11 +65,12 @@ public class GameRepositoryJson : IRepository<GameState>
     {
         var dir = FilesystemHelpers.GetGameDirectory();
         var safeName = Regex.Replace(data.SaveName.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
-        var fileName = $"{safeName}.json";
+        data.SaveName = safeName; // Update the data with safe name
+        var fileName = $"{data.Id}.json";
         var fullPath = Path.Combine(dir, fileName);
         var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(fullPath, json);
-        return Path.GetFileNameWithoutExtension(fileName);
+        return data.Id.ToString();
     }
 
     public GameState Load(string id)
@@ -91,7 +102,10 @@ public class GameRepositoryJson : IRepository<GameState>
 
     public void Delete(string id)
     {
+        Console.WriteLine($"DEBUG: Deleting game with id: '{id}'");
         var path = Path.Combine(FilesystemHelpers.GetGameDirectory(), id + ".json");
+        Console.WriteLine($"DEBUG: Path: '{path}', exists: {File.Exists(path)}");
         if (File.Exists(path)) File.Delete(path);
+        else Console.WriteLine("DEBUG: File does not exist, nothing to delete");
     }
 }
