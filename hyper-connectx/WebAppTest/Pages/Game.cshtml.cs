@@ -1,0 +1,175 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using BLL;
+using DAL;
+
+namespace WebAppTest.Pages;
+
+public class GameModel : PageModel
+{
+    private readonly IRepository<GameState> _gameRepository;
+
+    public GameModel(IRepository<GameState> gameRepository)
+    {
+        _gameRepository = gameRepository;
+    }
+
+    [BindProperty(SupportsGet = true)]
+    public string Id { get; set; } = default!;
+
+    public GameBrain Brain { get; private set; } = default!;
+    public GameState GameState { get; private set; } = default!;
+    public ECellState? Winner { get; private set; }
+    public bool IsDraw { get; private set; }
+    public bool IsAiTurn { get; private set; }
+    public string CurrentPlayerName { get; private set; } = "";
+    public string GameMessage { get; private set; } = "";
+
+    public IActionResult OnGet()
+    {
+        // Load game state from repository
+        var state = _gameRepository.Load(Id);
+        if (state == null)
+        {
+            return RedirectToPage("/Index");
+        }
+
+        SetupGame(state);
+        return Page();
+    }
+
+    public IActionResult OnPostMove(int column)
+    {
+        var state = _gameRepository.Load(Id);
+        if (state == null) return RedirectToPage("/Index");
+
+        SetupGame(state);
+        
+        // Check if game already over
+        if (Winner != null || IsDraw) return Page();
+
+        // Calculate and execute move
+        var moveResult = Brain.CalculateMove(column);
+        if (moveResult.IsValid)
+        {
+            Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            SaveAndRefresh();
+        }
+
+        return Page();
+    }
+
+    public IActionResult OnPostAiMove()
+    {
+        var state = _gameRepository.Load(Id);
+        if (state == null) return RedirectToPage("/Index");
+
+        SetupGame(state);
+        
+        // Check if game already over or not AI's turn
+        if (Winner != null || IsDraw || !IsAiTurn) return Page();
+
+        // Execute AI move - AI is always O (not X) in PvC mode
+        var config = state.Configuration ?? new GameConfiguration();
+        var ai = new MinimaxAI(config, isPlayerX: false);
+        int bestColumn = ai.GetBestMove(Brain.GetBoard(), Brain.IsNextPlayerX());
+        
+        var moveResult = Brain.CalculateMove(bestColumn);
+        if (moveResult.IsValid)
+        {
+            Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            SaveAndRefresh();
+        }
+
+        return Page();
+    }
+
+    public IActionResult OnPostSave(string saveName)
+    {
+        var state = _gameRepository.Load(Id);
+        if (state == null) return RedirectToPage("/Index");
+
+        state.SaveName = saveName;
+        _gameRepository.Save(state);
+        
+        SetupGame(state);
+        return Page();
+    }
+
+    private void SetupGame(GameState state)
+    {
+        GameState = state;
+        
+        // Create GameBrain from configuration and load state
+        var config = state.Configuration ?? new GameConfiguration();
+        Brain = new GameBrain(config);
+        Brain.LoadGameState(state);
+        
+        // Check for winner by scanning all cells
+        Winner = FindWinner();
+        IsDraw = Winner == null && Brain.IsBoardFull();
+        
+        bool isXTurn = Brain.IsNextPlayerX();
+        
+        CurrentPlayerName = isXTurn 
+            ? (config.P1Name ?? "Player 1") 
+            : (config.P2Name ?? "Player 2");
+        
+        // Check if it's AI's turn (PvC mode and O's turn)
+        IsAiTurn = config.Mode == EGameMode.PvC && !isXTurn;
+        
+        // Set game message
+        if (Winner == ECellState.X || Winner == ECellState.XWin)
+            GameMessage = $"{config.P1Name ?? "Player 1"} Wins!";
+        else if (Winner == ECellState.O || Winner == ECellState.OWin)
+            GameMessage = $"{config.P2Name ?? "Player 2"} Wins!";
+        else if (IsDraw)
+            GameMessage = "Game is a Draw!";
+        else
+            GameMessage = $"{CurrentPlayerName}'s Turn";
+    }
+
+    private ECellState? FindWinner()
+    {
+        var board = Brain.GetBoard();
+        int width = board.GetLength(0);
+        int height = board.GetLength(1);
+        
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (board[x, y] != ECellState.Empty)
+                {
+                    var winner = Brain.GetWinner(x, y);
+                    if (winner == ECellState.XWin || winner == ECellState.OWin)
+                    {
+                        return winner;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void SaveAndRefresh()
+    {
+        var newState = Brain.GetGameState();
+        newState.Id = Guid.Parse(Id);
+        newState.SaveName = GameState.SaveName;
+        _gameRepository.Save(newState);
+        
+        // Reload to refresh properties
+        SetupGame(newState);
+    }
+
+    // Helper methods for view
+    public ECellState GetCell(int x, int y) => Brain.GetBoard()[x, y];
+    public int GetBoardWidth() => Brain.GetBoard().GetLength(0);
+    public int GetBoardHeight() => Brain.GetBoard().GetLength(1);
+    public bool IsWinningCell(int x, int y)
+    {
+        var cell = GetCell(x, y);
+        return cell == ECellState.XWin || cell == ECellState.OWin;
+    }
+}

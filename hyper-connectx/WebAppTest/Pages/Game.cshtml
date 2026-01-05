@@ -1,0 +1,110 @@
+@page "{id}"
+@using BLL
+@model WebAppTest.Pages.GameModel
+@{
+    ViewData["Title"] = "Game";
+    var width = Model.GetBoardWidth();
+    var height = Model.GetBoardHeight();
+    var isGameOver = Model.Winner != null || Model.IsDraw;
+}
+
+<div class="game-container">
+    <h1>HyperConnectX</h1>
+    
+    <!-- Game Status -->
+    <div class="game-status @GetStatusClass()">
+        @Model.GameMessage
+    </div>
+
+    <!-- Game Info -->
+    <div class="game-info">
+        <span><strong>@(Model.GameState.Configuration?.P1Name ?? "P1")</strong> (X - Red)</span>
+        <span>vs</span>
+        <span><strong>@(Model.GameState.Configuration?.P2Name ?? "P2")</strong> (O - Yellow)</span>
+        @if (Model.GameState.Configuration?.IsCylindrical == true)
+        {
+            <span class="badge">Cylindrical</span>
+        }
+    </div>
+
+    <!-- Column Buttons (for making moves) -->
+    @if (!isGameOver && !Model.IsAiTurn)
+    {
+        <div class="column-buttons" style="--cols: @width;">
+            @for (int x = 0; x < width; x++)
+            {
+                var col = x;
+                <form method="post" asp-page-handler="Move" style="display:inline;">
+                    <input type="hidden" name="column" value="@col" />
+                    <button type="submit" class="column-btn" title="Drop in column @(col + 1)">
+                        ▼
+                    </button>
+                </form>
+            }
+        </div>
+    }
+
+    <!-- AI Move Button -->
+    @if (!isGameOver && Model.IsAiTurn)
+    {
+        <div class="ai-turn">
+            <p>Computer is thinking...</p>
+            <form method="post" asp-page-handler="AiMove">
+                <button type="submit" class="btn btn-warning">Make AI Move</button>
+            </form>
+        </div>
+    }
+
+    <!-- Game Board -->
+    <div class="game-board" style="--cols: @width; --rows: @height;">
+        @for (int y = 0; y < height; y++)
+        {
+            @for (int x = 0; x < width; x++)
+            {
+                var cell = Model.GetCell(x, y);
+                var isWin = Model.IsWinningCell(x, y);
+                <div class="cell @GetCellClass(cell) @(isWin ? "winning" : "")"></div>
+            }
+        }
+    </div>
+
+    <!-- Game Actions -->
+    <div class="game-actions">
+        @if (isGameOver)
+        {
+            <a asp-page="/NewGame" class="btn btn-primary">New Game</a>
+        }
+        <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
+        
+        @if (!isGameOver)
+        {
+            <form method="post" asp-page-handler="Save" class="save-form">
+                <input type="text" name="saveName" placeholder="Save name..." 
+                       value="@Model.GameState.SaveName" class="form-control" />
+                <button type="submit" class="btn btn-info">Save Game</button>
+            </form>
+        }
+    </div>
+</div>
+
+@functions {
+    string GetCellClass(ECellState cell)
+    {
+        return cell switch
+        {
+            ECellState.X => "player-x",
+            ECellState.O => "player-o",
+            ECellState.XWin => "player-x win-x",
+            ECellState.OWin => "player-o win-o",
+            _ => ""
+        };
+    }
+
+    string GetStatusClass()
+    {
+        if (Model.Winner == ECellState.X || Model.Winner == ECellState.XWin) return "winner-x";
+        if (Model.Winner == ECellState.O || Model.Winner == ECellState.OWin) return "winner-o";
+        if (Model.IsDraw) return "draw";
+        return "player-turn";
+    }
+}
