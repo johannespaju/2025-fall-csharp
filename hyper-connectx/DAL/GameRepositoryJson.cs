@@ -53,6 +53,7 @@ public class GameRepositoryJson : IRepository<GameState>
                 }
                 catch
                 {
+                    Console.WriteLine($"DEBUG: Skipping corrupted file: '{fileName}'");
                     // Skip corrupted files
                 }
             }
