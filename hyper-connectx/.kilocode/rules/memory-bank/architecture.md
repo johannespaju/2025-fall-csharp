@@ -125,6 +125,7 @@ Game save state containing:
 - Dual implementation: JSON files and Entity Framework Core
 - SQLite database stored at `~/app.db`
 - JSON files stored at `~/ConnectX/configs/` and `~/ConnectX/savegames/`
+- Async support: `ListAsync` method added to both EF and JSON repositories for non‑blocking retrieval. Full async CRUD methods (`SaveAsync`, `LoadAsync`, `DeleteAsync`) now implemented.
 
 ### ConsoleApp
 

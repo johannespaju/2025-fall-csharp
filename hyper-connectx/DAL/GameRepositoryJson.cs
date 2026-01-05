@@ -70,6 +70,25 @@ public class GameRepositoryJson : IRepository<GameState>
         return state ?? throw new Exception("Failed to deserialize game state");
     }
 
+    // Async methods
+    public async Task<string> SaveAsync(GameState data)
+    {
+        // Offload file I/O to a background thread
+        return await Task.Run(() => Save(data));
+    }
+
+    public async Task<GameState> LoadAsync(string id)
+    {
+        // Offload file I/O to a background thread
+        return await Task.Run(() => Load(id));
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        // Offload file I/O to a background thread
+        await Task.Run(() => Delete(id));
+    }
+
     public void Delete(string id)
     {
         var path = Path.Combine(FilesystemHelpers.GetGameDirectory(), id + ".json");

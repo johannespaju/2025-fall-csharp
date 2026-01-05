@@ -103,13 +103,66 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
     
         var conf = _dbContext.GameConfigurations
             .FirstOrDefault(c => c.Id == guidId);  // Compare Guid to Guid
-
+    
         if (conf == null)
         {
             return;
         }
-
+    
         _dbContext.GameConfigurations.Remove(conf);
         _dbContext.SaveChanges();
+    }
+
+    // Async Delete already implemented above
+    // Async methods
+    public async Task<string> SaveAsync(GameConfiguration data)
+    {
+        var safeName = Regex.Replace(data.Name.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
+        data.Name = safeName;
+
+        var existing = await _dbContext.GameConfigurations
+            .FirstOrDefaultAsync(c => c.Name == safeName);
+
+        if (existing == null)
+        {
+            await _dbContext.GameConfigurations.AddAsync(data);
+            await _dbContext.SaveChangesAsync();
+            return data.Id.ToString();
+        }
+        else
+        {
+            existing.Name = data.Name;
+            existing.BoardWidth = data.BoardWidth;
+            existing.BoardHeight = data.BoardHeight;
+            existing.ConnectHow = data.ConnectHow;
+            await _dbContext.SaveChangesAsync();
+            return existing.Id.ToString();
+        }
+    }
+
+    public async Task<GameConfiguration> LoadAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var guidId))
+            throw new ArgumentException($"Invalid ID format: '{id}'");
+
+        var conf = await _dbContext.GameConfigurations
+            .FirstOrDefaultAsync(c => c.Id == guidId);
+        if (conf == null)
+            throw new KeyNotFoundException($"Configuration '{id}' not found.");
+        return conf;
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var guidId))
+            return;
+
+        var conf = await _dbContext.GameConfigurations
+            .FirstOrDefaultAsync(c => c.Id == guidId);
+        if (conf == null)
+            return;
+
+        _dbContext.GameConfigurations.Remove(conf);
+        await _dbContext.SaveChangesAsync();
     }
 }

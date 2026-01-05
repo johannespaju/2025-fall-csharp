@@ -21,6 +21,8 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - Full Configuration CRUD pages (Create/Read/Update/Delete)
   - Shared layout with navigation
   - CSS styling for responsive game board
+  - Added asynchronous `ListAsync` methods to `GameRepositoryEF` and `GameRepositoryJson` for non‑blocking retrieval of game listings.
+  - Implemented full asynchronous CRUD (`SaveAsync`, `LoadAsync`, `DeleteAsync`) in all repository classes.
 
 ## Active Work Focus
 

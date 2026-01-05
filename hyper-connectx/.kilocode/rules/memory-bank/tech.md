@@ -92,6 +92,8 @@ gameRepo = new GameRepositoryEF(dbContext);
 // configRepo = new ConfigRepositoryJson();
 // gameRepo = new GameRepositoryJson();
 ```
+- Both EF and JSON repositories now expose `ListAsync` for asynchronous retrieval of game listings.
+- Full async CRUD methods (`SaveAsync`, `LoadAsync`, `DeleteAsync`) added using EF Core async APIs and `Task.Run` for file‑based repositories.
 
 ## Code Quality
 

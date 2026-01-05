@@ -119,4 +119,59 @@ public class GameRepositoryEF : IRepository<GameState>
         _dbContext.GameStates.Remove(game);
         _dbContext.SaveChanges();
     }
+    // Async methods
+    public async Task<string> SaveAsync(GameState data)
+    {
+        var safeName = Regex.Replace(data.SaveName.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
+        data.SaveName = safeName;
+
+        var existing = await _dbContext.GameStates
+            .FirstOrDefaultAsync(g => g.SaveName == safeName);
+
+        if (existing == null)
+        {
+            await _dbContext.GameStates.AddAsync(data);
+            await _dbContext.SaveChangesAsync();
+            return data.Id.ToString();
+        }
+        else
+        {
+            existing.SaveName = data.SaveName;
+            existing.GameConfigurationId = data.GameConfigurationId;
+            existing.BoardJson = data.BoardJson;
+            existing.NextMoveByX = data.NextMoveByX;
+            await _dbContext.SaveChangesAsync();
+            return existing.Id.ToString();
+        }
+    }
+
+    public async Task<GameState> LoadAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var guidId))
+            throw new ArgumentException($"Invalid ID format: '{id}'");
+
+        var game = await _dbContext.GameStates
+            .Include(g => g.Configuration)
+            .FirstOrDefaultAsync(g => g.Id == guidId);
+
+        if (game == null)
+            throw new KeyNotFoundException($"Game state '{id}' not found.");
+
+        return game;
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var guidId))
+            return;
+
+        var game = await _dbContext.GameStates
+            .FirstOrDefaultAsync(g => g.Id == guidId);
+
+        if (game == null)
+            return;
+
+        _dbContext.GameStates.Remove(game);
+        await _dbContext.SaveChangesAsync();
+    }
 }

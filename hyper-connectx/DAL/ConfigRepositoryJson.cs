@@ -96,4 +96,20 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
             File.Delete(jsonFileName);
         }
     }
+    // Async methods
+    public async Task<string> SaveAsync(GameConfiguration data)
+    {
+        // Offload to thread pool to avoid blocking
+        return await Task.Run(() => Save(data));
+    }
+
+    public async Task<GameConfiguration> LoadAsync(string id)
+    {
+        return await Task.Run(() => Load(id));
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        await Task.Run(() => Delete(id));
+    }
 }

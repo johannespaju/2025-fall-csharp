@@ -15,6 +15,7 @@ public class IndexModel : PageModel
         _configRepo = configRepo;
         _gameRepo = gameRepo;
     }
+    
 
     public List<GameState> SavedGames { get; set; } = new();
 

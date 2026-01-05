@@ -9,4 +9,8 @@ public interface IRepository<TData>
     string Save(TData data);
     TData Load(string id);
     void Delete(string id);
+    
+    Task<string> SaveAsync(TData data);
+    Task<TData> LoadAsync(string id);
+    Task DeleteAsync(string id);
 }
