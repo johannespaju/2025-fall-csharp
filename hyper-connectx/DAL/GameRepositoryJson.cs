@@ -25,6 +25,31 @@ public class GameRepositoryJson : IRepository<GameState>
 
         return result;
     }
+    
+    public async Task<List<(string id, string description)>> ListAsync()
+    {
+        var dir = FilesystemHelpers.GetGameDirectory();
+    
+        return await Task.Run(() =>
+        {
+            var result = new List<(string id, string description)>();
+
+            foreach (var fullFileName in Directory.EnumerateFiles(dir))
+            {  
+                var fileName = Path.GetFileName(fullFileName);
+                if (!fileName.EndsWith(".json")) continue;
+            
+                result.Add(
+                    (
+                        Path.GetFileNameWithoutExtension(fileName),
+                        Path.GetFileNameWithoutExtension(fileName)
+                    )
+                );
+            }
+
+            return result;
+        });
+    }
 
     public string Save(GameState data)
     {
