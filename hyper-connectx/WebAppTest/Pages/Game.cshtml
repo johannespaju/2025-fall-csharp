@@ -8,6 +8,200 @@
     var isGameOver = Model.Winner != null || Model.IsDraw;
 }
 
+<style>
+    .game-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 1rem;
+        text-align: center;
+        font-family: Arial, sans-serif;
+    }
+    
+    .game-container h1 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .game-status {
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    .game-status.winner-x {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+    
+    .game-status.winner-o {
+        background-color: #fff9c4;
+        color: #f57f17;
+    }
+    
+    .game-status.draw {
+        background-color: #e0e0e0;
+        color: #424242;
+    }
+    
+    .game-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+        font-size: 1.1rem;
+    }
+    
+    .badge {
+        background-color: #4caf50;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .column-buttons {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem auto;
+    }
+    
+    .column-btn {
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        padding: 0.5rem;
+        font-size: 1.2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .column-btn:hover {
+        background-color: #1976d2;
+    }
+    
+    .ai-turn {
+        margin: 1rem 0;
+        padding: 1rem;
+        background-color: #fff3e0;
+        border-radius: 8px;
+    }
+    
+    .game-board {
+        display: inline-grid;
+        gap: 8px;
+        padding: 20px;
+        background: linear-gradient(to bottom, #1976d2, #1565c0);
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        margin: 1rem auto;
+    }
+    
+    .cell {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #fff;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .cell.player-x {
+        background: radial-gradient(circle, #ef5350, #c62828);
+        box-shadow: 0 4px 8px rgba(239, 83, 80, 0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+    
+    .cell.player-o {
+        background: radial-gradient(circle, #ffeb3b, #f57f17);
+        box-shadow: 0 4px 8px rgba(255, 235, 59, 0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+    
+    .cell.winning {
+        animation: pulse 1s infinite;
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8) !important;
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .game-actions {
+        margin: 2rem 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary {
+        background-color: #4caf50;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+    
+    .btn-secondary {
+        background-color: #757575;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #616161;
+    }
+    
+    .btn-warning {
+        background-color: #ff9800;
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .btn-warning:hover {
+        background-color: #f57c00;
+    }
+    
+    .btn-info {
+        background-color: #2196f3;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background-color: #1976d2;
+    }
+    
+    .save-form {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+</style>
+
 <div class="game-container">
     <h1>HyperConnectX</h1>
     
@@ -30,7 +224,7 @@
     <!-- Column Buttons (for making moves) -->
     @if (!isGameOver && !Model.IsAiTurn)
     {
-        <div class="column-buttons" style="--cols: @width;">
+        <div class="column-buttons" style="grid-template-columns: repeat(@width, 1fr); max-width: @(width * 70)px;">
             @for (int x = 0; x < width; x++)
             {
                 var col = x;
@@ -56,7 +250,7 @@
     }
 
     <!-- Game Board -->
-    <div class="game-board" style="--cols: @width; --rows: @height;">
+    <div class="game-board" style="grid-template-columns: repeat(@width, 60px); grid-template-rows: repeat(@height, 60px);">
         @for (int y = 0; y < height; y++)
         {
             @for (int x = 0; x < width; x++)
