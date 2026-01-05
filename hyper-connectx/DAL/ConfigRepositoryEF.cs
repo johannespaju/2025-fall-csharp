@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using BLL;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL;
 
@@ -15,7 +16,7 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
     public List<(string id, string description)> List()
     {
         var res = new List<(string id, string description)>();
-        foreach (var dbConf in _dbContext.GameConfigurations)
+        foreach (var dbConf in _dbContext.GameConfigurations.ToList()) // Added .ToList()
         {
             res.Add(
                 (
@@ -24,7 +25,23 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
                 )
             );
         }
-        
+    
+        return res;
+    }
+
+    public async Task<List<(string id, string description)>> ListAsync()
+    {
+        var res = new List<(string id, string description)>();
+        foreach (var dbConf in await _dbContext.GameConfigurations.ToListAsync())
+        {
+            res.Add(
+                (
+                    dbConf.Id.ToString(),
+                    $"{dbConf.Name} - {dbConf.BoardWidth}x{dbConf.BoardHeight} - connect{dbConf.ConnectHow}"
+                )
+            );
+        }
+
         return res;
     }
 

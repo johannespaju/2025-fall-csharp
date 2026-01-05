@@ -16,14 +16,31 @@ public class GameRepositoryEF : IRepository<GameState>
     public List<(string id, string description)> List()
     {
         var res = new List<(string id, string description)>();
-        foreach (var dbGame in _dbContext.GameStates.Include(g => g.Configuration))
+        foreach (var dbGame in _dbContext.GameStates.Include(g => g.Configuration).ToList()) // Add .ToList()
         {
             var description = dbGame.SaveName;
             if (dbGame.Configuration != null)
             {
                 description += $" - {dbGame.Configuration.BoardWidth}x{dbGame.Configuration.BoardHeight}";
             }
-            
+        
+            res.Add((dbGame.Id.ToString(), description));
+        }
+    
+        return res;
+    }
+    
+    public async Task<List<(string id, string description)>> ListAsync()
+    {
+        var res = new List<(string id, string description)>();
+        foreach (var dbGame in await _dbContext.GameStates.Include(gameState => gameState.Configuration).ToListAsync())
+        {
+            var description = dbGame.SaveName;
+            if (dbGame.Configuration != null)
+            {
+                description += $" - {dbGame.Configuration.BoardWidth}x{dbGame.Configuration.BoardHeight}";
+            }
+
             res.Add(
                 (
                     dbGame.Id.ToString(),
@@ -31,7 +48,7 @@ public class GameRepositoryEF : IRepository<GameState>
                 )
             );
         }
-        
+
         return res;
     }
 
