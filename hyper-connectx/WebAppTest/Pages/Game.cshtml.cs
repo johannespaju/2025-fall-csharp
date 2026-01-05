@@ -157,13 +157,20 @@ public class GameModel : PageModel
 
     private void SaveAndRefresh()
     {
-        var newState = Brain.GetGameState();
-        newState.Id = Guid.Parse(Id);
-        newState.SaveName = GameState.SaveName;
-        _gameRepository.Save(newState);
+        // Load the existing game state from repository to ensure proper tracking
+        var existingState = _gameRepository.Load(Id);
+        if (existingState == null) return;
+        
+        // Update only the board state and turn, keeping foreign key relationships intact
+        var currentGameState = Brain.GetGameState();
+        existingState.Board = currentGameState.Board;
+        existingState.NextMoveByX = currentGameState.NextMoveByX;
+        
+        // Save the updated state (Configuration relationship is preserved)
+        _gameRepository.Save(existingState);
         
         // Reload to refresh properties
-        SetupGame(newState);
+        SetupGame(existingState);
     }
 
     // Helper methods for view
