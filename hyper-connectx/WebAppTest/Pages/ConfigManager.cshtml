@@ -1,0 +1,199 @@
+@page
+@using BLL
+@model WebApp.Pages.ConfigManagerModel
+@{
+    ViewData["Title"] = "Configuration Manager";
+}
+
+<div class="container mt-4">
+    <h1>Configuration Manager</h1>
+    <p class="text-muted">Create, edit, and delete game configurations</p>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ValidationError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.ValidationError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Create/Edit Configuration Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Create New Configuration</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="Create">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ConfigName" class="form-label">Configuration Name</label>
+                        <input asp-for="ConfigName" class="form-control" />
+                        <span asp-validation-for="ConfigName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="GameMode" class="form-label">Game Mode</label>
+                        <select asp-for="GameMode" class="form-select">
+                            <option value="@EGameMode.PvP">Player vs Player</option>
+                            <option value="@EGameMode.PvC">Player vs Computer</option>
+                            <option value="@EGameMode.CvC">Computer vs Computer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="BoardWidth" class="form-label">Board Width</label>
+                        <input asp-for="BoardWidth" type="number" class="form-control" min="3" max="20" />
+                        <span asp-validation-for="BoardWidth" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="BoardHeight" class="form-label">Board Height</label>
+                        <input asp-for="BoardHeight" type="number" class="form-control" min="3" max="20" />
+                        <span asp-validation-for="BoardHeight" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="ConnectHowMany" class="form-label">Connect How Many</label>
+                        <input asp-for="ConnectHowMany" type="number" class="form-control" min="2" max="20" />
+                        <span asp-validation-for="ConnectHowMany" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Player1Name" class="form-label">Player 1 Name (X)</label>
+                        <input asp-for="Player1Name" class="form-control" />
+                        <span asp-validation-for="Player1Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Player2Name" class="form-label">Player 2 Name (O)</label>
+                        <input asp-for="Player2Name" class="form-control" />
+                        <span asp-validation-for="Player2Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="IsCylindrical" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsCylindrical" class="form-check-label">
+                        Cylindrical Board (wraps horizontally)
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create Configuration
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Saved Configurations List -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Saved Configurations (@Model.SavedConfigurations.Count)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.SavedConfigurations.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Dimensions</th>
+                                <th>Connect</th>
+                                <th>Players</th>
+                                <th>Mode</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var config in Model.SavedConfigurations)
+                            {
+                                <tr>
+                                    <td><strong>@config.Name</strong></td>
+                                    <td>@config.BoardWidth × @config.BoardHeight</td>
+                                    <td>@config.ConnectHow</td>
+                                    <td>
+                                        <small>
+                                            @config.P1Name vs @config.P2Name
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @switch (config.Mode)
+                                        {
+                                            case EGameMode.PvP:
+                                                <span class="badge bg-primary">PvP</span>
+                                                break;
+                                            case EGameMode.PvC:
+                                                <span class="badge bg-success">PvC</span>
+                                                break;
+                                            case EGameMode.CvC:
+                                                <span class="badge bg-info">CvC</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (config.IsCylindrical)
+                                        {
+                                            <span class="badge bg-warning text-dark">Cylindrical</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Standard</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <form method="post" asp-page-handler="LoadForEdit" class="d-inline">
+                                                <input type="hidden" name="id" value="@config.Id" />
+                                                <button type="submit" class="btn btn-outline-secondary" title="Load for editing">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" asp-page-handler="Delete" class="d-inline" 
+                                                  onsubmit="return confirm('Are you sure you want to delete this configuration?');">
+                                                <input type="hidden" name="id" value="@config.Id" />
+                                                <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> No saved configurations yet. Create one using the form above!
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-page="/Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
