@@ -22,6 +22,7 @@ public class GameModel : PageModel
     public ECellState? Winner { get; private set; }
     public bool IsDraw { get; private set; }
     public bool IsAiTurn { get; private set; }
+    public bool IsCvCMode { get; private set; }
     public string CurrentPlayerName { get; private set; } = "";
     public string GameMessage { get; private set; } = "";
 
@@ -69,9 +70,13 @@ public class GameModel : PageModel
         // Check if game already over or not AI's turn
         if (Winner != null || IsDraw || !IsAiTurn) return Page();
 
-        // Execute AI move - AI is always O (not X) in PvC mode
+        // Execute AI move
         var config = state.Configuration ?? new GameConfiguration();
-        var ai = new MinimaxAI(config, isPlayerX: false);
+        
+        // In PvC mode, AI is always O (not X)
+        // In CvC mode, AI plays X when it's X's turn, O when it's O's turn
+        bool isPlayerX = config.Mode == EGameMode.CvC && Brain.IsNextPlayerX();
+        var ai = new MinimaxAI(config, isPlayerX);
         int bestColumn = ai.GetBestMove(Brain.GetBoard(), Brain.IsNextPlayerX());
         
         var moveResult = Brain.CalculateMove(bestColumn);
@@ -116,8 +121,9 @@ public class GameModel : PageModel
             ? (string.IsNullOrEmpty(state.P1Name) ? "Player 1" : state.P1Name)
             : (string.IsNullOrEmpty(state.P2Name) ? "Player 2" : state.P2Name);
         
-        // Check if it's AI's turn (PvC mode and O's turn)
-        IsAiTurn = config.Mode == EGameMode.PvC && !isXTurn;
+        // Check if it's AI's turn (PvC mode and O's turn, or CvC mode always)
+        IsAiTurn = (config.Mode == EGameMode.PvC && !isXTurn) || config.Mode == EGameMode.CvC;
+        IsCvCMode = config.Mode == EGameMode.CvC;
         
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
