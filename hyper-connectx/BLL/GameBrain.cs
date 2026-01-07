@@ -9,12 +9,12 @@ public class GameBrain
 
     private bool NextMoveByX { get; set; } = true;
 
-    public GameBrain(GameConfiguration configuration)
+    public GameBrain(GameState gameState)
     {
-        GameConfiguration = configuration;
-        P1Name = GameConfiguration.P1Name;
-        P2Name = GameConfiguration.P2Name;
-        GameBoard = new ECellState[configuration.BoardWidth, configuration.BoardHeight];
+        GameConfiguration = gameState.Configuration ?? new GameConfiguration();
+        P1Name = gameState.P1Name;
+        P2Name = gameState.P2Name;
+        GameBoard = new ECellState[GameConfiguration.BoardWidth, GameConfiguration.BoardHeight];
     }
 
     public string GetPlayerNames()
@@ -200,15 +200,19 @@ public class GameBrain
         {
             Configuration = GameConfiguration,
             Board = ConvertToJagged(GameBoard),
-            NextMoveByX = NextMoveByX
+            NextMoveByX = NextMoveByX,
+            P1Name = P1Name,
+            P2Name = P2Name
         };
     }
 
     public void LoadGameState(GameState state)
     {
-        GameConfiguration = state.Configuration;
+        GameConfiguration = state.Configuration ?? new GameConfiguration();
         GameBoard = ConvertToRectangular(state.Board);
         NextMoveByX = state.NextMoveByX;
+        P1Name = state.P1Name;
+        P2Name = state.P2Name;
     }
 
     public bool GetIsCylindrical()

@@ -8,12 +8,12 @@ IRepository<GameConfiguration> configRepo;
 IRepository<GameState> gameRepo;
 
 // json config repository
-// configRepo = new ConfigRepositoryJson();
-// gameRepo = new  GameRepositoryJson();
+configRepo = new ConfigRepositoryJson();
+gameRepo = new  GameRepositoryJson();
 // ef config repository
-using var dbContext = GetDbContext();
-configRepo = new ConfigRepositoryEF(dbContext);
-gameRepo = new GameRepositoryEF(dbContext);
+//using var dbContext = GetDbContext();
+// configRepo = new ConfigRepositoryEF(dbContext);
+// gameRepo = new GameRepositoryEF(dbContext);
 
 var gameConfig = new GameConfiguration();
 
@@ -27,11 +27,11 @@ main.AddMenuItem("n", "Start New Game", () =>
 {
     Console.Clear();
     Console.WriteLine("Enter Player 1 name: ");
-    gameConfig.P1Name = Console.ReadLine() ?? "Player 1";
+    var p1Name = Console.ReadLine() ?? "Player 1";
     Console.Clear();
     Console.WriteLine("Enter Player 2 name: ");
-    gameConfig.P2Name = Console.ReadLine() ?? "Player 2";
-    var controller = new GameController(gameConfig, gameRepo);
+    var p2Name = Console.ReadLine() ?? "Player 2";
+    var controller = new GameController(gameConfig, gameRepo, p1Name, p2Name);
     controller.GameLoop();
     return "";
 });
@@ -147,9 +147,9 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
     if (int.TryParse(input, out int index) && index >= 1 && index <= saves.Count)
     {
         var loaded = gameRepo.Load(saves[index - 1].id);
-        var brain = new GameBrain(loaded.Configuration);
+        var brain = new GameBrain(loaded);
         brain.LoadGameState(loaded);
-        var controller = new GameController(loaded.Configuration, gameRepo)
+        var controller = new GameController(loaded.Configuration ?? new GameConfiguration(), gameRepo, loaded.P1Name, loaded.P2Name)
         {
             GameBrain = brain
         };

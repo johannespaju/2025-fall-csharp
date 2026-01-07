@@ -212,9 +212,9 @@
 
     <!-- Game Info -->
     <div class="game-info">
-        <span><strong>@(Model.GameState.Configuration?.P1Name ?? "P1")</strong> (X - Red)</span>
+        <span><strong>@(string.IsNullOrEmpty(Model.GameState.P1Name) ? "Player 1" : Model.GameState.P1Name)</strong> (X - Red)</span>
         <span>vs</span>
-        <span><strong>@(Model.GameState.Configuration?.P2Name ?? "P2")</strong> (O - Yellow)</span>
+        <span><strong>@(string.IsNullOrEmpty(Model.GameState.P2Name) ? "Player 2" : Model.GameState.P2Name)</strong> (O - Yellow)</span>
         @if (Model.GameState.Configuration?.IsCylindrical == true)
         {
             <span class="badge">Cylindrical</span>

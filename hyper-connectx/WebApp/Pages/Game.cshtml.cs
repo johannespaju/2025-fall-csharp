@@ -102,7 +102,7 @@ public class GameModel : PageModel
         
         // Create GameBrain from configuration and load state
         var config = state.Configuration ?? new GameConfiguration();
-        Brain = new GameBrain(config);
+        Brain = new GameBrain(state);
         Brain.LoadGameState(state);
         
         // Check for winner by scanning all cells
@@ -111,18 +111,19 @@ public class GameModel : PageModel
         
         bool isXTurn = Brain.IsNextPlayerX();
         
+        // Use player names from GameState (fall back to defaults if empty)
         CurrentPlayerName = isXTurn 
-            ? (config.P1Name ?? "Player 1") 
-            : (config.P2Name ?? "Player 2");
+            ? (string.IsNullOrEmpty(state.P1Name) ? "Player 1" : state.P1Name)
+            : (string.IsNullOrEmpty(state.P2Name) ? "Player 2" : state.P2Name);
         
         // Check if it's AI's turn (PvC mode and O's turn)
         IsAiTurn = config.Mode == EGameMode.PvC && !isXTurn;
         
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
-            GameMessage = $"{config.P1Name ?? "Player 1"} Wins!";
+            GameMessage = $"{(string.IsNullOrEmpty(state.P1Name) ? "Player 1" : state.P1Name)} Wins!";
         else if (Winner == ECellState.O || Winner == ECellState.OWin)
-            GameMessage = $"{config.P2Name ?? "Player 2"} Wins!";
+            GameMessage = $"{(string.IsNullOrEmpty(state.P2Name) ? "Player 2" : state.P2Name)} Wins!";
         else if (IsDraw)
             GameMessage = "Game is a Draw!";
         else
@@ -161,10 +162,12 @@ public class GameModel : PageModel
         var existingState = _gameRepository.Load(Id);
         if (existingState == null) return;
         
-        // Update only the board state and turn, keeping foreign key relationships intact
+        // Update only the board state and turn, keeping player names and foreign key relationships intact
         var currentGameState = Brain.GetGameState();
         existingState.Board = currentGameState.Board;
         existingState.NextMoveByX = currentGameState.NextMoveByX;
+        existingState.P1Name = currentGameState.P1Name;
+        existingState.P2Name = currentGameState.P2Name;
         
         // Save the updated state (Configuration relationship is preserved)
         _gameRepository.Save(existingState);

@@ -19,12 +19,10 @@ public class SettingsMenu
         menu.AddMenuItem("1", "Change Board Width", ChangeBoardWidth);
         menu.AddMenuItem("2", "Change Board Height", ChangeBoardHeight);
         menu.AddMenuItem("3", "Change Connect How Many", ChangeConnectHow);
-        menu.AddMenuItem("4", "Change Player 1 Name", ChangePlayer1Name);
-        menu.AddMenuItem("5", "Change Player 2 Name", ChangePlayer2Name);
-        menu.AddMenuItem("6", "Toggle Cylindrical Mode", ToggleCylindricalMode);
-        menu.AddMenuItem("7", "Change Game Mode", ChangeGameMode);
-        menu.AddMenuItem("8", "Change Configuration Name", ChangeConfigurationName);
-        menu.AddMenuItem("9", "Reset to Defaults", ResetToDefaults);
+        menu.AddMenuItem("4", "Toggle Cylindrical Mode", ToggleCylindricalMode);
+        menu.AddMenuItem("5", "Change Game Mode", ChangeGameMode);
+        menu.AddMenuItem("6", "Change Configuration Name", ChangeConfigurationName);
+        menu.AddMenuItem("7", "Reset to Defaults", ResetToDefaults);
         menu.AddMenuItem("v", "View Current Settings", ViewCurrentSettings);
 
         return menu.Run();
@@ -114,54 +112,6 @@ public class SettingsMenu
         else
         {
             Console.WriteLine($"Invalid input! Must be between 2 and {maxConnect}.");
-        }
-        
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
-        return "";
-    }
-
-    private string ChangePlayer1Name()
-    {
-        Console.Clear();
-        Console.WriteLine("=== Change Player 1 Name ===");
-        Console.WriteLine($"Current name: {Configuration.P1Name}");
-        Console.WriteLine();
-        Console.Write("Enter new name for Player 1: ");
-        
-        var input = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(input))
-        {
-            Configuration.P1Name = input.Trim();
-            Console.WriteLine($"Player 1 name updated to '{Configuration.P1Name}'.");
-        }
-        else
-        {
-            Console.WriteLine("Invalid input! Name cannot be empty.");
-        }
-        
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
-        return "";
-    }
-
-    private string ChangePlayer2Name()
-    {
-        Console.Clear();
-        Console.WriteLine("=== Change Player 2 Name ===");
-        Console.WriteLine($"Current name: {Configuration.P2Name}");
-        Console.WriteLine();
-        Console.Write("Enter new name for Player 2: ");
-        
-        var input = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(input))
-        {
-            Configuration.P2Name = input.Trim();
-            Console.WriteLine($"Player 2 name updated to '{Configuration.P2Name}'.");
-        }
-        else
-        {
-            Console.WriteLine("Invalid input! Name cannot be empty.");
         }
         
         Console.WriteLine("Press any key to continue...");
@@ -277,8 +227,6 @@ public class SettingsMenu
         Console.WriteLine($"Configuration Name: {Configuration.Name}");
         Console.WriteLine($"Board Size: {Configuration.BoardWidth}x{Configuration.BoardHeight}");
         Console.WriteLine($"Connect How Many: {Configuration.ConnectHow}");
-        Console.WriteLine($"Player 1 Name: {Configuration.P1Name}");
-        Console.WriteLine($"Player 2 Name: {Configuration.P2Name}");
         Console.WriteLine($"Board Type: {(Configuration.IsCylindrical ? "Cylindrical" : "Standard")}");
         Console.WriteLine($"Game Mode: {Configuration.Mode}");
         Console.WriteLine();

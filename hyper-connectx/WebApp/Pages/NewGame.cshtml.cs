@@ -100,8 +100,6 @@ public class NewGameModel : PageModel
             BoardWidth = BoardWidth,
             BoardHeight = BoardHeight,
             ConnectHow = ConnectHowMany,
-            P1Name = Player1Name,
-            P2Name = Player2Name,
             Mode = GameMode,
             IsCylindrical = IsCylindrical
         };
@@ -110,7 +108,14 @@ public class NewGameModel : PageModel
         _configRepository.Save(config);
 
         // Create game brain with configuration
-        var brain = new GameBrain(config);
+        // Create a temporary GameState to initialize GameBrain, then set player names
+        var initialState = new GameState
+        {
+            Configuration = config,
+            P1Name = Player1Name,
+            P2Name = Player2Name
+        };
+        var brain = new GameBrain(initialState);
         
         // Get initial game state
         var gameState = brain.GetGameState();
@@ -139,8 +144,8 @@ public class NewGameModel : PageModel
                 TempData["BoardWidth"] = config.BoardWidth;
                 TempData["BoardHeight"] = config.BoardHeight;
                 TempData["ConnectHowMany"] = config.ConnectHow;
-                TempData["Player1Name"] = config.P1Name;
-                TempData["Player2Name"] = config.P2Name;
+                TempData["Player1Name"] = "Player 1"; // Default name for loaded configs
+                TempData["Player2Name"] = "Player 2"; // Default name for loaded configs
                 TempData["GameMode"] = (int)config.Mode;
                 TempData["IsCylindrical"] = config.IsCylindrical;
                 

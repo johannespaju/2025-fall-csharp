@@ -11,9 +11,6 @@ public class GameConfiguration : BaseEntity
     
     public int ConnectHow { get; set; } = 4;
     
-    public string P1Name { get; set; } = "Player 1";
-    public string P2Name { get; set; } = "Player 2";
-    
     // Game mode (PvP, PvAi, AivAi)
     public EGameMode Mode { get; set; } = EGameMode.PvP;
     
@@ -26,8 +23,6 @@ public class GameConfiguration : BaseEntity
         BoardWidth = 7;
         BoardHeight = 6;
         ConnectHow = 4;
-        P1Name = "Player 1";
-        P2Name = "Player 2";
         Mode = EGameMode.PvP;
         IsCylindrical = false;
     }
@@ -38,8 +33,6 @@ public class GameConfiguration : BaseEntity
         BoardWidth = other.BoardWidth;
         BoardHeight = other.BoardHeight;
         ConnectHow = other.ConnectHow;
-        P1Name = other.P1Name;
-        P2Name = other.P2Name;
         Mode = other.Mode;
         IsCylindrical = other.IsCylindrical;
     }

@@ -44,16 +44,6 @@ public class ConfigManagerModel : PageModel
     public int ConnectHowMany { get; set; } = 4;
 
     [BindProperty]
-    [Required(ErrorMessage = "Player 1 name is required")]
-    [StringLength(50, MinimumLength = 1, ErrorMessage = "Player name must be 1-50 characters")]
-    public string Player1Name { get; set; } = "Player 1";
-
-    [BindProperty]
-    [Required(ErrorMessage = "Player 2 name is required")]
-    [StringLength(50, MinimumLength = 1, ErrorMessage = "Player name must be 1-50 characters")]
-    public string Player2Name { get; set; } = "Player 2";
-
-    [BindProperty]
     public EGameMode GameMode { get; set; } = EGameMode.PvP;
 
     [BindProperty]
@@ -93,8 +83,6 @@ public class ConfigManagerModel : PageModel
             BoardWidth = BoardWidth,
             BoardHeight = BoardHeight,
             ConnectHow = ConnectHowMany,
-            P1Name = Player1Name,
-            P2Name = Player2Name,
             Mode = GameMode,
             IsCylindrical = IsCylindrical
         };
@@ -158,8 +146,6 @@ public class ConfigManagerModel : PageModel
             BoardWidth = config.BoardWidth;
             BoardHeight = config.BoardHeight;
             ConnectHowMany = config.ConnectHow;
-            Player1Name = config.P1Name;
-            Player2Name = config.P2Name;
             GameMode = config.Mode;
             IsCylindrical = config.IsCylindrical;
         }
@@ -223,8 +209,6 @@ public class ConfigManagerModel : PageModel
         BoardWidth = 7;
         BoardHeight = 6;
         ConnectHowMany = 4;
-        Player1Name = "Player 1";
-        Player2Name = "Player 2";
         GameMode = EGameMode.PvP;
         IsCylindrical = false;
     }

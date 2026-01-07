@@ -66,20 +66,6 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="form-group">
-                        <label asp-for="Player1Name">Player 1 Name (X)</label>
-                        <input asp-for="Player1Name" />
-                        <span asp-validation-for="Player1Name" class="validation-error"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="Player2Name">Player 2 Name (O)</label>
-                        <input asp-for="Player2Name" />
-                        <span asp-validation-for="Player2Name" class="validation-error"></span>
-                    </div>
-                </div>
-
                 <div class="checkbox-group">
                     <input asp-for="IsCylindrical" type="checkbox" />
                     <label asp-for="IsCylindrical">
@@ -105,9 +91,6 @@
                             <div class="config-name">@config.Name</div>
                             <div class="config-dims">@config.BoardWidth × @config.BoardHeight</div>
                             <div class="config-connect">@config.ConnectHow</div>
-                            <div class="config-players">
-                                <small>@config.P1Name vs @config.P2Name</small>
-                            </div>
                             <div>
                                 @switch (config.Mode)
                                 {

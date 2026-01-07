@@ -11,12 +11,24 @@ public class GameController
     private MinimaxAI? _aiPlayerX;  // AI for X player
     private MinimaxAI? _aiPlayerO;  // AI for O player
     private GameConfiguration _config;
+    private string _p1Name;
+    private string _p2Name;
 
-    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository)
+    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository, string p1Name = "Player 1", string p2Name = "Player 2")
     {
-        GameBrain = new GameBrain(configuration);
-        Repo = gameRepository;
         _config = configuration;
+        _p1Name = p1Name;
+        _p2Name = p2Name;
+        Repo = gameRepository;
+        
+        // Create a temporary GameState to initialize GameBrain
+        var initialState = new GameState
+        {
+            Configuration = configuration,
+            P1Name = p1Name,
+            P2Name = p2Name
+        };
+        GameBrain = new GameBrain(initialState);
         
         // Initialize AI if needed
         if (configuration.Mode == EGameMode.PvC)
@@ -110,6 +122,9 @@ public class GameController
                 
                 case ConsoleKey.S:
                     var state = GameBrain.GetGameState();
+                    // Ensure player names are preserved in saved state
+                    state.P1Name = _p1Name;
+                    state.P2Name = _p2Name;
 
                     Console.Write("Enter a name for this save: ");
                     var name = Console.ReadLine()?.Trim();

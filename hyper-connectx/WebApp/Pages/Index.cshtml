@@ -31,8 +31,8 @@
                     <tr>
                         <td>@game.SaveName</td>
                         <td>
-                            @(game.Configuration?.P1Name ?? "Player 1") vs 
-                            @(game.Configuration?.P2Name ?? "Player 2")
+                            @(string.IsNullOrEmpty(game.P1Name) ? "Player 1" : game.P1Name) vs 
+                            @(string.IsNullOrEmpty(game.P2Name) ? "Player 2" : game.P2Name)
                         </td>
                         <td>
                             @(game.Configuration?.BoardWidth)x@(game.Configuration?.BoardHeight)

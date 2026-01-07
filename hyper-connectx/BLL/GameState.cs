@@ -18,4 +18,7 @@ public class GameState : BaseEntity
     }
     public bool NextMoveByX { get; set; }
     public string SaveName { get; set; } = $"Save_{DateTime.UtcNow:MM-dd_hh_mm}";
+    
+    public string P1Name { get; set; } = "Player 1";
+    public string P2Name { get; set; } = "Player 2";
 }
