@@ -231,16 +231,21 @@ hr {
 .config-actions {
   display: flex;
   gap: 6px;
+  min-width: 150px;
 }
 
 .btn-edit,
-.btn-delete {
+.btn-delete,
+.btn-disabled {
   padding: 5px 10px;
   border-radius: 3px;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.15s;
   background: white;
+  min-width: 60px;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .btn-edit {
@@ -262,15 +267,13 @@ hr {
 }
 
 .btn-disabled {
-  padding: 5px 10px;
-  border-radius: 3px;
-  font-size: 12px;
   background: #f0f0f0;
   border: 1px solid #ddd;
   color: #999;
+  pointer-events: none;
 }
 
-/* Alert Styles */
+
 .alert-success {
   padding: 12px 16px;
   background: #f5f5f5;
