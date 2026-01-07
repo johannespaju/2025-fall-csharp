@@ -56,13 +56,23 @@ public class GameRepositoryEF : IRepository<GameState>
     {
         var safeName = Regex.Replace(data.SaveName.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
         data.SaveName = safeName;
-    
+
+        // Check if this is an update by ID (not by SaveName) to avoid foreign key issues
         var existing = _dbContext.GameStates
-            .FirstOrDefault(g => g.SaveName == safeName);
-    
+            .FirstOrDefault(g => g.Id == data.Id);
+
         if (existing == null)
         {
-            // new game state
+            // new game state - also check if SaveName already exists to avoid duplicate names
+            var existingByName = _dbContext.GameStates
+                .FirstOrDefault(g => g.SaveName == safeName);
+            
+            if (existingByName != null)
+            {
+                // Generate a unique name
+                data.SaveName = $"{safeName}_{Guid.NewGuid():N}";
+            }
+            
             _dbContext.GameStates.Add(data);
             _dbContext.SaveChanges();
             return data.Id.ToString();
@@ -74,7 +84,7 @@ public class GameRepositoryEF : IRepository<GameState>
             existing.GameConfigurationId = data.GameConfigurationId;
             existing.BoardJson = data.BoardJson;
             existing.NextMoveByX = data.NextMoveByX;
-        
+
             _dbContext.SaveChanges();
             return existing.Id.ToString();
         }
@@ -125,11 +135,22 @@ public class GameRepositoryEF : IRepository<GameState>
         var safeName = Regex.Replace(data.SaveName.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
         data.SaveName = safeName;
 
+        // Check if this is an update by ID (not by SaveName) to avoid foreign key issues
         var existing = await _dbContext.GameStates
-            .FirstOrDefaultAsync(g => g.SaveName == safeName);
+            .FirstOrDefaultAsync(g => g.Id == data.Id);
 
         if (existing == null)
         {
+            // new game state - also check if SaveName already exists to avoid duplicate names
+            var existingByName = await _dbContext.GameStates
+                .FirstOrDefaultAsync(g => g.SaveName == safeName);
+            
+            if (existingByName != null)
+            {
+                // Generate a unique name
+                data.SaveName = $"{safeName}_{Guid.NewGuid():N}";
+            }
+            
             await _dbContext.GameStates.AddAsync(data);
             await _dbContext.SaveChangesAsync();
             return data.Id.ToString();
