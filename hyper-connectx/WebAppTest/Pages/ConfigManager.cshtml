@@ -157,12 +157,22 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <form method="post" asp-page-handler="LoadForEdit" class="d-inline">
-                                                <input type="hidden" name="id" value="@config.Id" />
-                                                <button type="submit" class="btn btn-outline-secondary" title="Load for editing">
+                                            @if (Model.ConfigHasGames.TryGetValue(config.Id, out var hasGames) && hasGames)
+                                            {
+                                                <button type="button" class="btn btn-outline-secondary" title="Cannot edit: configuration has saved games" disabled>
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
-                                            </form>
+                                                <span class="badge bg-warning text-dark ms-1" title="Has associated games">Has Games</span>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page-handler="LoadForEdit" class="d-inline">
+                                                    <input type="hidden" name="id" value="@config.Id" />
+                                                    <button type="submit" class="btn btn-outline-secondary" title="Load for editing">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </form>
+                                            }
                                             <form method="post" asp-page-handler="Delete" class="d-inline" 
                                                   onsubmit="return confirm('Are you sure you want to delete this configuration?');">
                                                 <input type="hidden" name="id" value="@config.Id" />

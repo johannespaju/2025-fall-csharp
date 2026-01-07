@@ -9,14 +9,21 @@ namespace WebApp.Pages;
 public class ConfigManagerModel : PageModel
 {
     private readonly IRepository<GameConfiguration> _configRepository;
+    private readonly IRepository<GameState> _gameRepository;
 
-    public ConfigManagerModel(IRepository<GameConfiguration> configRepository)
+    public ConfigManagerModel(
+        IRepository<GameConfiguration> configRepository,
+        IRepository<GameState> gameRepository)
     {
         _configRepository = configRepository;
+        _gameRepository = gameRepository;
     }
 
     // List of saved configurations
     public List<GameConfiguration> SavedConfigurations { get; set; } = new();
+    
+    // Tracks which configurations have associated games
+    public Dictionary<Guid, bool> ConfigHasGames { get; set; } = new();
 
     // Form binding properties for creating new configuration
     [BindProperty]
@@ -131,6 +138,19 @@ public class ConfigManagerModel : PageModel
 
         try
         {
+            if (!Guid.TryParse(id, out var configId))
+            {
+                ValidationError = "Invalid configuration ID format.";
+                return Page();
+            }
+            
+            // Check if this configuration has any associated games
+            if (ConfigHasGames.TryGetValue(configId, out var hasGames) && hasGames)
+            {
+                ValidationError = "Cannot edit this configuration because it has one or more saved games associated with it. Delete the associated games first.";
+                return Page();
+            }
+            
             var config = _configRepository.Load(id);
             
             // Populate form with loaded configuration values
@@ -154,7 +174,27 @@ public class ConfigManagerModel : PageModel
     private void LoadConfigurations()
     {
         SavedConfigurations.Clear();
+        ConfigHasGames.Clear();
         var configList = _configRepository.List();
+        
+        // First, load all games to check which configs have associated games
+        var gamesWithConfigs = new HashSet<Guid>();
+        var gameList = _gameRepository.List();
+        foreach (var (gameId, _) in gameList)
+        {
+            try
+            {
+                var game = _gameRepository.Load(gameId);
+                if (game.GameConfigurationId != Guid.Empty)
+                {
+                    gamesWithConfigs.Add(game.GameConfigurationId);
+                }
+            }
+            catch
+            {
+                // Skip games that can't be loaded
+            }
+        }
         
         foreach (var (id, description) in configList)
         {
@@ -162,6 +202,10 @@ public class ConfigManagerModel : PageModel
             {
                 var config = _configRepository.Load(id);
                 SavedConfigurations.Add(config);
+                
+                // Check if this configuration has any associated games
+                var hasGames = gamesWithConfigs.Contains(config.Id);
+                ConfigHasGames[config.Id] = hasGames;
             }
             catch
             {
