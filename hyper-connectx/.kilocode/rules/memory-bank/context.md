@@ -6,7 +6,7 @@ The project is a fully functional Connect X game with:
 - Complete core game logic (BLL)
 - Working data access layer with dual repository support (JSON and EF Core)
 - Console application with animated piece dropping and menu system
-- **Web application** using ASP.NET Core Razor Pages (completed 2025-12-18)
+- **Web application** using ASP.NET Core Razor Pages (completed 2025-12-18, updated 2026-01-07)
 - AI opponent using Minimax with alpha-beta pruning
 
 Both ConsoleApp and WebApp share the same BLL and DAL layers.
@@ -14,25 +14,27 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 ## Recent Changes
 
 - Memory bank initialized on 2025-12-17
-- 2025-12-18: WebApp implementation completed with:
-  - Home page with saved games list (Index)
-  - New game creation form with configuration options (NewGame)
-  - Game board rendering with CSS Grid and move handling (Game)
-  - Full Configuration CRUD pages (Create/Read/Update/Delete)
-  - Shared layout with navigation
-  - CSS styling for responsive game board
-  - Added asynchronous `ListAsync` methods to `GameRepositoryEF` and `GameRepositoryJson` for non‑blocking retrieval of game listings.
-  - Implemented full asynchronous CRUD (`SaveAsync`, `LoadAsync`, `DeleteAsync`) in all repository classes.
+- 2025-12-18: WebApp implementation completed
+- **2026-01-07: Major refactoring - Player names moved from Configuration to GameState**
+  - Database migration `AddPlayerNamesToGameState` moves `P1Name` and `P2Name` from `GameConfigurations` to `GameStates` table
+  - [`GameConfiguration`](BLL/GameConfiguration.cs) no longer stores player names - configurations are now purely game rule templates
+  - [`GameState`](BLL/GameState.cs) now has `P1Name` and `P2Name` properties (defaulting to "Player 1" and "Player 2")
+  - [`GameBrain`](BLL/GameBrain.cs) constructor now accepts `GameState` instead of `GameConfiguration` to access player names
+  - [`NewGame.cshtml.cs`](WebApp/Pages/NewGame.cshtml.cs) now has player name form inputs collected at game creation
+  - [`ConfigManager`](WebApp/Pages/ConfigManager.cshtml.cs) replaced the separate `Configurations/` CRUD pages with a single unified page
+  - Configuration CRUD simplified - edit protection added for configs that have associated games
+  - [`SettingsMenu`](MenuSystem/SettingsMenu.cs) no longer has player name options (player names are per-game, not per-config)
 
 ## Active Work Focus
 
-**WebApp Complete** - The ASP.NET Core Razor Pages web application is fully implemented:
+**WebApp and BLL Refactored** - Player names are now game-specific rather than configuration-specific:
 - Reuses existing BLL (GameBrain, MinimaxAI, GameConfiguration, GameState)
 - Reuses existing DAL (IRepository with EF Core implementation via DI)
 - Supports PvP (Player vs Player) and PvC (Player vs Computer) modes
 - Uses unique game URLs for access (/Game?id={guid})
 - Page refresh for game state updates (no real-time WebSocket/SignalR)
 - Minimal JavaScript (no JS required for core functionality)
+- Configuration management unified in single ConfigManager page
 
 ## Open Questions / Technical Debt
 
@@ -50,6 +52,8 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 
 6. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
 
+7. **ConsoleApp player name input**: May need updating to collect player names at game start (since they're no longer in configuration).
+
 ## Next Steps
 
 1. **Optional enhancements** (not required):
@@ -57,6 +61,7 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
    - Add game lobby/matchmaking system
    - Make AI depth configurable in WebApp
    - Add game history/replay feature
+   - Update ConsoleApp to prompt for player names at game start
 
 ## Dependencies Status
 

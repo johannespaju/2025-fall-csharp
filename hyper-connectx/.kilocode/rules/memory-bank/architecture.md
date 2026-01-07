@@ -58,7 +58,6 @@ hyper-connectx/
 │   ├── SettingsMenu.cs     # Settings UI
 │   └── EMenuLevel.cs       # Menu level enum
 ├── WebApp/                 # ASP.NET Core Razor Pages
-│   ├── ARCHITECTURE.md     # WebApp design document
 │   ├── Program.cs          # ASP.NET Core setup, DI, middleware
 │   ├── WebApp.csproj       # Project file with BLL/DAL references
 │   ├── appsettings.json    # App configuration
@@ -66,20 +65,16 @@ hyper-connectx/
 │   │   ├── _ViewImports.cshtml # Tag helpers, using directives
 │   │   ├── _ViewStart.cshtml   # Layout reference
 │   │   ├── Index.cshtml(.cs)   # Home page with game list
-│   │   ├── NewGame.cshtml(.cs) # Game creation form
+│   │   ├── NewGame.cshtml(.cs) # Game creation form with player names
 │   │   ├── Game.cshtml(.cs)    # Game board and gameplay
-│   │   ├── Configurations/     # Configuration CRUD
-│   │   │   ├── Index.cshtml(.cs)
-│   │   │   ├── Create.cshtml(.cs)
-│   │   │   ├── Edit.cshtml(.cs)
-│   │   │   └── Delete.cshtml(.cs)
+│   │   ├── ConfigManager.cshtml(.cs) # Unified configuration CRUD
 │   │   └── Shared/
 │   │       └── _Layout.cshtml  # Master layout template
 │   └── wwwroot/
 │       ├── css/
 │       │   └── site.css        # All styling including game board
 │       └── js/
-│           └── .gitkeep
+│           └── site.js
 └── ConsoleAppDbTest/       # Database testing project
 ```
 
@@ -96,6 +91,8 @@ Core game engine responsible for:
 - Cylindrical board wrapping via [`WrapX()`](BLL/GameBrain.cs:106)
 - Game state serialization/deserialization
 
+Constructor accepts `GameState` (not `GameConfiguration`) to provide access to both game rules and player names.
+
 #### [`MinimaxAI`](BLL/MinimaxAI.cs)
 AI opponent using Minimax algorithm:
 - Alpha-beta pruning optimization
@@ -107,7 +104,6 @@ AI opponent using Minimax algorithm:
 Configuration entity storing:
 - Board dimensions (width/height)
 - Connect requirement
-- Player names
 - Game mode
 - Cylindrical mode flag
 
@@ -117,6 +113,7 @@ Game save state containing:
 - Board state (serialized as JSON)
 - Next player turn
 - Save name with timestamp
+- Player names (P1Name, P2Name)
 
 ### DAL - Data Access Layer
 
@@ -159,7 +156,7 @@ Application entry point and configuration:
 - [`Index`](WebApp/Pages/Index.cshtml.cs) - Home page listing saved games with load/delete actions
 - [`NewGame`](WebApp/Pages/NewGame.cshtml.cs) - Game creation form with configuration selection
 - [`Game`](WebApp/Pages/Game.cshtml.cs) - Core gameplay page with board rendering and move handling
-- [`Configurations/`](WebApp/Pages/Configurations/) - Full CRUD for game configurations
+- [`ConfigManager`](WebApp/Pages/ConfigManager.cshtml.cs) - Unified configuration CRUD
 
 #### Styling
 - [`site.css`](WebApp/wwwroot/css/site.css) - Comprehensive styling including:

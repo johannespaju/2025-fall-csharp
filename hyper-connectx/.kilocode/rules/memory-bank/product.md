@@ -40,6 +40,11 @@ HyperConnectX is a highly customizable Connect Four game designed to provide fle
 | Board Width | 3-20 | 7 |
 | Board Height | 3-20 | 6 |
 | Connect How Many | 2 to min(width,height) | 4 |
-| Player Names | Any string | "Player 1", "Player 2" |
 | Cylindrical Mode | On/Off | Off |
 | Game Mode | PvP/PvC/CvC | PvP |
+
+## Game Options (set at game creation)
+| Setting | Range | Default |
+|---------|-------|---------|
+| Player 1 Name | Any string (1-50 chars) | "Player 1" |
+| Player 2 Name | Any string (1-50 chars) | "Player 2" |
