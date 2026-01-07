@@ -8,12 +8,12 @@ IRepository<GameConfiguration> configRepo;
 IRepository<GameState> gameRepo;
 
 // json config repository
-configRepo = new ConfigRepositoryJson();
-gameRepo = new  GameRepositoryJson();
+// configRepo = new ConfigRepositoryJson();
+// gameRepo = new  GameRepositoryJson();
 // ef config repository
-// using var dbContext = GetDbContext();
-// configRepo = new ConfigRepositoryEF(dbContext);
-// gameRepo = new GameRepositoryEF(dbContext);
+using var dbContext = GetDbContext();
+configRepo = new ConfigRepositoryEF(dbContext);
+gameRepo = new GameRepositoryEF(dbContext);
 
 var gameConfig = new GameConfiguration();
 
