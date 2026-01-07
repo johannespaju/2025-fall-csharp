@@ -255,9 +255,8 @@
             else
             {
                 <p>Computer is thinking...</p>
-                <form method="post" asp-page-handler="AiMove">
-                    <button type="submit" class="btn btn-warning">Make AI Move</button>
-                </form>
+                <form method="post" asp-page-handler="AiMove" id="pvcAutoPlayForm"></form>
+                <script>setTimeout(function() { document.getElementById('pvcAutoPlayForm').submit(); }, 1000);</script>
             }
         </div>
     }
