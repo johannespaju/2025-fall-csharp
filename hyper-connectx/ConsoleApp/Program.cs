@@ -25,6 +25,12 @@ var main = new Menu("ConnectX Main Menu", EMenuLevel.Root);
 // New game uses the SAME instance
 main.AddMenuItem("n", "Start New Game", () =>
 {
+    Console.Clear();
+    Console.WriteLine("Enter Player 1 name: ");
+    gameConfig.P1Name = Console.ReadLine() ?? "Player 1";
+    Console.Clear();
+    Console.WriteLine("Enter Player 2 name: ");
+    gameConfig.P2Name = Console.ReadLine() ?? "Player 2";
     var controller = new GameController(gameConfig, gameRepo);
     controller.GameLoop();
     return "";
