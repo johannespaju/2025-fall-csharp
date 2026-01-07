@@ -20,7 +20,7 @@ html {
 body {
   margin-bottom: 60px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f5f5f5;
+  background-color: #fafafa;
   color: #333;
 }
 
@@ -33,12 +33,12 @@ body {
 h1 {
   font-size: 28px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #111;
   margin-bottom: 8px;
 }
 
 .text-muted {
-  color: #6c757d;
+  color: #777;
   font-size: 14px;
 }
 
@@ -51,18 +51,18 @@ hr {
 /* ConfigManager div-based styles */
 .card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #ddd;
+  border-radius: 6px;
   margin-bottom: 24px;
-  overflow: hidden;
 }
 
 .card > div:first-child {
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-size: 18px;
+  padding: 14px 18px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
   font-weight: 600;
+  color: #333;
 }
 
 .card > div:not(:first-child) {
@@ -92,19 +92,19 @@ hr {
 .form-group input[type="number"],
 .form-group select {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
   box-sizing: border-box;
+  background: white;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  border-color: #555;
 }
 
 .checkbox-group {
@@ -112,14 +112,14 @@ hr {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 6px;
+  background: #f5f5f5;
+  border-radius: 4px;
   margin-bottom: 20px;
 }
 
 .checkbox-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
 }
 
@@ -130,46 +130,42 @@ hr {
 }
 
 .btn-primary {
-  padding: 12px 28px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 10px 24px;
+  background: #444;
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s;
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
+  background: #333;
 }
 
 /* Configurations List */
 .config-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .config-row {
   display: grid;
   grid-template-columns: 2fr 1fr 0.6fr 2.5fr 0.8fr 1.2fr 1.8fr;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   background: #fafafa;
-  border-radius: 8px;
+  border: 1px solid #eee;
+  border-radius: 4px;
   align-items: center;
-  transition: background-color 0.15s;
 }
 
 .config-row:hover {
-  background: #f0f0f5;
+  background: #f0f0f0;
+  border-color: #ddd;
 }
 
 .config-row > div {
@@ -180,7 +176,7 @@ hr {
 
 .config-name {
   font-weight: 600;
-  color: #1a1a1a;
+  color: #222;
 }
 
 .config-dims,
@@ -195,106 +191,110 @@ hr {
 
 .badge {
   display: inline-block;
-  padding: 5px 10px;
-  border-radius: 20px;
+  padding: 4px 8px;
+  border-radius: 3px;
   font-size: 12px;
   font-weight: 500;
+  border: 1px solid;
 }
 
 .badge-pvp {
-  background: #e7e9ff;
-  color: #4f46e5;
+  background: #f5f5f5;
+  color: #444;
+  border-color: #ddd;
 }
 
 .badge-pvc {
-  background: #dcfce7;
-  color: #16a34a;
+  background: #f5f5f5;
+  color: #444;
+  border-color: #ddd;
 }
 
 .badge-cvc {
-  background: #dbeafe;
-  color: #2563eb;
+  background: #f5f5f5;
+  color: #444;
+  border-color: #ddd;
 }
 
 .badge-cyl {
-  background: #fef3c7;
-  color: #d97706;
+  background: #f5f5f5;
+  color: #444;
+  border-color: #ddd;
 }
 
 .badge-std {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #f5f5f5;
+  color: #444;
+  border-color: #ddd;
 }
 
 .config-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn-edit,
 .btn-delete {
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.15s;
+  background: white;
 }
 
 .btn-edit {
-  background: white;
-  border: 1px solid #ddd;
-  color: #555;
+  border: 1px solid #999;
+  color: #444;
 }
 
 .btn-edit:hover {
-  border-color: #667eea;
-  color: #667eea;
+  background: #eee;
 }
 
 .btn-delete {
-  background: white;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  border: 1px solid #999;
+  color: #444;
 }
 
 .btn-delete:hover {
-  background: #fef2f2;
+  background: #eee;
 }
 
 .btn-disabled {
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  color: #9ca3af;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  color: #999;
 }
 
 /* Alert Styles */
 .alert-success {
-  padding: 14px 18px;
-  background: #dcfce7;
-  border: 1px solid #bbf7d0;
-  border-radius: 6px;
-  color: #166534;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
   margin-bottom: 20px;
 }
 
 .alert-danger {
-  padding: 14px 18px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #991b1b;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
   margin-bottom: 20px;
 }
 
 .alert-info {
   padding: 16px 20px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
-  color: #1e40af;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
   text-align: center;
 }
 
@@ -306,18 +306,19 @@ hr {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #667eea;
+  color: #444;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.15s;
 }
 
 .back-link:hover {
-  color: #764ba2;
+  color: #111;
+  text-decoration: underline;
 }
 
 .validation-error {
-  color: #dc2626;
+  color: #666;
   font-size: 12px;
   margin-top: 4px;
 }
@@ -326,7 +327,7 @@ hr {
 @media (max-width: 900px) {
   .config-row {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }
 
   .config-name {
