@@ -4,22 +4,29 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddRazorPages();
+// Add services to the container.
 
-// Configure SQLite database connection
-var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? $"Data Source={homeDirectory}{Path.DirectorySeparatorChar}app.db";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Path.DirectorySeparatorChar;
+
+connectionString = connectionString.Replace("<db_file>", $"{homeDirectory}app.db");
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(connectionString)
-        .EnableDetailedErrors()
-        .EnableSensitiveDataLogging());
+    options.UseSqlite(connectionString));
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Register repository services
 builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryEF>();
+// builder.Services.AddScoped<IRepository<GameConfiguration>, ConfigRepositoryJson>();
+
+
 builder.Services.AddScoped<IRepository<GameState>, GameRepositoryEF>();
+// builder.Services.AddScoped<IRepository<GameState>, GameRepositoryJson>();
+
+
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -30,20 +37,26 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
+    app.UseMigrationsEndPoint();
+}
+else
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapRazorPages();
+app.MapStaticAssets();
+app.MapRazorPages()
+    .WithStaticAssets();
 
 app.Run();

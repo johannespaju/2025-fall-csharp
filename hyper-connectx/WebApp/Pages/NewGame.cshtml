@@ -18,7 +18,7 @@
         Load from Saved Configuration (Optional)
     </div>
     <div class="card-body">
-        <form method="post" asp-page-handler="LoadConfig" class="form-inline">
+        <form method="post" asp-page-handler="LoadConfig" asp-page="/NewGame" class="form-inline">
             <div class="form-group mr-3">
                 <select asp-for="SelectedConfigId" asp-items="Model.SavedConfigurations" class="form-control"></select>
             </div>

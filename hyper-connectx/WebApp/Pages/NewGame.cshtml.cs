@@ -61,6 +61,18 @@ public class NewGameModel : PageModel
     public void OnGet()
     {
         LoadSavedConfigurations();
+        
+        // Check if we have loaded config data from TempData (after redirect from LoadConfig)
+        if (TempData.ContainsKey("BoardWidth"))
+        {
+            BoardWidth = (int)TempData["BoardWidth"]!;
+            BoardHeight = (int)TempData["BoardHeight"]!;
+            ConnectHowMany = (int)TempData["ConnectHowMany"]!;
+            Player1Name = (string)TempData["Player1Name"]!;
+            Player2Name = (string)TempData["Player2Name"]!;
+            GameMode = (EGameMode)TempData["GameMode"]!;
+            IsCylindrical = (bool)TempData["IsCylindrical"]!;
+        }
     }
 
     public IActionResult OnPost()
@@ -94,6 +106,9 @@ public class NewGameModel : PageModel
             IsCylindrical = IsCylindrical
         };
 
+        // Save the configuration first
+        _configRepository.Save(config);
+
         // Create game brain with configuration
         var brain = new GameBrain(config);
         
@@ -120,18 +135,22 @@ public class NewGameModel : PageModel
             {
                 var config = _configRepository.Load(SelectedConfigId.Value.ToString());
                 
-                // Populate form with loaded configuration values
-                BoardWidth = config.BoardWidth;
-                BoardHeight = config.BoardHeight;
-                ConnectHowMany = config.ConnectHow;
-                Player1Name = config.P1Name;
-                Player2Name = config.P2Name;
-                GameMode = config.Mode;
-                IsCylindrical = config.IsCylindrical;
+                // Populate form with loaded configuration values - store in TempData to survive redirect
+                TempData["BoardWidth"] = config.BoardWidth;
+                TempData["BoardHeight"] = config.BoardHeight;
+                TempData["ConnectHowMany"] = config.ConnectHow;
+                TempData["Player1Name"] = config.P1Name;
+                TempData["Player2Name"] = config.P2Name;
+                TempData["GameMode"] = (int)config.Mode;
+                TempData["IsCylindrical"] = config.IsCylindrical;
+                
+                // Redirect to clean URL
+                return RedirectToPage("/NewGame");
             }
             catch (Exception)
             {
                 ValidationError = "Failed to load the selected configuration.";
+                return Page();
             }
         }
 
