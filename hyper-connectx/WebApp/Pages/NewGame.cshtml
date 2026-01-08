@@ -45,9 +45,7 @@
         <div class="card-body">
             <div class="form-group">
                 <label for="SelectedConfigId">Choose a configuration:</label>
-                <select asp-for="SelectedConfigId" asp-items="Model.SavedConfigurations" class="form-control">
-                    <option value="">-- Select a saved configuration --</option>
-                </select>
+                <select asp-for="SelectedConfigId" asp-items="Model.SavedConfigurations" class="form-control"></select>
                 <span asp-validation-for="SelectedConfigId" class="text-danger"></span>
             </div>
         </div>
