@@ -12,6 +12,8 @@ public class GameBrain
 
     private int? LastMoveColumn { get; set; }
     private int? LastMoveRow { get; set; }
+    
+    private EGameStatus Status { get; set; } = EGameStatus.InProgress;
 
     public GameBrain(GameState gameState)
     {
@@ -221,7 +223,8 @@ public class GameBrain
             P2Name = P2Name,
             GameMode = GameMode,
             LastMoveColumn = LastMoveColumn,
-            LastMoveRow = LastMoveRow
+            LastMoveRow = LastMoveRow,
+            Status = Status
         };
     }
 
@@ -235,7 +238,15 @@ public class GameBrain
         GameMode = state.GameMode;
         LastMoveColumn = state.LastMoveColumn;
         LastMoveRow = state.LastMoveRow;
+        Status = state.Status;
     }
+    
+    public void SetStatus(EGameStatus status)
+    {
+        Status = status;
+    }
+    
+    public EGameStatus GetStatus() => Status;
 
     public bool GetIsCylindrical()
     {

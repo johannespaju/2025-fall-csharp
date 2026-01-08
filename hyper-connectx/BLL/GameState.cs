@@ -26,4 +26,6 @@ public class GameState : BaseEntity
     
     public int? LastMoveColumn { get; set; }
     public int? LastMoveRow { get; set; }
+    
+    public EGameStatus Status { get; set; } = EGameStatus.InProgress;
 }

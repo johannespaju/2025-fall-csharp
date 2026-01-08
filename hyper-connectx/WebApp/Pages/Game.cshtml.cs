@@ -27,6 +27,7 @@ public class GameModel : PageModel
     public string GameMessage { get; private set; } = "";
     public int? LastMoveColumn { get; private set; }
     public int? LastMoveRow { get; private set; }
+    public EGameStatus GameStatus { get; private set; }
 
     public IActionResult OnGet()
     {
@@ -66,9 +67,16 @@ public class GameModel : PageModel
             var winner = Brain.GetWinner(column, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
+                // Set game status
+                Brain.SetStatus(winner == ECellState.XWin ? EGameStatus.XWon : EGameStatus.OWon);
                 // Save the winning board state before redirecting
                 SaveAndRefresh();
                 return RedirectToPage("/Game", new { Id });
+            }
+            // Check for draw
+            if (Brain.IsBoardFull())
+            {
+                Brain.SetStatus(EGameStatus.Draw);
             }
             SaveAndRefresh();
             // PRG: Redirect to GET to prevent re-submission on refresh
@@ -111,9 +119,16 @@ public class GameModel : PageModel
             var winner = Brain.GetWinner(bestColumn, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
+                // Set game status
+                Brain.SetStatus(winner == ECellState.XWin ? EGameStatus.XWon : EGameStatus.OWon);
                 // Save the winning board state before redirecting
                 SaveAndRefresh();
                 return RedirectToPage("/Game", new { Id });
+            }
+            // Check for draw
+            if (Brain.IsBoardFull())
+            {
+                Brain.SetStatus(EGameStatus.Draw);
             }
             SaveAndRefresh();
             // PRG: Redirect to GET to prevent re-submission on refresh
@@ -164,6 +179,9 @@ public class GameModel : PageModel
         LastMoveColumn = state.LastMoveColumn;
         LastMoveRow = state.LastMoveRow;
         
+        // Load game status
+        GameStatus = Brain.GetStatus();
+        
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
             GameMessage = $"{(string.IsNullOrEmpty(state.P1Name) ? "Player 1" : state.P1Name)} Wins!";
@@ -209,6 +227,7 @@ public class GameModel : PageModel
         existingState.GameMode = currentGameState.GameMode;
         existingState.LastMoveColumn = currentGameState.LastMoveColumn;
         existingState.LastMoveRow = currentGameState.LastMoveRow;
+        existingState.Status = currentGameState.Status;
         
         // Save the updated state (Configuration relationship is preserved)
         _gameRepository.Save(existingState);

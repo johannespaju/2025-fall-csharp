@@ -38,7 +38,21 @@
                             @(game.Configuration?.BoardWidth)x@(game.Configuration?.BoardHeight)
                         </td>
                         <td>
-                            @(game.NextMoveByX ? "X's Turn" : "O's Turn")
+                            @switch (game.Status)
+                            {
+                                case BLL.EGameStatus.InProgress:
+                                    @(game.NextMoveByX ? $"{game.P1Name}'s Turn" : $"{game.P2Name}'s Turn")
+                                    break;
+                                case BLL.EGameStatus.XWon:
+                                    @($"{game.P1Name} won")
+                                    break;
+                                case BLL.EGameStatus.OWon:
+                                    @($"{game.P2Name} won")
+                                    break;
+                                case BLL.EGameStatus.Draw:
+                                    @("Draw")
+                                    break;
+                            }
                         </td>
                         <td>
                             <a asp-page="/Game" asp-route-id="@game.Id" class="btn btn-success btn-sm">Load</a>
