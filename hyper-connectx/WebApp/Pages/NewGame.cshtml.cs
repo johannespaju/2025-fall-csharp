@@ -25,6 +25,9 @@ public class NewGameModel : PageModel
 
     // Form binding properties
     [BindProperty]
+    public string ConfigChoice { get; set; } = "new";
+
+    [BindProperty]
     public Guid? SelectedConfigId { get; set; }
 
     [BindProperty]
@@ -61,51 +64,53 @@ public class NewGameModel : PageModel
     public void OnGet()
     {
         LoadSavedConfigurations();
-        
-        // Check if we have loaded config data from TempData (after redirect from LoadConfig)
-        if (TempData.ContainsKey("BoardWidth"))
-        {
-            BoardWidth = (int)TempData["BoardWidth"]!;
-            BoardHeight = (int)TempData["BoardHeight"]!;
-            ConnectHowMany = (int)TempData["ConnectHowMany"]!;
-            Player1Name = (string)TempData["Player1Name"]!;
-            Player2Name = (string)TempData["Player2Name"]!;
-            GameMode = (EGameMode)TempData["GameMode"]!;
-            IsCylindrical = (bool)TempData["IsCylindrical"]!;
-        }
     }
 
     public IActionResult OnPost()
     {
         LoadSavedConfigurations();
 
-        // Custom validation: ConnectHowMany must be <= min(BoardWidth, BoardHeight)
-        var maxConnect = Math.Min(BoardWidth, BoardHeight);
-        if (ConnectHowMany > maxConnect)
+        // If using existing config, load it
+        GameConfiguration config;
+        if (SelectedConfigId.HasValue && SelectedConfigId.Value != Guid.Empty)
         {
-            ValidationError = $"Connect How Many ({ConnectHowMany}) cannot exceed the minimum board dimension ({maxConnect})";
-            return Page();
+            config = _configRepository.Load(SelectedConfigId.Value.ToString())!;
+            if (config == null)
+            {
+                ValidationError = "Selected configuration not found.";
+                return Page();
+            }
         }
-
-        if (!ModelState.IsValid)
+        else
         {
-            return Page();
+            // Custom validation: ConnectHowMany must be <= min(BoardWidth, BoardHeight)
+            var maxConnect = Math.Min(BoardWidth, BoardHeight);
+            if (ConnectHowMany > maxConnect)
+            {
+                ValidationError = $"Connect How Many ({ConnectHowMany}) cannot exceed the minimum board dimension ({maxConnect})";
+                return Page();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            // Create new configuration
+            config = new GameConfiguration
+            {
+                Id = Guid.NewGuid(),
+                Name = $"Game Config {DateTime.Now:yyyy-MM-dd HH:mm}",
+                BoardWidth = BoardWidth,
+                BoardHeight = BoardHeight,
+                ConnectHow = ConnectHowMany,
+                Mode = GameMode,
+                IsCylindrical = IsCylindrical
+            };
+
+            // Save the configuration
+            _configRepository.Save(config);
         }
-
-        // Create game configuration
-        var config = new GameConfiguration
-        {
-            Id = Guid.NewGuid(),
-            Name = $"Game Config {DateTime.Now:yyyy-MM-dd HH:mm}",
-            BoardWidth = BoardWidth,
-            BoardHeight = BoardHeight,
-            ConnectHow = ConnectHowMany,
-            Mode = GameMode,
-            IsCylindrical = IsCylindrical
-        };
-
-        // Save the configuration first
-        _configRepository.Save(config);
 
         // Create game brain with configuration
         // Create a temporary GameState to initialize GameBrain, then set player names
@@ -130,37 +135,6 @@ public class NewGameModel : PageModel
         return RedirectToPage("/Game", new { id = gameState.Id });
     }
 
-    public IActionResult OnPostLoadConfig()
-    {
-        LoadSavedConfigurations();
-
-        if (SelectedConfigId.HasValue && SelectedConfigId.Value != Guid.Empty)
-        {
-            try
-            {
-                var config = _configRepository.Load(SelectedConfigId.Value.ToString());
-                
-                // Populate form with loaded configuration values - store in TempData to survive redirect
-                TempData["BoardWidth"] = config.BoardWidth;
-                TempData["BoardHeight"] = config.BoardHeight;
-                TempData["ConnectHowMany"] = config.ConnectHow;
-                TempData["Player1Name"] = "Player 1"; // Default name for loaded configs
-                TempData["Player2Name"] = "Player 2"; // Default name for loaded configs
-                TempData["GameMode"] = (int)config.Mode;
-                TempData["IsCylindrical"] = config.IsCylindrical;
-                
-                // Redirect to clean URL
-                return RedirectToPage("/NewGame");
-            }
-            catch (Exception)
-            {
-                ValidationError = "Failed to load the selected configuration.";
-                return Page();
-            }
-        }
-
-        return Page();
-    }
 
     private void LoadSavedConfigurations()
     {

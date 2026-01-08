@@ -13,22 +13,48 @@
     </div>
 }
 
-<div class="card mb-4">
-    <div class="card-header">
-        Load from Saved Configuration (Optional)
-    </div>
-    <div class="card-body">
-        <form method="post" asp-page-handler="LoadConfig" asp-page="/NewGame" class="form-inline">
-            <div class="form-group mr-3">
-                <select asp-for="SelectedConfigId" asp-items="Model.SavedConfigurations" class="form-control"></select>
-            </div>
-            <button type="submit" class="btn btn-secondary">Load Configuration</button>
-        </form>
-    </div>
-</div>
-
 <form method="post">
+    <!-- Configuration Choice -->
     <div class="card mb-4">
+        <div class="card-header">
+            Configuration Source
+        </div>
+        <div class="card-body">
+            <div class="form-check mb-2">
+                <input type="radio" id="configChoiceNew" name="ConfigChoice" value="new" class="form-check-input"
+                       @(Model.ConfigChoice == "new" || !Model.SelectedConfigId.HasValue ? "checked" : "") />
+                <label for="configChoiceNew" class="form-check-label">
+                    <strong>Custom Configuration</strong> - Set up your own board settings
+                </label>
+            </div>
+            <div class="form-check">
+                <input type="radio" id="configChoiceExisting" name="ConfigChoice" value="existing" class="form-check-input"
+                       @(Model.SelectedConfigId.HasValue ? "checked" : "") />
+                <label for="configChoiceExisting" class="form-check-label">
+                    <strong>Use Existing Configuration</strong> - Load a saved configuration
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Config Selection (shown when "Use Existing Config" is selected) -->
+    <div class="card mb-4" id="existingConfigSection" style="display: @(Model.SelectedConfigId.HasValue ? "block" : "none");">
+        <div class="card-header">
+            Select Saved Configuration
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="SelectedConfigId">Choose a configuration:</label>
+                <select asp-for="SelectedConfigId" asp-items="Model.SavedConfigurations" class="form-control">
+                    <option value="">-- Select a saved configuration --</option>
+                </select>
+                <span asp-validation-for="SelectedConfigId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Configuration (shown when "Custom Configuration" is selected) -->
+    <div class="card mb-4" id="customConfigSection" style="display: @(Model.SelectedConfigId.HasValue ? "none" : "block");">
         <div class="card-header">
             Board Settings
         </div>
@@ -40,14 +66,14 @@
                     <span asp-validation-for="BoardWidth" class="text-danger"></span>
                     <small class="form-text">3-20 columns</small>
                 </div>
-                
+
                 <div class="form-group" style="min-width: 150px;">
                     <label asp-for="BoardHeight">Board Height</label>
                     <input asp-for="BoardHeight" type="number" min="3" max="20" class="form-control" />
                     <span asp-validation-for="BoardHeight" class="text-danger"></span>
                     <small class="form-text">3-20 rows</small>
                 </div>
-                
+
                 <div class="form-group" style="min-width: 150px;">
                     <label asp-for="ConnectHowMany">Connect How Many</label>
                     <input asp-for="ConnectHowMany" type="number" min="2" max="20" class="form-control" />
@@ -55,45 +81,8 @@
                     <small class="form-text">2 to min(width, height)</small>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            Player Settings
-        </div>
-        <div class="card-body">
-            <div class="d-flex gap-3 flex-wrap">
-                <div class="form-group" style="min-width: 200px; flex: 1;">
-                    <label asp-for="Player1Name">Player 1 Name (X)</label>
-                    <input asp-for="Player1Name" type="text" class="form-control" placeholder="Enter player 1 name" />
-                    <span asp-validation-for="Player1Name" class="text-danger"></span>
-                </div>
-                
-                <div class="form-group" style="min-width: 200px; flex: 1;">
-                    <label asp-for="Player2Name">Player 2 Name (O)</label>
-                    <input asp-for="Player2Name" type="text" class="form-control" placeholder="Enter player 2 name" />
-                    <span asp-validation-for="Player2Name" class="text-danger"></span>
-                </div>
-            </div>
-            
-            <div class="form-group mt-3">
-                <label asp-for="GameMode">Game Mode</label>
-                <select asp-for="GameMode" asp-items="Html.GetEnumSelectList<BLL.EGameMode>()" class="form-control" style="max-width: 300px;"></select>
-                <small class="form-text">
-                    <strong>PvP</strong> = Player vs Player | 
-                    <strong>PvC</strong> = Player vs Computer (AI plays as O)
-                </small>
-            </div>
-        </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header">
-            Additional Settings
-        </div>
-        <div class="card-body">
-            <div class="form-check">
+            <div class="form-check mt-3">
                 <input asp-for="IsCylindrical" type="checkbox" class="form-check-input" />
                 <label asp-for="IsCylindrical" class="form-check-label">
                     Cylindrical Mode
@@ -105,9 +94,63 @@
         </div>
     </div>
 
+    <!-- Player Settings (always shown) -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Player Settings
+        </div>
+        <div class="card-body">
+            <div class="d-flex gap-3 flex-wrap">
+                <div class="form-group" style="min-width: 200px; flex: 1;">
+                    <label asp-for="Player1Name">Player 1 Name (X)</label>
+                    <input asp-for="Player1Name" type="text" class="form-control" placeholder="Enter player 1 name" />
+                    <span asp-validation-for="Player1Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="min-width: 200px; flex: 1;">
+                    <label asp-for="Player2Name">Player 2 Name (O)</label>
+                    <input asp-for="Player2Name" type="text" class="form-control" placeholder="Enter player 2 name" />
+                    <span asp-validation-for="Player2Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="GameMode">Game Mode</label>
+                <select asp-for="GameMode" asp-items="Html.GetEnumSelectList<BLL.EGameMode>()" class="form-control" style="max-width: 300px;"></select>
+                <small class="form-text">
+                    <strong>PvP</strong> = Player vs Player |
+                    <strong>PvC</strong> = Player vs Computer (AI plays as O)
+                </small>
+            </div>
+        </div>
+    </div>
+
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary btn-lg">Start Game</button>
         <a asp-page="/Index" class="btn btn-secondary btn-lg">Cancel</a>
     </div>
 </form>
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const configChoiceNew = document.getElementById('configChoiceNew');
+            const configChoiceExisting = document.getElementById('configChoiceExisting');
+            const existingConfigSection = document.getElementById('existingConfigSection');
+            const customConfigSection = document.getElementById('customConfigSection');
+
+            function updateVisibility() {
+                if (configChoiceExisting.checked) {
+                    existingConfigSection.style.display = 'block';
+                    customConfigSection.style.display = 'none';
+                } else {
+                    existingConfigSection.style.display = 'none';
+                    customConfigSection.style.display = 'block';
+                }
+            }
+
+            configChoiceNew.addEventListener('change', updateVisibility);
+            configChoiceExisting.addEventListener('change', updateVisibility);
+        });
+    </script>
+}
