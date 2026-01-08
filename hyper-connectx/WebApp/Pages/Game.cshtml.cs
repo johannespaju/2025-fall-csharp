@@ -61,8 +61,8 @@ public class GameModel : PageModel
             LastMoveColumn = column;
             LastMoveRow = moveResult.FinalRow;
             
-            // Check winner immediately after move
-            var winner = Brain.MarkWinner();
+            // Check winner immediately after move using optimized GetWinner(x, y)
+            var winner = Brain.GetWinner(column, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
                 GameState = Brain.GetGameState();
@@ -104,8 +104,8 @@ public class GameModel : PageModel
             LastMoveColumn = bestColumn;
             LastMoveRow = moveResult.FinalRow;
             
-            // Check winner immediately after move
-            var winner = Brain.MarkWinner();
+            // Check winner immediately after AI move using optimized GetWinner(x, y)
+            var winner = Brain.GetWinner(bestColumn, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
                 GameState = Brain.GetGameState();
@@ -139,7 +139,7 @@ public class GameModel : PageModel
         Brain = new GameBrain(state);
         Brain.LoadGameState(state);
         
-        // Check for winner by scanning all cells
+        // Check for winner by scanning for XWin/OWin cells (already marked in board)
         Winner = FindWinner();
         IsDraw = Winner == null && Brain.IsBoardFull();
         
