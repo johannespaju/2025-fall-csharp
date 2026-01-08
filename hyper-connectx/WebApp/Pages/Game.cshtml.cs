@@ -65,9 +65,8 @@ public class GameModel : PageModel
             var winner = Brain.GetWinner(column, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
-                GameState = Brain.GetGameState();
-                _gameRepository.Save(GameState);
-                // PRG: Redirect to GET to prevent re-submission on refresh
+                // Save the winning board state before redirecting
+                SaveAndRefresh();
                 return RedirectToPage("/Game", new { Id });
             }
             SaveAndRefresh();
@@ -110,9 +109,8 @@ public class GameModel : PageModel
             var winner = Brain.GetWinner(bestColumn, moveResult.FinalRow);
             if (winner == ECellState.XWin || winner == ECellState.OWin)
             {
-                GameState = Brain.GetGameState();
-                _gameRepository.Save(GameState);
-                // PRG: Redirect to GET to prevent re-submission on refresh
+                // Save the winning board state before redirecting
+                SaveAndRefresh();
                 return RedirectToPage("/Game", new { Id });
             }
             SaveAndRefresh();

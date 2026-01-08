@@ -17,7 +17,7 @@ public class GameState : BaseEntity
         set => BoardJson = JsonSerializer.Serialize(value);
     }
     public bool NextMoveByX { get; set; }
-    public string SaveName { get; set; } = $"Save_{DateTime.UtcNow:MM-dd_hh_mm}";
+    public string SaveName { get; set; } = $"Game_{DateTime.UtcNow:yyyy-MM-dd_HH-mm}";
     
     public string P1Name { get; set; } = "Player 1";
     public string P2Name { get; set; } = "Player 2";
