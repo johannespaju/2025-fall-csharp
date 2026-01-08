@@ -61,6 +61,24 @@ public class ConfigManagerModel : PageModel
         LoadConfigurations();
     }
 
+    private bool ConfigNameExists(string name, Guid? excludeId = null)
+    {
+        var configList = _configRepository.List();
+        foreach (var (id, _) in configList)
+        {
+            if (excludeId.HasValue && id == excludeId.Value.ToString())
+            {
+                continue; // Skip the config being edited
+            }
+            var config = _configRepository.Load(id);
+            if (config.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public IActionResult OnPostCreate()
     {
         LoadConfigurations();
@@ -70,6 +88,13 @@ public class ConfigManagerModel : PageModel
         if (ConnectHowMany > maxConnect)
         {
             ValidationError = $"Connect How Many ({ConnectHowMany}) cannot exceed the minimum board dimension ({maxConnect})";
+            return Page();
+        }
+
+        // Check for duplicate configuration name
+        if (ConfigNameExists(ConfigName))
+        {
+            ValidationError = $"A configuration with the name '{ConfigName}' already exists. Please choose a different name.";
             return Page();
         }
 
@@ -175,6 +200,13 @@ public class ConfigManagerModel : PageModel
         if (ConnectHowMany > maxConnect)
         {
             ValidationError = $"Connect How Many ({ConnectHowMany}) cannot exceed the minimum board dimension ({maxConnect})";
+            return Page();
+        }
+
+        // Check for duplicate configuration name (excluding the current config being edited)
+        if (ConfigNameExists(ConfigName, EditingConfigId))
+        {
+            ValidationError = $"A configuration with the name '{ConfigName}' already exists. Please choose a different name.";
             return Page();
         }
 
