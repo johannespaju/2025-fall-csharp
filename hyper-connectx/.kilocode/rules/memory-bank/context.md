@@ -6,7 +6,7 @@ The project is a fully functional Connect X game with:
 - Complete core game logic (BLL)
 - Working data access layer with dual repository support (JSON and EF Core)
 - Console application with animated piece dropping and menu system
-- **Web application** using ASP.NET Core Razor Pages (completed 2025-12-18, updated 2026-01-07)
+- **Web application** using ASP.NET Core Razor Pages (completed 2025-12-18, updated 2026-01-08)
 - AI opponent using Minimax with alpha-beta pruning
 
 Both ConsoleApp and WebApp share the same BLL and DAL layers.
@@ -15,26 +15,26 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 
 - Memory bank initialized on 2025-12-17
 - 2025-12-18: WebApp implementation completed
-- **2026-01-07: Major refactoring - Player names moved from Configuration to GameState**
-  - Database migration `AddPlayerNamesToGameState` moves `P1Name` and `P2Name` from `GameConfigurations` to `GameStates` table
-  - [`GameConfiguration`](BLL/GameConfiguration.cs) no longer stores player names - configurations are now purely game rule templates
-  - [`GameState`](BLL/GameState.cs) now has `P1Name` and `P2Name` properties (defaulting to "Player 1" and "Player 2")
-  - [`GameBrain`](BLL/GameBrain.cs) constructor now accepts `GameState` instead of `GameConfiguration` to access player names
-  - [`NewGame.cshtml.cs`](WebApp/Pages/NewGame.cshtml.cs) now has player name form inputs collected at game creation
-  - [`ConfigManager`](WebApp/Pages/ConfigManager.cshtml.cs) replaced the separate `Configurations/` CRUD pages with a single unified page
-  - Configuration CRUD simplified - edit protection added for configs that have associated games
-  - [`SettingsMenu`](MenuSystem/SettingsMenu.cs) no longer has player name options (player names are per-game, not per-config)
+- 2026-01-07: Major refactoring - Player names moved from Configuration to GameState
+- **2026-01-08: Major refactoring - GameMode moved from Configuration to GameState**
+  - New database migration `MoveGameModeToGameState` removes `Mode` from `GameConfigurations` and adds `GameMode` to `GameStates` table
+  - [`GameConfiguration`](BLL/GameConfiguration.cs) is now purely rule-based (board size, connect requirement, cylindrical mode only)
+  - [`GameState`](BLL/GameState.cs) now has `EGameMode GameMode` property (defaulting to `EGameMode.PvP`)
+  - [`GameBrain`](BLL/GameBrain.cs) reads game mode from `GameState`, not configuration
+  - New file [`BLL/EDatabaseProvider.cs`](BLL/EDatabaseProvider.cs) - Central database provider configuration enum and static config
+  - Both [`WebApp/Program.cs`](WebApp/Program.cs) and [`ConsoleApp/Program.cs`](ConsoleApp/Program.cs) now use `DatabaseConfig.CurrentProvider` to select repository implementation
+  - Repository switching is now centralized - change `DatabaseConfig.CurrentProvider` in `BLL/EDatabaseProvider.cs` to switch storage
+  - [`NewGame.cshtml.cs`](WebApp/Pages/NewGame.cshtml.cs) collects player names AND game mode at game creation time
+  - [`ConsoleApp/Program.cs`](ConsoleApp/Program.cs) prompts for player names and game mode when starting a new game
+  - [`GameController`](ConsoleApp/GameController.cs) constructor now takes `EGameMode`, `p1Name`, and `p2Name` parameters
 
 ## Active Work Focus
 
-**WebApp and BLL Refactored** - Player names are now game-specific rather than configuration-specific:
-- Reuses existing BLL (GameBrain, MinimaxAI, GameConfiguration, GameState)
-- Reuses existing DAL (IRepository with EF Core implementation via DI)
-- Supports PvP (Player vs Player) and PvC (Player vs Computer) modes
-- Uses unique game URLs for access (/Game?id={guid})
-- Page refresh for game state updates (no real-time WebSocket/SignalR)
-- Minimal JavaScript (no JS required for core functionality)
-- Configuration management unified in single ConfigManager page
+**Configurations are now pure rule templates** - All per-game settings (player names, game mode) are in GameState:
+- `GameConfiguration` defines board rules: width, height, connect requirement, cylindrical mode
+- `GameState` holds game-specific data: player names, game mode, board state, turn
+- Repository selection is centralized via `DatabaseConfig.CurrentProvider` enum
+- Both ConsoleApp and WebApp now prompt for player names and game mode at game start
 
 ## Open Questions / Technical Debt
 
@@ -46,13 +46,9 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 
 3. **Hardcoded AI depth**: The Minimax depth is set at construction time but defaults to 6 - could be made configurable via settings.
 
-4. **Repository switching in ConsoleApp**: JSON vs EF Core is currently selected by commenting/uncommenting code in Program.cs - could be made configurable.
+4. **WebApp AI delay**: No artificial delay for AI moves - AI responds instantly which may feel abrupt to users.
 
-5. **WebApp AI delay**: No artificial delay for AI moves - AI responds instantly which may feel abrupt to users.
-
-6. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
-
-7. **ConsoleApp player name input**: May need updating to collect player names at game start (since they're no longer in configuration).
+5. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
 
 ## Next Steps
 
@@ -61,7 +57,6 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
    - Add game lobby/matchmaking system
    - Make AI depth configurable in WebApp
    - Add game history/replay feature
-   - Update ConsoleApp to prompt for player names at game start
 
 ## Dependencies Status
 

@@ -82,17 +82,30 @@ dotnet run --project WebApp
 - AI always plays as O (second player) in PvC mode
 
 ### Repository Selection
-Currently EF Core is used (JSON repositories commented out in Program.cs):
-```csharp
-// Currently active:
-configRepo = new ConfigRepositoryEF(dbContext);
-gameRepo = new GameRepositoryEF(dbContext);
+Repository selection is now centralized via `DatabaseConfig.CurrentProvider` in [`BLL/EDatabaseProvider.cs`](BLL/EDatabaseProvider.cs):
 
-// Alternative (JSON-based):
-// configRepo = new ConfigRepositoryJson();
-// gameRepo = new GameRepositoryJson();
+```csharp
+// Change this to switch storage backend:
+public static EDatabaseProvider CurrentProvider { get; set; } = EDatabaseProvider.EntityFramework;
 ```
-- Both EF and JSON repositories now expose `ListAsync` for asynchronous retrieval of game listings.
+
+Both ConsoleApp and WebApp use this setting to initialize the correct repositories:
+```csharp
+switch (DatabaseConfig.CurrentProvider)
+{
+    case EDatabaseProvider.EntityFramework:
+        configRepo = new ConfigRepositoryEF(dbContext);
+        gameRepo = new GameRepositoryEF(dbContext);
+        break;
+    case EDatabaseProvider.Json:
+    default:
+        configRepo = new ConfigRepositoryJson();
+        gameRepo = new GameRepositoryJson();
+        break;
+}
+```
+
+- Both EF and JSON repositories expose `ListAsync` for asynchronous retrieval of game listings.
 - Full async CRUD methods (`SaveAsync`, `LoadAsync`, `DeleteAsync`) added using EF Core async APIs and `Task.Run` for file‑based repositories.
 
 ## Code Quality

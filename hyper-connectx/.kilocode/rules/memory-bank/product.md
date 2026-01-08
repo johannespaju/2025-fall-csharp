@@ -12,17 +12,18 @@ HyperConnectX is a highly customizable Connect Four game designed to provide fle
 ## How It Works
 
 ### Game Flow
-1. User launches the console application
+1. User launches the console or web application
 2. Main menu offers: New Game, Settings, Save/Load Configuration, Load/Delete Saved Games
-3. Settings allow customization of all game parameters
-4. Game starts with selected configuration
-5. Players take turns dropping pieces into columns
-6. First to connect the required number of pieces wins (or draw if board fills)
-7. Game can be saved at any point
+3. Settings allow customization of board rules (size, connect requirement, cylindrical mode)
+4. When starting a new game, user enters player names and selects game mode
+5. Game starts with selected configuration
+6. Players take turns dropping pieces into columns
+7. First to connect the required number of pieces wins (or draw if board fills)
+8. Game can be saved at any point
 
 ### User Experience Goals
-- **Intuitive Console Interface**: Arrow key navigation in menus and during gameplay
-- **Visual Feedback**: Animated piece dropping effect when placing pieces
+- **Intuitive Interface**: Arrow key navigation in console; click-based in web
+- **Visual Feedback**: Animated piece dropping effect when placing pieces (console app)
 - **Clear Game State**: Board displayed with row/column numbers, current player indicator
 - **Persistent Data**: Games and configurations survive between sessions
 - **Flexible Storage**: Supports both JSON files and SQLite database backends
@@ -34,17 +35,17 @@ HyperConnectX is a highly customizable Connect Four game designed to provide fle
 | PvC | Human player vs AI (AI is always O/Player 2) |
 | CvC | Two AI opponents compete (for demonstration/testing) |
 
-## Configuration Options
+## Configuration Options (saved in GameConfiguration)
 | Setting | Range | Default |
 |---------|-------|---------|
 | Board Width | 3-20 | 7 |
 | Board Height | 3-20 | 6 |
 | Connect How Many | 2 to min(width,height) | 4 |
 | Cylindrical Mode | On/Off | Off |
-| Game Mode | PvP/PvC/CvC | PvP |
 
-## Game Options (set at game creation)
+## Game Options (set at game creation, saved in GameState)
 | Setting | Range | Default |
 |---------|-------|---------|
 | Player 1 Name | Any string (1-50 chars) | "Player 1" |
 | Player 2 Name | Any string (1-50 chars) | "Player 2" |
+| Game Mode | PvP/PvC/CvC | PvP |
