@@ -39,6 +39,11 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - Added `IsHidden` property to [`GameConfiguration`](BLL/GameConfiguration.cs) to allow hiding configurations from UI
   - New database migration `AddIsHiddenToGameConfiguration` adds `IsHidden` column to `GameConfigurations` table
   - Configurations can be hidden while preserving existing games that use them
+- **2026-01-08: Database Schema Mismatch Bug Fixed**
+  - Added `LastMoveColumn` and `LastMoveRow` properties to [`BLL/GameState.cs`](BLL/GameState.cs:27)
+  - These properties were added in migration `20260108194806_AddLastMoveToGameState` but were missing from the entity class
+  - A subsequent migration `20260108195505_fix` dropped these columns from the database
+  - To persist these values, a new EF Core migration will need to be created
 
 ## Active Work Focus
 
@@ -62,12 +67,13 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 
 5. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
 
+6. ~~LastMove columns not persisted~~: **RESOLVED** - Migration `AddLastMoveBack` re-added the `LastMoveColumn` and `LastMoveRow` columns to the database. The entity properties in `GameState.cs` now match the database schema.
+
 ## Next Steps
 
 1. **Optional enhancements** (not required):
    - Add SignalR for real-time game updates in WebApp
    - Add game lobby/matchmaking system
-   - Make AI depth configurable in WebApp
    - Add game history/replay feature
 
 ## Dependencies Status

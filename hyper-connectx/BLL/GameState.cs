@@ -23,4 +23,7 @@ public class GameState : BaseEntity
     public string P2Name { get; set; } = "Player 2";
     
     public EGameMode GameMode { get; set; } = EGameMode.PvP;
+    
+    public int? LastMoveColumn { get; set; }
+    public int? LastMoveRow { get; set; }
 }
