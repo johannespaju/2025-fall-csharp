@@ -46,6 +46,12 @@ public class ConfigManagerModel : PageModel
     [BindProperty]
     public bool IsCylindrical { get; set; } = false;
 
+    // Properties for editing existing configuration
+    [BindProperty]
+    public Guid? EditingConfigId { get; set; }
+
+    public bool IsEditing => EditingConfigId.HasValue;
+
     // Validation and status messages
     public string? ValidationError { get; set; }
     public string? SuccessMessage { get; set; }
@@ -138,6 +144,7 @@ public class ConfigManagerModel : PageModel
             var config = _configRepository.Load(id);
             
             // Populate form with loaded configuration values
+            EditingConfigId = config.Id;
             ConfigName = config.Name;
             BoardWidth = config.BoardWidth;
             BoardHeight = config.BoardHeight;
@@ -149,6 +156,64 @@ public class ConfigManagerModel : PageModel
             ValidationError = $"Error loading configuration: {ex.Message}";
         }
 
+        return Page();
+    }
+
+    public IActionResult OnPostUpdate()
+    {
+        if (!EditingConfigId.HasValue)
+        {
+            ValidationError = "No configuration is being edited.";
+            LoadConfigurations();
+            return Page();
+        }
+        
+        LoadConfigurations();
+
+        // Custom validation: ConnectHowMany must be <= min(BoardWidth, BoardHeight)
+        var maxConnect = Math.Min(BoardWidth, BoardHeight);
+        if (ConnectHowMany > maxConnect)
+        {
+            ValidationError = $"Connect How Many ({ConnectHowMany}) cannot exceed the minimum board dimension ({maxConnect})";
+            return Page();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        try
+        {
+            var config = _configRepository.Load(EditingConfigId.Value.ToString());
+            config.Name = ConfigName;
+            config.BoardWidth = BoardWidth;
+            config.BoardHeight = BoardHeight;
+            config.ConnectHow = ConnectHowMany;
+            config.IsCylindrical = IsCylindrical;
+            
+            _configRepository.Save(config);
+            SuccessMessage = $"Configuration '{ConfigName}' updated successfully!";
+            
+            // Exit edit mode and reset form
+            EditingConfigId = null;
+            ResetForm();
+            LoadConfigurations();
+        }
+        catch (Exception ex)
+        {
+            ValidationError = $"Error updating configuration: {ex.Message}";
+        }
+
+        return Page();
+    }
+
+    public IActionResult OnPostCancelEdit()
+    {
+        EditingConfigId = null;
+        ResetForm();
+        LoadConfigurations();
+        SuccessMessage = "Edit cancelled.";
         return Page();
     }
 

@@ -24,50 +24,108 @@
         </div>
     }
 
-    <!-- Create/Edit Configuration Form -->
-    <div class="card">
-        <div>Create New Configuration</div>
-        <div>
-            <form method="post" asp-page-handler="Create">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label asp-for="ConfigName">Configuration Name</label>
-                        <input asp-for="ConfigName" />
-                        <span asp-validation-for="ConfigName" class="validation-error"></span>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="form-group">
-                        <label asp-for="BoardWidth">Board Width</label>
-                        <input asp-for="BoardWidth" type="number" min="3" max="20" />
-                        <span asp-validation-for="BoardWidth" class="validation-error"></span>
+    <!-- Create New Configuration Section -->
+    @if (!Model.IsEditing)
+    {
+        <div class="card">
+            <div>Create New Configuration</div>
+            <div>
+                <form method="post" asp-page-handler="Create">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label asp-for="ConfigName">Configuration Name</label>
+                            <input asp-for="ConfigName" />
+                            <span asp-validation-for="ConfigName" class="validation-error"></span>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="BoardHeight">Board Height</label>
-                        <input asp-for="BoardHeight" type="number" min="3" max="20" />
-                        <span asp-validation-for="BoardHeight" class="validation-error"></span>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label asp-for="BoardWidth">Board Width</label>
+                            <input asp-for="BoardWidth" type="number" min="3" max="20" />
+                            <span asp-validation-for="BoardWidth" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="BoardHeight">Board Height</label>
+                            <input asp-for="BoardHeight" type="number" min="3" max="20" />
+                            <span asp-validation-for="BoardHeight" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ConnectHowMany">Connect How Many</label>
+                            <input asp-for="ConnectHowMany" type="number" min="2" max="20" />
+                            <span asp-validation-for="ConnectHowMany" class="validation-error"></span>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="ConnectHowMany">Connect How Many</label>
-                        <input asp-for="ConnectHowMany" type="number" min="2" max="20" />
-                        <span asp-validation-for="ConnectHowMany" class="validation-error"></span>
+                    <div class="checkbox-group">
+                        <input asp-for="IsCylindrical" type="checkbox" />
+                        <label asp-for="IsCylindrical">
+                            Cylindrical Board (wraps horizontally)
+                        </label>
                     </div>
-                </div>
 
-                <div class="checkbox-group">
-                    <input asp-for="IsCylindrical" type="checkbox" />
-                    <label asp-for="IsCylindrical">
-                        Cylindrical Board (wraps horizontally)
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-primary">Create Configuration</button>
-            </form>
+                    <button type="submit" class="btn-primary">Create Configuration</button>
+                </form>
+            </div>
         </div>
-    </div>
+    }
+
+    <!-- Edit Existing Configuration Section -->
+    @if (Model.IsEditing)
+    {
+        <div class="card">
+            <div>Edit Configuration</div>
+            <div>
+                <form method="post" asp-page-handler="Update">
+                    <input type="hidden" asp-for="EditingConfigId" />
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label asp-for="ConfigName">Configuration Name</label>
+                            <input asp-for="ConfigName" />
+                            <span asp-validation-for="ConfigName" class="validation-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label asp-for="BoardWidth">Board Width</label>
+                            <input asp-for="BoardWidth" type="number" min="3" max="20" />
+                            <span asp-validation-for="BoardWidth" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="BoardHeight">Board Height</label>
+                            <input asp-for="BoardHeight" type="number" min="3" max="20" />
+                            <span asp-validation-for="BoardHeight" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ConnectHowMany">Connect How Many</label>
+                            <input asp-for="ConnectHowMany" type="number" min="2" max="20" />
+                            <span asp-validation-for="ConnectHowMany" class="validation-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input asp-for="IsCylindrical" type="checkbox" />
+                        <label asp-for="IsCylindrical">
+                            Cylindrical Board (wraps horizontally)
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                        <form method="post" asp-page-handler="CancelEdit" style="display: inline;">
+                            <button type="submit" class="btn-secondary">Cancel</button>
+                        </form>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
 
     <!-- Saved Configurations List -->
     <div class="card">
@@ -93,7 +151,11 @@
                                 }
                             </div>
                             <div class="config-actions">
-                                @if (Model.ConfigHasGames.TryGetValue(config.Id, out var hasGames) && hasGames)
+                                @if (Model.IsEditing && Model.EditingConfigId == config.Id)
+                                {
+                                    <span class="badge badge-editing">Editing</span>
+                                }
+                                else if (Model.ConfigHasGames.TryGetValue(config.Id, out var hasGames) && hasGames)
                                 {
                                     <span class="btn-disabled">Has Games</span>
                                 }
