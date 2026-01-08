@@ -10,6 +10,9 @@ public class GameBrain
 
     private bool NextMoveByX { get; set; } = true;
 
+    private int? LastMoveColumn { get; set; }
+    private int? LastMoveRow { get; set; }
+
     public GameBrain(GameState gameState)
     {
         GameConfiguration = gameState.Configuration ?? new GameConfiguration();
@@ -70,6 +73,8 @@ public class GameBrain
         var pieceState = NextMoveByX ? ECellState.X : ECellState.O;
         GameBoard[column, row] = pieceState;
         NextMoveByX = !NextMoveByX;
+        LastMoveColumn = column;
+        LastMoveRow = row;
     }
     
     // NEW: Check if the board is full (draw condition)
@@ -170,26 +175,6 @@ public class GameBrain
         return ECellState.Empty;
     }
     
-    // Mark winner by checking all cells (used after a move to detect and mark wins)
-    public ECellState? MarkWinner()
-    {
-        for (int x = 0; x < GameConfiguration.BoardWidth; x++)
-        {
-            for (int y = 0; y < GameConfiguration.BoardHeight; y++)
-            {
-                if (GameBoard[x, y] == ECellState.X || GameBoard[x, y] == ECellState.O)
-                {
-                    var result = GetWinner(x, y);
-                    if (result == ECellState.XWin || result == ECellState.OWin)
-                    {
-                        return result;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    
     private static ECellState[][] ConvertToJagged(ECellState[,] board)
     {
         int width = board.GetLength(0);
@@ -234,7 +219,9 @@ public class GameBrain
             NextMoveByX = NextMoveByX,
             P1Name = P1Name,
             P2Name = P2Name,
-            GameMode = GameMode
+            GameMode = GameMode,
+            LastMoveColumn = LastMoveColumn,
+            LastMoveRow = LastMoveRow
         };
     }
 
@@ -246,6 +233,8 @@ public class GameBrain
         P1Name = state.P1Name;
         P2Name = state.P2Name;
         GameMode = state.GameMode;
+        LastMoveColumn = state.LastMoveColumn;
+        LastMoveRow = state.LastMoveRow;
     }
 
     public bool GetIsCylindrical()

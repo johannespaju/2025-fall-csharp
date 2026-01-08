@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using BLL;
 using Microsoft.EntityFrameworkCore;
 
@@ -162,6 +162,8 @@ public class GameRepositoryEF : IRepository<GameState>
             existing.GameConfigurationId = data.GameConfigurationId;
             existing.BoardJson = data.BoardJson;
             existing.NextMoveByX = data.NextMoveByX;
+            existing.LastMoveColumn = data.LastMoveColumn;
+            existing.LastMoveRow = data.LastMoveRow;
             await _dbContext.SaveChangesAsync();
             return existing.Id.ToString();
         }

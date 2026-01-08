@@ -57,9 +57,10 @@ public class GameModel : PageModel
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
             
-            // Track last move for animation
-            LastMoveColumn = column;
-            LastMoveRow = moveResult.FinalRow;
+            // Update last move from brain's game state (now tracked by ExecuteMove)
+            var currentState = Brain.GetGameState();
+            LastMoveColumn = currentState.LastMoveColumn;
+            LastMoveRow = currentState.LastMoveRow;
             
             // Check winner immediately after move using optimized GetWinner(x, y)
             var winner = Brain.GetWinner(column, moveResult.FinalRow);
@@ -101,9 +102,10 @@ public class GameModel : PageModel
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
             
-            // Track last move for animation
-            LastMoveColumn = bestColumn;
-            LastMoveRow = moveResult.FinalRow;
+            // Update last move from brain's game state (now tracked by ExecuteMove)
+            var currentState = Brain.GetGameState();
+            LastMoveColumn = currentState.LastMoveColumn;
+            LastMoveRow = currentState.LastMoveRow;
             
             // Check winner immediately after AI move using optimized GetWinner(x, y)
             var winner = Brain.GetWinner(bestColumn, moveResult.FinalRow);
@@ -158,6 +160,10 @@ public class GameModel : PageModel
         IsAiTurn = (state.GameMode == EGameMode.PvC && !isXTurn) || state.GameMode == EGameMode.CvC;
         IsCvCMode = state.GameMode == EGameMode.CvC;
         
+        // Load last move for animation from persisted state
+        LastMoveColumn = state.LastMoveColumn;
+        LastMoveRow = state.LastMoveRow;
+        
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
             GameMessage = $"{(string.IsNullOrEmpty(state.P1Name) ? "Player 1" : state.P1Name)} Wins!";
@@ -201,6 +207,8 @@ public class GameModel : PageModel
         existingState.P1Name = currentGameState.P1Name;
         existingState.P2Name = currentGameState.P2Name;
         existingState.GameMode = currentGameState.GameMode;
+        existingState.LastMoveColumn = currentGameState.LastMoveColumn;
+        existingState.LastMoveRow = currentGameState.LastMoveRow;
         
         // Save the updated state (Configuration relationship is preserved)
         _gameRepository.Save(existingState);
