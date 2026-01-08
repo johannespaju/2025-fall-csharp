@@ -44,10 +44,15 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - These properties were added in migration `20260108194806_AddLastMoveToGameState` but were missing from the entity class
   - A subsequent migration `20260108195505_fix` dropped these columns from the database
   - To persist these values, a new EF Core migration will need to be created
+- **2026-01-08: GameStatus Feature Added**
+  - New [`EGameStatus`](BLL/EGameStatus.cs) enum with values: `InProgress`, `XWon`, `OWon`, `Draw`
+  - Added `Status` property to [`GameState`](BLL/GameState.cs:30) entity
+  - Database migration `AddGameStatus` adds Status column to GameStates table
+  - Enables explicit game status tracking and querying by game state
 
 ## Active Work Focus
 
-**Configurations are now pure rule templates** - All per-game settings (player names, game mode) are in GameState:
+**Configurations are now pure rule templates** - All per-game settings (player names, game mode, game status) are in GameState:
 - `GameConfiguration` defines board rules: width, height, connect requirement, cylindrical mode
 - `GameState` holds game-specific data: player names, game mode, board state, turn
 - Repository selection is centralized via `DatabaseConfig.CurrentProvider` enum

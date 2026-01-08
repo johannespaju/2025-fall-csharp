@@ -34,6 +34,7 @@ hyper-connectx/
 │   ├── ECellState.cs       # Cell state enum (Empty/X/O/XWin/OWin)
 │   ├── EDatabaseProvider.cs # Database provider enum and central config
 │   ├── EGameMode.cs        # Game mode enum (PvP/PvC/CvC)
+│   ├── EGameStatus.cs      # Game status enum (InProgress/XWon/OWon/Draw)
 │   ├── GameBrain.cs        # Core game logic
 │   ├── GameConfiguration.cs # Configuration entity (rules only)
 │   ├── GameState.cs        # Game state entity (includes player names & mode)
@@ -126,6 +127,7 @@ Game save state containing:
 - Save name with timestamp
 - Player names (P1Name, P2Name)
 - Game mode (EGameMode)
+- Game status (EGameStatus)
 
 ### DAL - Data Access Layer
 
