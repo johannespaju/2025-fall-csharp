@@ -104,7 +104,8 @@ public class NewGameModel : PageModel
                 BoardWidth = BoardWidth,
                 BoardHeight = BoardHeight,
                 ConnectHow = ConnectHowMany,
-                IsCylindrical = IsCylindrical
+                IsCylindrical = IsCylindrical,
+                IsHidden = true  // Auto-created config should be hidden from the list
             };
 
             // Save the configuration
@@ -138,7 +139,7 @@ public class NewGameModel : PageModel
 
     private void LoadSavedConfigurations()
     {
-        var configs = _configRepository.List();
+        var configs = _configRepository.List().Where(c => !c.isHidden);
         
         SavedConfigurations = new List<SelectListItem>
         {

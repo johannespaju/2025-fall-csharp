@@ -13,9 +13,9 @@ public class GameRepositoryEF : IRepository<GameState>
         _dbContext = dbContext;
     }
     
-    public List<(string id, string description)> List()
+    public List<(string id, string description, bool isHidden)> List()
     {
-        var res = new List<(string id, string description)>();
+        var res = new List<(string id, string description, bool isHidden)>();
         foreach (var dbGame in _dbContext.GameStates.Include(g => g.Configuration).ToList()) // Add .ToList()
         {
             var description = dbGame.SaveName;
@@ -24,15 +24,15 @@ public class GameRepositoryEF : IRepository<GameState>
                 description += $" - {dbGame.Configuration.BoardWidth}x{dbGame.Configuration.BoardHeight}";
             }
         
-            res.Add((dbGame.Id.ToString(), description));
+            res.Add((dbGame.Id.ToString(), description, false));
         }
     
         return res;
     }
     
-    public async Task<List<(string id, string description)>> ListAsync()
+    public async Task<List<(string id, string description, bool isHidden)>> ListAsync()
     {
-        var res = new List<(string id, string description)>();
+        var res = new List<(string id, string description, bool isHidden)>();
         foreach (var dbGame in await _dbContext.GameStates.Include(gameState => gameState.Configuration).ToListAsync())
         {
             var description = dbGame.SaveName;
@@ -44,7 +44,8 @@ public class GameRepositoryEF : IRepository<GameState>
             res.Add(
                 (
                     dbGame.Id.ToString(),
-                    description
+                    description,
+                    false
                 )
             );
         }

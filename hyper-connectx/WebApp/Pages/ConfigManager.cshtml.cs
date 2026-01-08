@@ -64,7 +64,7 @@ public class ConfigManagerModel : PageModel
     private bool ConfigNameExists(string name, Guid? excludeId = null)
     {
         var configList = _configRepository.List();
-        foreach (var (id, _) in configList)
+        foreach (var (id, _, _) in configList)
         {
             if (excludeId.HasValue && id == excludeId.Value.ToString())
             {
@@ -111,7 +111,8 @@ public class ConfigManagerModel : PageModel
             BoardWidth = BoardWidth,
             BoardHeight = BoardHeight,
             ConnectHow = ConnectHowMany,
-            IsCylindrical = IsCylindrical
+            IsCylindrical = IsCylindrical,
+            IsHidden = false
         };
 
         try
@@ -258,7 +259,7 @@ public class ConfigManagerModel : PageModel
         // First, load all games to check which configs have associated games
         var gamesWithConfigs = new HashSet<Guid>();
         var gameList = _gameRepository.List();
-        foreach (var (gameId, _) in gameList)
+        foreach (var (gameId, _, _) in gameList)
         {
             try
             {
@@ -274,7 +275,7 @@ public class ConfigManagerModel : PageModel
             }
         }
         
-        foreach (var (id, description) in configList)
+        foreach (var (id, description, _) in configList)
         {
             try
             {

@@ -13,15 +13,16 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
         _dbContext = dbContext;
     }
 
-    public List<(string id, string description)> List()
+    public List<(string id, string description, bool isHidden)> List()
     {
-        var res = new List<(string id, string description)>();
+        var res = new List<(string id, string description, bool isHidden)>();
         foreach (var dbConf in _dbContext.GameConfigurations.ToList()) // Added .ToList()
         {
             res.Add(
                 (
                     dbConf.Id.ToString(),
-                    $"{dbConf.Name} - {dbConf.BoardWidth}x{dbConf.BoardHeight} - connect{dbConf.ConnectHow}"
+                    $"{dbConf.Name} - {dbConf.BoardWidth}x{dbConf.BoardHeight} - connect{dbConf.ConnectHow}",
+                    dbConf.IsHidden
                 )
             );
         }
@@ -29,15 +30,16 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
         return res;
     }
 
-    public async Task<List<(string id, string description)>> ListAsync()
+    public async Task<List<(string id, string description, bool isHidden)>> ListAsync()
     {
-        var res = new List<(string id, string description)>();
+        var res = new List<(string id, string description, bool isHidden)>();
         foreach (var dbConf in await _dbContext.GameConfigurations.ToListAsync())
         {
             res.Add(
                 (
                     dbConf.Id.ToString(),
-                    $"{dbConf.Name} - {dbConf.BoardWidth}x{dbConf.BoardHeight} - connect{dbConf.ConnectHow}"
+                    $"{dbConf.Name} - {dbConf.BoardWidth}x{dbConf.BoardHeight} - connect{dbConf.ConnectHow}",
+                    dbConf.IsHidden
                 )
             );
         }
@@ -67,8 +69,8 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
             existing.BoardWidth = data.BoardWidth;
             existing.BoardHeight = data.BoardHeight;
             existing.ConnectHow = data.ConnectHow;
-            // ... copy any other properties you have
-        
+            existing.IsHidden = data.IsHidden;
+    
             _dbContext.SaveChanges();
             return existing.Id.ToString();
         }
@@ -135,6 +137,7 @@ public class ConfigRepositoryEF : IRepository<GameConfiguration>
             existing.BoardWidth = data.BoardWidth;
             existing.BoardHeight = data.BoardHeight;
             existing.ConnectHow = data.ConnectHow;
+            existing.IsHidden = data.IsHidden;
             await _dbContext.SaveChangesAsync();
             return existing.Id.ToString();
         }

@@ -7,10 +7,10 @@ namespace DAL;
 
 public class GameRepositoryJson : IRepository<GameState>
 {
-    public List<(string id, string description)> List()
+    public List<(string id, string description, bool isHidden)> List()
     {
         var dir = FilesystemHelpers.GetGameDirectory();
-        var result = new List<(string id, string description)>();
+        var result = new List<(string id, string description, bool isHidden)>();
 
         foreach (var fullFileName in Directory.EnumerateFiles(dir))
         {
@@ -21,7 +21,7 @@ public class GameRepositoryJson : IRepository<GameState>
             try
             {
                 var game = Load(id);
-                result.Add((id, game.SaveName));
+                result.Add((id, game.SaveName, false));
             }
             catch
             {
@@ -32,13 +32,13 @@ public class GameRepositoryJson : IRepository<GameState>
         return result;
     }
     
-    public async Task<List<(string id, string description)>> ListAsync()
+    public async Task<List<(string id, string description, bool isHidden)>> ListAsync()
     {
         var dir = FilesystemHelpers.GetGameDirectory();
 
         return await Task.Run(() =>
         {
-            var result = new List<(string id, string description)>();
+            var result = new List<(string id, string description, bool isHidden)>();
 
             foreach (var fullFileName in Directory.EnumerateFiles(dir))
             {
@@ -49,7 +49,7 @@ public class GameRepositoryJson : IRepository<GameState>
                 try
                 {
                     var game = Load(id);
-                    result.Add((id, game.SaveName));
+                    result.Add((id, game.SaveName, false));
                 }
                 catch
                 {

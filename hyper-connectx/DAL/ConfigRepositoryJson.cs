@@ -6,10 +6,10 @@ namespace DAL;
 
 public class ConfigRepositoryJson : IRepository<GameConfiguration>
 {
-    public List<(string id, string description)> List()
+    public List<(string id, string description, bool isHidden)> List()
     {
         var dir = FilesystemHelpers.GetConfigDirectory();
-        var result = new List<(string id, string description)>();
+        var result = new List<(string id, string description, bool isHidden)>();
 
         foreach (var fullFileName in Directory.EnumerateFiles(dir, "*.json"))
         {  
@@ -23,7 +23,8 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
                 result.Add(
                     (
                         config.Id.ToString(),
-                        $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}"
+                        $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}",
+                        config.IsHidden
                     )
                 );
             }
@@ -36,14 +37,14 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
         return result;
     }
     
-    public async Task<List<(string id, string description)>> ListAsync()
+    public async Task<List<(string id, string description, bool isHidden)>> ListAsync()
     {
         var dir = FilesystemHelpers.GetConfigDirectory();
     
         // Run file enumeration on thread pool to avoid blocking
         return await Task.Run(() =>
         {
-            var result = new List<(string id, string description)>();
+            var result = new List<(string id, string description, bool isHidden)>();
 
             foreach (var fullFileName in Directory.EnumerateFiles(dir, "*.json"))
             {  
@@ -57,7 +58,8 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
                     result.Add(
                         (
                             config.Id.ToString(),
-                            $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}"
+                            $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}",
+                            config.IsHidden
                         )
                     );
                 }

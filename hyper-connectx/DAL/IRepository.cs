@@ -3,8 +3,8 @@
 public interface IRepository<TData>
 {
     
-    List<(string id, string description)> List();
-    Task<List<(string id, string description)>> ListAsync();
+    List<(string id, string description, bool isHidden)> List();
+    Task<List<(string id, string description, bool isHidden)>> ListAsync();
     
     string Save(TData data);
     TData Load(string id);

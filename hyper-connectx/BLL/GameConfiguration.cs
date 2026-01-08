@@ -13,6 +13,8 @@ public class GameConfiguration : BaseEntity
     
     public bool IsCylindrical { get; set; } = false;
     
+    public bool IsHidden { get; set; } = false;
+    
     // Reset to default settings
     public void ResetToDefault()
     {
@@ -21,6 +23,7 @@ public class GameConfiguration : BaseEntity
         BoardHeight = 6;
         ConnectHow = 4;
         IsCylindrical = false;
+        IsHidden = false;
     }
     
     public void ApplyFrom(GameConfiguration other)
@@ -30,5 +33,6 @@ public class GameConfiguration : BaseEntity
         BoardHeight = other.BoardHeight;
         ConnectHow = other.ConnectHow;
         IsCylindrical = other.IsCylindrical;
+        IsHidden = other.IsHidden;
     }
 }
