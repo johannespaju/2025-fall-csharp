@@ -7,6 +7,7 @@ public class GameBrain
     private string P1Name { get; set; }
     private string P2Name { get; set; }
     private EGameMode GameMode { get; set; }
+    private EAiDifficulty Difficulty { get; set; }
 
     private bool NextMoveByX { get; set; } = true;
 
@@ -21,6 +22,7 @@ public class GameBrain
         P1Name = gameState.P1Name;
         P2Name = gameState.P2Name;
         GameMode = gameState.GameMode;
+        Difficulty = gameState.Difficulty;
         GameBoard = new ECellState[GameConfiguration.BoardWidth, GameConfiguration.BoardHeight];
     }
 
@@ -224,7 +226,8 @@ public class GameBrain
             GameMode = GameMode,
             LastMoveColumn = LastMoveColumn,
             LastMoveRow = LastMoveRow,
-            Status = Status
+            Status = Status,
+            Difficulty = Difficulty
         };
     }
 
@@ -236,6 +239,7 @@ public class GameBrain
         P1Name = state.P1Name;
         P2Name = state.P2Name;
         GameMode = state.GameMode;
+        Difficulty = state.Difficulty;
         LastMoveColumn = state.LastMoveColumn;
         LastMoveRow = state.LastMoveRow;
         Status = state.Status;
@@ -256,5 +260,10 @@ public class GameBrain
     public EGameMode GetGameMode()
     {
         return GameMode;
+    }
+
+    public EAiDifficulty GetDifficulty()
+    {
+        return Difficulty;
     }
 }

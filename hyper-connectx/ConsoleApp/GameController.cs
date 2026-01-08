@@ -13,12 +13,14 @@ public class GameController
     private GameConfiguration _config;
     private string _p1Name;
     private string _p2Name;
+    private EAiDifficulty _difficulty;
 
-    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository, EGameMode gameMode = EGameMode.PvP, string p1Name = "Player 1", string p2Name = "Player 2")
+    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository, EGameMode gameMode = EGameMode.PvP, string p1Name = "Player 1", string p2Name = "Player 2", EAiDifficulty difficulty = EAiDifficulty.Hard)
     {
         _config = configuration;
         _p1Name = p1Name;
         _p2Name = p2Name;
+        _difficulty = difficulty;
         Repo = gameRepository;
         
         // Create a temporary GameState to initialize GameBrain
@@ -27,7 +29,8 @@ public class GameController
             Configuration = configuration,
             P1Name = p1Name,
             P2Name = p2Name,
-            GameMode = gameMode
+            GameMode = gameMode,
+            Difficulty = difficulty
         };
         GameBrain = new GameBrain(initialState);
         
@@ -35,13 +38,13 @@ public class GameController
         if (gameMode == EGameMode.PvC)
         {
             // AI plays as O (second player)
-            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
+            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, difficulty);
         }
         else if (gameMode == EGameMode.CvC)
         {
             // For CvC, create both AIs
-            _aiPlayerX = new MinimaxAI(configuration, isPlayerX: true, maxDepth: 6);
-            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
+            _aiPlayerX = new MinimaxAI(configuration, isPlayerX: true, difficulty);
+            _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, difficulty);
         }
     }
 

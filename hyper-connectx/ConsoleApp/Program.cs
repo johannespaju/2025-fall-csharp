@@ -50,7 +50,27 @@ main.AddMenuItem("n", "Start New Game", () =>
         ConsoleKey.D3 => EGameMode.CvC,
         _ => EGameMode.PvP
     };
-    var controller = new GameController(gameConfig, gameRepo, gameMode, p1Name, p2Name);
+    
+    // Only prompt for difficulty if AI is involved
+    EAiDifficulty difficulty = EAiDifficulty.Hard;
+    if (gameMode != EGameMode.PvP)
+    {
+        Console.Clear();
+        Console.WriteLine("Select AI Difficulty:");
+        Console.WriteLine("1 - Easy (Random moves)");
+        Console.WriteLine("2 - Medium (Depth 4)");
+        Console.WriteLine("3 - Hard (Depth 6)");
+        var diffKey = Console.ReadKey(true);
+        difficulty = diffKey.Key switch
+        {
+            ConsoleKey.D1 => EAiDifficulty.Easy,
+            ConsoleKey.D2 => EAiDifficulty.Medium,
+            ConsoleKey.D3 => EAiDifficulty.Hard,
+            _ => EAiDifficulty.Hard
+        };
+    }
+    
+    var controller = new GameController(gameConfig, gameRepo, gameMode, p1Name, p2Name, difficulty);
     controller.GameLoop();
     return "";
 });
@@ -168,7 +188,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
         var loaded = gameRepo.Load(saves[index - 1].id);
         var brain = new GameBrain(loaded);
         brain.LoadGameState(loaded);
-        var controller = new GameController(loaded.Configuration ?? new GameConfiguration(), gameRepo, loaded.GameMode, loaded.P1Name, loaded.P2Name)
+        var controller = new GameController(loaded.Configuration ?? new GameConfiguration(), gameRepo, loaded.GameMode, loaded.P1Name, loaded.P2Name, loaded.Difficulty)
         {
             GameBrain = brain
         };

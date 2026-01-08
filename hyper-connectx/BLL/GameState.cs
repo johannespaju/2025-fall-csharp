@@ -28,4 +28,6 @@ public class GameState : BaseEntity
     public int? LastMoveRow { get; set; }
     
     public EGameStatus Status { get; set; } = EGameStatus.InProgress;
+    
+    public EAiDifficulty Difficulty { get; set; } = EAiDifficulty.Hard;
 }

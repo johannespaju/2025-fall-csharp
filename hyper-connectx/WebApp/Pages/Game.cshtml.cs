@@ -29,6 +29,7 @@ public class GameModel : PageModel
     public int? LastMoveRow { get; private set; }
     public EGameStatus GameStatus { get; private set; }
     public string CurrentGameUrl { get; private set; } = "";
+    public EAiDifficulty CurrentDifficulty { get; private set; }
 
     public IActionResult OnGet()
     {
@@ -99,11 +100,12 @@ public class GameModel : PageModel
 
         // Execute AI move
         var config = state.Configuration ?? new GameConfiguration();
+        var difficulty = state.Difficulty;
         
         // In PvC mode, AI is always O (not X)
         // In CvC mode, AI plays X when it's X's turn, O when it's O's turn
         bool isPlayerX = state.GameMode == EGameMode.CvC && Brain.IsNextPlayerX();
-        var ai = new MinimaxAI(config, isPlayerX);
+        var ai = new MinimaxAI(config, isPlayerX, difficulty);
         int bestColumn = ai.GetBestMove(Brain.GetBoard(), Brain.IsNextPlayerX());
         
         var moveResult = Brain.CalculateMove(bestColumn);
@@ -183,6 +185,9 @@ public class GameModel : PageModel
         // Load game status
         GameStatus = Brain.GetStatus();
         
+        // Load difficulty
+        CurrentDifficulty = Brain.GetDifficulty();
+        
         // Construct current game URL
         CurrentGameUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}?Id={state.Id}";
         
@@ -232,6 +237,7 @@ public class GameModel : PageModel
         existingState.LastMoveColumn = currentGameState.LastMoveColumn;
         existingState.LastMoveRow = currentGameState.LastMoveRow;
         existingState.Status = currentGameState.Status;
+        existingState.Difficulty = currentGameState.Difficulty;
         
         // Save the updated state (Configuration relationship is preserved)
         _gameRepository.Save(existingState);

@@ -32,6 +32,7 @@ hyper-connectx/
 ├── BLL/                    # Business Logic Layer (shared)
 │   ├── BaseEntity.cs       # Base class with Guid Id
 │   ├── ECellState.cs       # Cell state enum (Empty/X/O/XWin/OWin)
+│   ├── EAiDifficulty.cs    # AI difficulty enum (Easy/Medium/Hard)
 │   ├── EDatabaseProvider.cs # Database provider enum and central config
 │   ├── EGameMode.cs        # Game mode enum (PvP/PvC/CvC)
 │   ├── EGameStatus.cs      # Game status enum (InProgress/XWon/OWon/Draw)
@@ -84,6 +85,12 @@ hyper-connectx/
 
 ### BLL - Business Logic Layer
 
+#### [`EAiDifficulty`](BLL/EAiDifficulty.cs)
+AI difficulty configuration:
+- `Easy`: Random valid move (no minimax evaluation)
+- `Medium`: Depth 4 with standard evaluation
+- `Hard`: Depth 6 with standard evaluation (previous behavior)
+
 #### [`EDatabaseProvider`](BLL/EDatabaseProvider.cs)
 Central database provider configuration:
 - `EDatabaseProvider` enum defines available storage options (EntityFramework, Json)
@@ -106,9 +113,13 @@ Constructor accepts `GameState` (not `GameConfiguration`) to provide access to b
 #### [`MinimaxAI`](BLL/MinimaxAI.cs)
 AI opponent using Minimax algorithm:
 - Alpha-beta pruning optimization
-- Configurable search depth (default: 6)
+- Configurable difficulty levels:
+  - **Easy**: Random valid move
+  - **Medium**: Depth 4 search
+  - **Hard**: Depth 6 search (default)
 - Positional evaluation with center column preference
 - Window-based scoring for partial lines
+- Constructor accepts `EAiDifficulty` parameter instead of raw depth
 
 #### [`GameConfiguration`](BLL/GameConfiguration.cs)
 Configuration entity storing **rules only**:
@@ -128,6 +139,7 @@ Game save state containing:
 - Player names (P1Name, P2Name)
 - Game mode (EGameMode)
 - Game status (EGameStatus)
+- AI difficulty (EAiDifficulty)
 
 ### DAL - Data Access Layer
 

@@ -5,6 +5,7 @@ public class MinimaxAI
     private readonly GameConfiguration _config;
     private readonly int _maxDepth;
     private readonly bool _isMaximizingPlayer; // true if AI is X, false if AI is O
+    private readonly EAiDifficulty _difficulty;
     
     // Evaluation weights
     private const int WIN_SCORE = 100000;
@@ -12,15 +13,28 @@ public class MinimaxAI
     private const int TWO_IN_ROW = 10;
     private const int CENTER_BONUS = 3;
     
-    public MinimaxAI(GameConfiguration config, bool isPlayerX, int maxDepth = 6)
+    public MinimaxAI(GameConfiguration config, bool isPlayerX, EAiDifficulty difficulty = EAiDifficulty.Hard)
     {
         _config = config;
         _isMaximizingPlayer = isPlayerX;
-        _maxDepth = maxDepth;
+        _difficulty = difficulty;
+        _maxDepth = difficulty switch
+        {
+            EAiDifficulty.Easy => 0, // Will be handled as random move
+            EAiDifficulty.Medium => 4,
+            EAiDifficulty.Hard => 6,
+            _ => 6
+        };
     }
     
     public int GetBestMove(ECellState[,] board, bool nextMoveByX)
     {
+        // Easy mode: random valid move
+        if (_difficulty == EAiDifficulty.Easy)
+        {
+            return GetRandomMove(board);
+        }
+        
         int bestMove = -1;
         int bestScore = int.MinValue;
         int alpha = int.MinValue;
@@ -52,6 +66,21 @@ public class MinimaxAI
         
         // Fallback to center column if no move found
         return bestMove != -1 ? bestMove : _config.BoardWidth / 2;
+    }
+    
+    private int GetRandomMove(ECellState[,] board)
+    {
+        var validMoves = new List<int>();
+        for (int col = 0; col < _config.BoardWidth; col++)
+        {
+            if (GetLowestEmptyRow(board, col) != -1)
+                validMoves.Add(col);
+        }
+        
+        if (validMoves.Count == 0) return _config.BoardWidth / 2;
+        
+        var random = new Random();
+        return validMoves[random.Next(validMoves.Count)];
     }
     
     private int Minimax(ECellState[,] board, int depth, int alpha, int beta, bool isMaximizing, bool nextMoveByX)

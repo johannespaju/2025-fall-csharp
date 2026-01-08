@@ -58,6 +58,9 @@ public class NewGameModel : PageModel
     [BindProperty]
     public bool IsCylindrical { get; set; } = false;
 
+    [BindProperty]
+    public EAiDifficulty Difficulty { get; set; } = EAiDifficulty.Medium;
+
     // Validation error message
     public string? ValidationError { get; set; }
 
@@ -119,7 +122,8 @@ public class NewGameModel : PageModel
             Configuration = config,
             P1Name = Player1Name,
             P2Name = Player2Name,
-            GameMode = GameMode
+            GameMode = GameMode,
+            Difficulty = Difficulty
         };
         var brain = new GameBrain(initialState);
         

@@ -49,3 +49,4 @@ HyperConnectX is a highly customizable Connect Four game designed to provide fle
 | Player 1 Name | Any string (1-50 chars) | "Player 1" |
 | Player 2 Name | Any string (1-50 chars) | "Player 2" |
 | Game Mode | PvP/PvC/CvC | PvP |
+| AI Difficulty | Easy/Medium/Hard | Hard |

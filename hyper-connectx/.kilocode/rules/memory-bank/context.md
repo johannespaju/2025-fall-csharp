@@ -49,6 +49,20 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - Added `Status` property to [`GameState`](BLL/GameState.cs:30) entity
   - Database migration `AddGameStatus` adds Status column to GameStates table
   - Enables explicit game status tracking and querying by game state
+- **2026-01-08: AI Difficulty Levels Added**
+  - New [`EAiDifficulty`](BLL/EAiDifficulty.cs) enum with values: `Easy`, `Medium`, `Hard`
+  - Added `Difficulty` property to [`GameState`](BLL/GameState.cs) entity (default: `Hard`)
+  - Updated [`MinimaxAI`](BLL/MinimaxAI.cs) to accept difficulty parameter:
+    - **Easy**: Random valid move (no minimax evaluation)
+    - **Medium**: Depth 4 with standard evaluation
+    - **Hard**: Depth 6 with standard evaluation (previous behavior)
+  - Updated [`GameBrain`](BLL/GameBrain.cs) with `GetDifficulty()` method
+  - Updated [`ConsoleApp/GameController.cs`](ConsoleApp/GameController.cs) to prompt for difficulty in AI modes
+  - Updated [`ConsoleApp/Program.cs`](ConsoleApp/Program.cs) with difficulty selection menu
+  - Updated [`WebApp/NewGame.cshtml`](WebApp/Pages/NewGame.cshtml) with difficulty dropdown
+  - Updated [`WebApp/NewGame.cshtml.cs`](WebApp/Pages/NewGame.cshtml.cs) to save difficulty in GameState
+  - Updated [`WebApp/Game.cshtml.cs`](WebApp/Pages/Game.cshtml.cs) to use difficulty when creating AI
+  - Database migration `AddAiDifficulty` adds Difficulty column to GameStates table
 
 ## Active Work Focus
 
@@ -68,9 +82,11 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
 
 3. **Hardcoded AI depth**: The Minimax depth is set at construction time but defaults to 6 - could be made configurable via settings.
 
-4. **WebApp AI delay**: No artificial delay for AI moves - AI responds instantly which may feel abrupt to users.
+4. **~~AI Difficulty Levels~~**: **RESOLVED** - Added EAiDifficulty enum with Easy, Medium, Hard options.
 
-5. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
+5. **WebApp AI delay**: No artificial delay for AI moves - AI responds instantly which may feel abrupt to users.
+
+6. **WebApp PvP sharing**: Two players on the same device work fine, but remote PvP requires manual URL sharing and page refresh to see opponent moves.
 
 6. ~~LastMove columns not persisted~~: **RESOLVED** - Migration `AddLastMoveBack` re-added the `LastMoveColumn` and `LastMoveRow` columns to the database. The entity properties in `GameState.cs` now match the database schema.
 
