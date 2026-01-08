@@ -114,7 +114,7 @@
 
             <div class="form-group mt-3">
                 <label asp-for="GameMode">Game Mode</label>
-                <select asp-for="GameMode" asp-items="Html.GetEnumSelectList<BLL.EGameMode>()" class="form-control" style="max-width: 300px;"></select>
+                <select asp-for="GameMode" id="GameMode" asp-items="Html.GetEnumSelectList<BLL.EGameMode>()" class="form-control" style="max-width: 300px;"></select>
                 <small class="form-text">
                     <strong>PvP</strong> = Player vs Player |
                     <strong>PvC</strong> = Player vs Computer (AI plays as O) |
@@ -122,7 +122,7 @@
                 </small>
             </div>
             
-            <div class="form-group mt-3">
+            <div class="form-group mt-3" id="difficultySection">
                 <label asp-for="Difficulty">AI Difficulty</label>
                 <select asp-for="Difficulty" asp-items="Html.GetEnumSelectList<BLL.EAiDifficulty>()" class="form-control" style="max-width: 300px;"></select>
                 <small class="form-text">
@@ -147,8 +147,10 @@
             const configChoiceExisting = document.getElementById('configChoiceExisting');
             const existingConfigSection = document.getElementById('existingConfigSection');
             const customConfigSection = document.getElementById('customConfigSection');
+            const gameModeSelect = document.getElementById('GameMode');
+            const difficultySection = document.getElementById('difficultySection');
 
-            function updateVisibility() {
+            function updateConfigVisibility() {
                 if (configChoiceExisting.checked) {
                     existingConfigSection.style.display = 'block';
                     customConfigSection.style.display = 'none';
@@ -158,8 +160,23 @@
                 }
             }
 
-            configChoiceNew.addEventListener('change', updateVisibility);
-            configChoiceExisting.addEventListener('change', updateVisibility);
+            function updateDifficultyVisibility() {
+                // PvC = 1, CvC = 2 - show difficulty for AI modes
+                const gameMode = parseInt(gameModeSelect.value);
+                if (gameMode === 1 || gameMode === 2) {
+                    difficultySection.style.display = 'block';
+                } else {
+                    difficultySection.style.display = 'none';
+                }
+            }
+
+            configChoiceNew.addEventListener('change', updateConfigVisibility);
+            configChoiceExisting.addEventListener('change', updateConfigVisibility);
+            gameModeSelect.addEventListener('change', updateDifficultyVisibility);
+
+            // Initial state
+            updateConfigVisibility();
+            updateDifficultyVisibility();
         });
     </script>
 }
