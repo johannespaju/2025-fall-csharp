@@ -40,7 +40,17 @@ main.AddMenuItem("n", "Start New Game", () =>
     Console.Clear();
     Console.WriteLine("Enter Player 2 name: ");
     var p2Name = Console.ReadLine() ?? "Player 2";
-    var controller = new GameController(gameConfig, gameRepo, EGameMode.PvP, p1Name, p2Name);
+    Console.Clear();
+    Console.WriteLine("Press 1 for PvP, 2 for PvC, 3 for CvC");
+    var mode = Console.ReadKey(true);
+    var gameMode = mode.Key switch
+    {
+        ConsoleKey.D1 => EGameMode.PvP,
+        ConsoleKey.D2 => EGameMode.PvC,
+        ConsoleKey.D3 => EGameMode.CvC,
+        _ => EGameMode.PvP
+    };
+    var controller = new GameController(gameConfig, gameRepo, gameMode, p1Name, p2Name);
     controller.GameLoop();
     return "";
 });
