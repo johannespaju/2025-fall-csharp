@@ -7,13 +7,22 @@ using Microsoft.EntityFrameworkCore;
 IRepository<GameConfiguration> configRepo;
 IRepository<GameState> gameRepo;
 
-// json config repository
-configRepo = new ConfigRepositoryJson();
-gameRepo = new  GameRepositoryJson();
-// ef config repository
-//using var dbContext = GetDbContext();
-// configRepo = new ConfigRepositoryEF(dbContext);
-// gameRepo = new GameRepositoryEF(dbContext);
+// Initialize repositories based on central configuration
+switch (DatabaseConfig.CurrentProvider)
+{
+    case EDatabaseProvider.EntityFramework:
+    {
+        using var dbContext = GetDbContext();
+        configRepo = new ConfigRepositoryEF(dbContext);
+        gameRepo = new GameRepositoryEF(dbContext);
+        break;
+    }
+    case EDatabaseProvider.Json:
+    default:
+        configRepo = new ConfigRepositoryJson();
+        gameRepo = new GameRepositoryJson();
+        break;
+}
 
 var gameConfig = new GameConfiguration();
 
