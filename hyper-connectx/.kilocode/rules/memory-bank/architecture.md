@@ -94,8 +94,9 @@ Core game engine responsible for:
 - Managing board state as `ECellState[,]` 2D array
 - Calculating valid moves with [`CalculateMove()`](BLL/GameBrain.cs:37)
 - Executing moves with [`ExecuteMove()`](BLL/GameBrain.cs:68)
-- Win detection via [`GetWinner()`](BLL/GameBrain.cs:120)
+- Win detection via [`GetWinner()`](BLL/GameBrain.cs:120) - also marks all winning cells with XWin/OWin states
 - Cylindrical board wrapping via [`WrapX()`](BLL/GameBrain.cs:108)
+- Marking winning cells via [`MarkWinner()`](BLL/GameBrain.cs) - marks all cells in a winning line
 - Game state serialization/deserialization
 - Game mode access via [`GetGameMode()`](BLL/GameBrain.cs:227)
 
@@ -170,7 +171,11 @@ Application entry point and configuration:
 #### Pages Structure
 - [`Index`](WebApp/Pages/Index.cshtml.cs) - Home page listing saved games with load/delete actions
 - [`NewGame`](WebApp/Pages/NewGame.cshtml.cs) - Game creation form with configuration selection, player names, and game mode
-- [`Game`](WebApp/Pages/Game.cshtml.cs) - Core gameplay page with board rendering and move handling
+- [`Game`](WebApp/Pages/Game.cshtml.cs) - Core gameplay page with board rendering and move handling:
+  - `OnPostMove()` - Handles human player moves with immediate winner detection
+  - `OnPostAiMove()` - Handles AI moves with immediate winner detection
+  - `FindWinner()` - Scans board for XWin/OWin cells to determine winner
+  - POST handlers redirect to game page when game is over, preventing additional moves
 - [`ConfigManager`](WebApp/Pages/ConfigManager.cshtml.cs) - Unified configuration CRUD
 
 #### Styling

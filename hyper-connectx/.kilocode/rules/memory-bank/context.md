@@ -27,6 +27,14 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - [`NewGame.cshtml.cs`](WebApp/Pages/NewGame.cshtml.cs) collects player names AND game mode at game creation time
   - [`ConsoleApp/Program.cs`](ConsoleApp/Program.cs) prompts for player names and game mode when starting a new game
   - [`GameController`](ConsoleApp/GameController.cs) constructor now takes `EGameMode`, `p1Name`, and `p2Name` parameters
+- **2026-01-08: WebApp Win Detection Bug Fixed**
+  - Added [`MarkWinner()`](BLL/GameBrain.cs) method to `GameBrain` to mark all winning cells in a winning line
+  - Modified [`GetWinner()`](BLL/GameBrain.cs) to track and mark all winning cells on the board
+  - Removed `LastMove` property from [`Game.cshtml.cs`](WebApp/Pages/Game.cshtml.cs) as it's no longer needed
+  - Added immediate winner detection in `OnPostMove()` and `OnPostAiMove()` handlers
+  - Updated [`FindWinner()`](WebApp/Pages/Game.cshtml.cs) to scan for XWin/OWin cells on the board
+  - POST handlers now redirect to game page when game is over, preventing additional moves after a win
+  - Game now properly highlights winning pieces and ends the game correctly
 
 ## Active Work Focus
 
