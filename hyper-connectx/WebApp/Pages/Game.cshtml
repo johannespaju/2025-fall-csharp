@@ -63,27 +63,6 @@
         font-size: 0.9rem;
     }
     
-    .column-buttons {
-        display: grid;
-        gap: 0.5rem;
-        margin: 1rem auto;
-    }
-    
-    .column-btn {
-        background-color: #2196f3;
-        color: white;
-        border: none;
-        padding: 0.5rem;
-        font-size: 1.2rem;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    
-    .column-btn:hover {
-        background-color: #1976d2;
-    }
-    
     .ai-turn {
         margin: 1rem 0;
         padding: 1rem;
@@ -260,23 +239,6 @@
         }
     </div>
 
-    <!-- Column Buttons (for making moves) -->
-    @if (!isGameOver && !Model.IsAiTurn)
-    {
-        <div class="column-buttons" style="grid-template-columns: repeat(@width, 1fr); max-width: @(width * 70)px;">
-            @for (int x = 0; x < width; x++)
-            {
-                var col = x;
-                <form method="post" asp-page-handler="Move" style="display:inline;">
-                    <input type="hidden" name="column" value="@col" />
-                    <button type="submit" class="column-btn" title="Drop in column @(col + 1)">
-                        ▼
-                    </button>
-                </form>
-            }
-        </div>
-    }
-
     <!-- Hidden move form for JavaScript cell clicks -->
     @if (!isGameOver && !Model.IsAiTurn)
     {
@@ -296,7 +258,7 @@
         <div class="ai-turn">
             @if (Model.IsCvCMode)
             {
-                <p>🤖 Computers are playing...</p>
+                <p>Computers are playing...</p>
                 <script>setTimeout(function() { document.querySelector('form[asp-page-handler="AiMove"] button').click(); }, 1000);</script>
             }
             else
