@@ -6,6 +6,7 @@ public class GameBrain
     private GameConfiguration GameConfiguration { get; set; }
     private string P1Name { get; set; }
     private string P2Name { get; set; }
+    private EGameMode GameMode { get; set; }
 
     private bool NextMoveByX { get; set; } = true;
 
@@ -14,6 +15,7 @@ public class GameBrain
         GameConfiguration = gameState.Configuration ?? new GameConfiguration();
         P1Name = gameState.P1Name;
         P2Name = gameState.P2Name;
+        GameMode = gameState.GameMode;
         GameBoard = new ECellState[GameConfiguration.BoardWidth, GameConfiguration.BoardHeight];
     }
 
@@ -202,7 +204,8 @@ public class GameBrain
             Board = ConvertToJagged(GameBoard),
             NextMoveByX = NextMoveByX,
             P1Name = P1Name,
-            P2Name = P2Name
+            P2Name = P2Name,
+            GameMode = GameMode
         };
     }
 
@@ -213,10 +216,16 @@ public class GameBrain
         NextMoveByX = state.NextMoveByX;
         P1Name = state.P1Name;
         P2Name = state.P2Name;
+        GameMode = state.GameMode;
     }
 
     public bool GetIsCylindrical()
     {
         return GameConfiguration.IsCylindrical;
+    }
+
+    public EGameMode GetGameMode()
+    {
+        return GameMode;
     }
 }

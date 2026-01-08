@@ -11,9 +11,6 @@ public class GameConfiguration : BaseEntity
     
     public int ConnectHow { get; set; } = 4;
     
-    // Game mode (PvP, PvAi, AivAi)
-    public EGameMode Mode { get; set; } = EGameMode.PvP;
-    
     public bool IsCylindrical { get; set; } = false;
     
     // Reset to default settings
@@ -23,7 +20,6 @@ public class GameConfiguration : BaseEntity
         BoardWidth = 7;
         BoardHeight = 6;
         ConnectHow = 4;
-        Mode = EGameMode.PvP;
         IsCylindrical = false;
     }
     
@@ -33,7 +29,6 @@ public class GameConfiguration : BaseEntity
         BoardWidth = other.BoardWidth;
         BoardHeight = other.BoardHeight;
         ConnectHow = other.ConnectHow;
-        Mode = other.Mode;
         IsCylindrical = other.IsCylindrical;
     }
 }

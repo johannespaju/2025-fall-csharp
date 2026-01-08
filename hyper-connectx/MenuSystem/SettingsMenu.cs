@@ -20,9 +20,8 @@ public class SettingsMenu
         menu.AddMenuItem("2", "Change Board Height", ChangeBoardHeight);
         menu.AddMenuItem("3", "Change Connect How Many", ChangeConnectHow);
         menu.AddMenuItem("4", "Toggle Cylindrical Mode", ToggleCylindricalMode);
-        menu.AddMenuItem("5", "Change Game Mode", ChangeGameMode);
-        menu.AddMenuItem("6", "Change Configuration Name", ChangeConfigurationName);
-        menu.AddMenuItem("7", "Reset to Defaults", ResetToDefaults);
+        menu.AddMenuItem("5", "Change Configuration Name", ChangeConfigurationName);
+        menu.AddMenuItem("6", "Reset to Defaults", ResetToDefaults);
         menu.AddMenuItem("v", "View Current Settings", ViewCurrentSettings);
 
         return menu.Run();
@@ -134,44 +133,6 @@ public class SettingsMenu
         return "";
     }
 
-    private string ChangeGameMode()
-    {
-        Console.Clear();
-        Console.WriteLine("=== Change Game Mode ===");
-        Console.WriteLine($"Current mode: {Configuration.Mode}");
-        Console.WriteLine();
-        Console.WriteLine("Available modes:");
-        Console.WriteLine("1) PvP - Player vs Player");
-        Console.WriteLine("2) PvC - Player vs Computer");
-        Console.WriteLine("3) CvC - Computer vs Computer");
-        Console.WriteLine();
-        Console.Write("Select mode (1-3): ");
-        
-        var input = Console.ReadLine();
-        switch (input)
-        {
-            case "1":
-                Configuration.Mode = EGameMode.PvP;
-                Console.WriteLine("Game mode updated to Player vs Player.");
-                break;
-            case "2":
-                Configuration.Mode = EGameMode.PvC;
-                Console.WriteLine("Game mode updated to Player vs Computer.");
-                break;
-            case "3":
-                Configuration.Mode = EGameMode.CvC;
-                Console.WriteLine("Game mode updated to Computer vs Computer.");
-                break;
-            default:
-                Console.WriteLine("Invalid input!");
-                break;
-        }
-        
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
-        return "";
-    }
-
     private string ChangeConfigurationName()
     {
         Console.Clear();
@@ -228,7 +189,6 @@ public class SettingsMenu
         Console.WriteLine($"Board Size: {Configuration.BoardWidth}x{Configuration.BoardHeight}");
         Console.WriteLine($"Connect How Many: {Configuration.ConnectHow}");
         Console.WriteLine($"Board Type: {(Configuration.IsCylindrical ? "Cylindrical" : "Standard")}");
-        Console.WriteLine($"Game Mode: {Configuration.Mode}");
         Console.WriteLine();
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey();

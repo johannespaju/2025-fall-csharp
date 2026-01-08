@@ -21,4 +21,6 @@ public class GameState : BaseEntity
     
     public string P1Name { get; set; } = "Player 1";
     public string P2Name { get; set; } = "Player 2";
+    
+    public EGameMode GameMode { get; set; } = EGameMode.PvP;
 }

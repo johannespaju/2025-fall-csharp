@@ -40,7 +40,7 @@ main.AddMenuItem("n", "Start New Game", () =>
     Console.Clear();
     Console.WriteLine("Enter Player 2 name: ");
     var p2Name = Console.ReadLine() ?? "Player 2";
-    var controller = new GameController(gameConfig, gameRepo, p1Name, p2Name);
+    var controller = new GameController(gameConfig, gameRepo, EGameMode.PvP, p1Name, p2Name);
     controller.GameLoop();
     return "";
 });
@@ -158,7 +158,7 @@ main.AddMenuItem("loadgame", "Load Saved Game", () =>
         var loaded = gameRepo.Load(saves[index - 1].id);
         var brain = new GameBrain(loaded);
         brain.LoadGameState(loaded);
-        var controller = new GameController(loaded.Configuration ?? new GameConfiguration(), gameRepo, loaded.P1Name, loaded.P2Name)
+        var controller = new GameController(loaded.Configuration ?? new GameConfiguration(), gameRepo, loaded.GameMode, loaded.P1Name, loaded.P2Name)
         {
             GameBrain = brain
         };

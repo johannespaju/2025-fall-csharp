@@ -35,15 +35,6 @@
                         <input asp-for="ConfigName" />
                         <span asp-validation-for="ConfigName" class="validation-error"></span>
                     </div>
-
-                    <div class="form-group">
-                        <label asp-for="GameMode">Game Mode</label>
-                        <select asp-for="GameMode">
-                            <option value="@EGameMode.PvP">Player vs Player</option>
-                            <option value="@EGameMode.PvC">Player vs Computer</option>
-                            <option value="@EGameMode.CvC">Computer vs Computer</option>
-                        </select>
-                    </div>
                 </div>
 
                 <div class="form-section">
@@ -91,20 +82,6 @@
                             <div class="config-name">@config.Name</div>
                             <div class="config-dims">@config.BoardWidth × @config.BoardHeight</div>
                             <div class="config-connect">@config.ConnectHow</div>
-                            <div>
-                                @switch (config.Mode)
-                                {
-                                    case EGameMode.PvP:
-                                        <span class="badge badge-pvp">PvP</span>
-                                        break;
-                                    case EGameMode.PvC:
-                                        <span class="badge badge-pvc">PvC</span>
-                                        break;
-                                    case EGameMode.CvC:
-                                        <span class="badge badge-cvc">CvC</span>
-                                        break;
-                                }
-                            </div>
                             <div>
                                 @if (config.IsCylindrical)
                                 {

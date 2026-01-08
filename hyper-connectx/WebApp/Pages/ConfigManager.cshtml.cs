@@ -44,9 +44,6 @@ public class ConfigManagerModel : PageModel
     public int ConnectHowMany { get; set; } = 4;
 
     [BindProperty]
-    public EGameMode GameMode { get; set; } = EGameMode.PvP;
-
-    [BindProperty]
     public bool IsCylindrical { get; set; } = false;
 
     // Validation and status messages
@@ -83,7 +80,6 @@ public class ConfigManagerModel : PageModel
             BoardWidth = BoardWidth,
             BoardHeight = BoardHeight,
             ConnectHow = ConnectHowMany,
-            Mode = GameMode,
             IsCylindrical = IsCylindrical
         };
 
@@ -146,7 +142,6 @@ public class ConfigManagerModel : PageModel
             BoardWidth = config.BoardWidth;
             BoardHeight = config.BoardHeight;
             ConnectHowMany = config.ConnectHow;
-            GameMode = config.Mode;
             IsCylindrical = config.IsCylindrical;
         }
         catch (Exception ex)
@@ -209,7 +204,6 @@ public class ConfigManagerModel : PageModel
         BoardWidth = 7;
         BoardHeight = 6;
         ConnectHowMany = 4;
-        GameMode = EGameMode.PvP;
         IsCylindrical = false;
     }
 }

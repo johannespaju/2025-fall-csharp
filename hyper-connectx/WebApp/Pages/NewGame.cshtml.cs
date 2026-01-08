@@ -104,7 +104,6 @@ public class NewGameModel : PageModel
                 BoardWidth = BoardWidth,
                 BoardHeight = BoardHeight,
                 ConnectHow = ConnectHowMany,
-                Mode = GameMode,
                 IsCylindrical = IsCylindrical
             };
 
@@ -118,7 +117,8 @@ public class NewGameModel : PageModel
         {
             Configuration = config,
             P1Name = Player1Name,
-            P2Name = Player2Name
+            P2Name = Player2Name,
+            GameMode = GameMode
         };
         var brain = new GameBrain(initialState);
         

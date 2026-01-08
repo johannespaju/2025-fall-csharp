@@ -75,7 +75,7 @@ public class GameModel : PageModel
         
         // In PvC mode, AI is always O (not X)
         // In CvC mode, AI plays X when it's X's turn, O when it's O's turn
-        bool isPlayerX = config.Mode == EGameMode.CvC && Brain.IsNextPlayerX();
+        bool isPlayerX = state.GameMode == EGameMode.CvC && Brain.IsNextPlayerX();
         var ai = new MinimaxAI(config, isPlayerX);
         int bestColumn = ai.GetBestMove(Brain.GetBoard(), Brain.IsNextPlayerX());
         
@@ -122,8 +122,8 @@ public class GameModel : PageModel
             : (string.IsNullOrEmpty(state.P2Name) ? "Player 2" : state.P2Name);
         
         // Check if it's AI's turn (PvC mode and O's turn, or CvC mode always)
-        IsAiTurn = (config.Mode == EGameMode.PvC && !isXTurn) || config.Mode == EGameMode.CvC;
-        IsCvCMode = config.Mode == EGameMode.CvC;
+        IsAiTurn = (state.GameMode == EGameMode.PvC && !isXTurn) || state.GameMode == EGameMode.CvC;
+        IsCvCMode = state.GameMode == EGameMode.CvC;
         
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
@@ -174,6 +174,7 @@ public class GameModel : PageModel
         existingState.NextMoveByX = currentGameState.NextMoveByX;
         existingState.P1Name = currentGameState.P1Name;
         existingState.P2Name = currentGameState.P2Name;
+        existingState.GameMode = currentGameState.GameMode;
         
         // Save the updated state (Configuration relationship is preserved)
         _gameRepository.Save(existingState);

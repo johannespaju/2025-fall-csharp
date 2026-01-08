@@ -14,7 +14,7 @@ public class GameController
     private string _p1Name;
     private string _p2Name;
 
-    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository, string p1Name = "Player 1", string p2Name = "Player 2")
+    public GameController(GameConfiguration configuration, IRepository<GameState> gameRepository, EGameMode gameMode = EGameMode.PvP, string p1Name = "Player 1", string p2Name = "Player 2")
     {
         _config = configuration;
         _p1Name = p1Name;
@@ -26,17 +26,18 @@ public class GameController
         {
             Configuration = configuration,
             P1Name = p1Name,
-            P2Name = p2Name
+            P2Name = p2Name,
+            GameMode = gameMode
         };
         GameBrain = new GameBrain(initialState);
         
         // Initialize AI if needed
-        if (configuration.Mode == EGameMode.PvC)
+        if (gameMode == EGameMode.PvC)
         {
             // AI plays as O (second player)
             _aiPlayerO = new MinimaxAI(configuration, isPlayerX: false, maxDepth: 6);
         }
-        else if (configuration.Mode == EGameMode.CvC)
+        else if (gameMode == EGameMode.CvC)
         {
             // For CvC, create both AIs
             _aiPlayerX = new MinimaxAI(configuration, isPlayerX: true, maxDepth: 6);
@@ -190,16 +191,18 @@ public class GameController
 
     private bool ShouldAiMove()
     {
-        if (_config.Mode == EGameMode.PvP)
+        var gameMode = GameBrain.GetGameMode();
+        
+        if (gameMode == EGameMode.PvP)
             return false;
         
-        if (_config.Mode == EGameMode.PvC)
+        if (gameMode == EGameMode.PvC)
         {
             // AI is O (second player), so moves when NextMoveByX is false
             return !GameBrain.IsNextPlayerX();
         }
         
-        if (_config.Mode == EGameMode.CvC)
+        if (gameMode == EGameMode.CvC)
         {
             // Both players are AI
             return true;
