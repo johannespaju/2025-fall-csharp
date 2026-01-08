@@ -11,15 +11,26 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
         var dir = FilesystemHelpers.GetConfigDirectory();
         var result = new List<(string id, string description)>();
 
-        foreach (var fullFileName in Directory.EnumerateFiles(dir))
+        foreach (var fullFileName in Directory.EnumerateFiles(dir, "*.json"))
         {  
-            var fileName = Path.GetFileName(fullFileName);
-            if (!fileName.EndsWith(".json")) continue;
-            result.Add(
-                (
-                    Path.GetFileNameWithoutExtension(fileName),
-                    Path.GetFileNameWithoutExtension(fileName))
-            );
+            var id = Path.GetFileNameWithoutExtension(fullFileName);
+            // Skip non-GUID files for backward compatibility
+            if (!Guid.TryParse(id, out _)) continue;
+            
+            try
+            {
+                var config = Load(id);
+                result.Add(
+                    (
+                        config.Id.ToString(),
+                        $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}"
+                    )
+                );
+            }
+            catch
+            {
+                // Skip files that can't be loaded (corrupted or old format)
+            }
         }
 
         return result;
@@ -34,17 +45,26 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
         {
             var result = new List<(string id, string description)>();
 
-            foreach (var fullFileName in Directory.EnumerateFiles(dir))
+            foreach (var fullFileName in Directory.EnumerateFiles(dir, "*.json"))
             {  
-                var fileName = Path.GetFileName(fullFileName);
-                if (!fileName.EndsWith(".json")) continue;
+                var id = Path.GetFileNameWithoutExtension(fullFileName);
+                // Skip non-GUID files for backward compatibility
+                if (!Guid.TryParse(id, out _)) continue;
             
-                result.Add(
-                    (
-                        Path.GetFileNameWithoutExtension(fileName),
-                        Path.GetFileNameWithoutExtension(fileName)
-                    )
-                );
+                try
+                {
+                    var config = Load(id);
+                    result.Add(
+                        (
+                            config.Id.ToString(),
+                            $"{config.Name} - {config.BoardWidth}x{config.BoardHeight} - connect{config.ConnectHow}"
+                        )
+                    );
+                }
+                catch
+                {
+                    // Skip files that can't be loaded (corrupted or old format)
+                }
             }
 
             return result;
@@ -53,26 +73,22 @@ public class ConfigRepositoryJson : IRepository<GameConfiguration>
     
     public string Save(GameConfiguration data)
     {
+        // Ensure the configuration has an ID
+        if (data.Id == Guid.Empty)
+        {
+            data.Id = Guid.NewGuid();
+        }
+        
         var jsonStr = JsonSerializer.Serialize(data);
         
-        var safeName = Regex.Replace(data.Name.Trim(), @"[^a-zA-Z0-9 _\-]", "_");
-        
-        var fileName = $"{safeName} - {data.BoardWidth}x{data.BoardHeight} - connect{data.ConnectHow}" + ".json";
+        // Use GUID as filename for consistent lookup
+        var fileName = $"{data.Id}.json";
         var dir = FilesystemHelpers.GetConfigDirectory();
         var fullFileName = Path.Combine(dir, fileName);
         
-        foreach (var existingFile in Directory.EnumerateFiles(dir, "*.json"))
-        {
-            if (Path.GetFileNameWithoutExtension(existingFile).StartsWith(safeName + " -"))
-            {
-                File.Delete(existingFile);
-                break;
-            }
-        }
-        
         File.WriteAllText(fullFileName, jsonStr);
 
-        return fileName;
+        return data.Id.ToString();
     }
 
     public GameConfiguration Load(string id)
