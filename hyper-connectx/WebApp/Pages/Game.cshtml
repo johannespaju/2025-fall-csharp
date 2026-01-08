@@ -310,6 +310,7 @@
         {
             <a asp-page="/NewGame" class="btn btn-primary">New Game</a>
         }
+        <button type="button" class="btn btn-info" onclick="copyGameLink('@Model.CurrentGameUrl', event)">Copy Link</button>
         <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
         
         @if (!isGameOver)

@@ -28,6 +28,7 @@ public class GameModel : PageModel
     public int? LastMoveColumn { get; private set; }
     public int? LastMoveRow { get; private set; }
     public EGameStatus GameStatus { get; private set; }
+    public string CurrentGameUrl { get; private set; } = "";
 
     public IActionResult OnGet()
     {
@@ -181,6 +182,9 @@ public class GameModel : PageModel
         
         // Load game status
         GameStatus = Brain.GetStatus();
+        
+        // Construct current game URL
+        CurrentGameUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}?Id={state.Id}";
         
         // Set game message
         if (Winner == ECellState.X || Winner == ECellState.XWin)
