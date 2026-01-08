@@ -105,8 +105,7 @@ public class GameModel : PageModel
     {
         GameState = state;
         
-        // Create GameBrain from configuration and load state
-        var config = state.Configuration ?? new GameConfiguration();
+        // Create GameBrain from game state and load board
         Brain = new GameBrain(state);
         Brain.LoadGameState(state);
         
