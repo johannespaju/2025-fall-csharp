@@ -25,6 +25,8 @@ public class GameModel : PageModel
     public bool IsCvCMode { get; private set; }
     public string CurrentPlayerName { get; private set; } = "";
     public string GameMessage { get; private set; } = "";
+    public int? LastMoveColumn { get; private set; }
+    public int? LastMoveRow { get; private set; }
 
     public IActionResult OnGet()
     {
@@ -54,6 +56,10 @@ public class GameModel : PageModel
         if (moveResult.IsValid)
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            
+            // Track last move for animation
+            LastMoveColumn = column;
+            LastMoveRow = moveResult.FinalRow;
             
             // Check winner immediately after move
             var winner = Brain.MarkWinner();
@@ -93,6 +99,10 @@ public class GameModel : PageModel
         if (moveResult.IsValid)
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            
+            // Track last move for animation
+            LastMoveColumn = bestColumn;
+            LastMoveRow = moveResult.FinalRow;
             
             // Check winner immediately after move
             var winner = Brain.MarkWinner();

@@ -237,6 +237,28 @@
         border-radius: 6px;
         font-size: 1rem;
     }
+    
+    /* Drop animation for new pieces */
+    .cell.dropping {
+        animation: dropIn 0.5s ease-in;
+    }
+
+    @@keyframes dropIn {
+        0% {
+            transform: translateY(-500px);
+            opacity: 0.5;
+        }
+        60% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        75% {
+            transform: translateY(-10px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
 </style>
 
 <div class="game-container">
@@ -309,7 +331,12 @@
     <!-- Hidden game state for JavaScript -->
     @if (!isGameOver)
     {
-        <div id="gameState" data-next-player-x="@Model.Brain.IsNextPlayerX().ToString().ToLower()" data-is-ai-turn="@Model.IsAiTurn.ToString().ToLower()" style="display:none;"></div>
+        <div id="gameState" 
+             data-next-player-x="@Model.Brain.IsNextPlayerX().ToString().ToLower()" 
+             data-is-ai-turn="@Model.IsAiTurn.ToString().ToLower()"
+             data-last-move-column="@(Model.LastMoveColumn?.ToString() ?? "")"
+             data-last-move-row="@(Model.LastMoveRow?.ToString() ?? "")"
+             style="display:none;"></div>
     }
     
     <!-- Game Board -->
@@ -320,7 +347,7 @@
             {
                 var cell = Model.GetCell(x, y);
                 var isWin = Model.IsWinningCell(x, y);
-                <div class="cell @GetCellClass(cell) @(isWin ? "winning" : "")" data-column="@x"></div>
+                <div class="cell @GetCellClass(cell) @(isWin ? "winning" : "")" data-column="@x" data-row="@y"></div>
             }
         }
     </div>
@@ -474,6 +501,29 @@
                 }
             });
         }
+        
+        // Check for and animate the last placed piece
+        function animateLastMove() {
+            if (!gameState) return;
+            
+            const lastMoveColumn = gameState.dataset.lastMoveColumn;
+            const lastMoveRow = gameState.dataset.lastMoveRow;
+            
+            if (lastMoveColumn && lastMoveRow) {
+                const cell = document.querySelector(`.cell[data-column="${lastMoveColumn}"][data-row="${lastMoveRow}"]`);
+                if (cell) {
+                    // Remove any existing animation classes first
+                    cell.classList.remove('dropping');
+                    // Force reflow to restart animation
+                    void cell.offsetWidth;
+                    // Add animation class
+                    cell.classList.add('dropping');
+                }
+            }
+        }
+        
+        // Call animation at the end of DOMContentLoaded
+        animateLastMove();
     });
 </script>
 
