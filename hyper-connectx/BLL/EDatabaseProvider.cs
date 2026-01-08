@@ -22,5 +22,5 @@ public static class DatabaseConfig
     /// Gets or sets the current database provider.
     /// Change this value to switch between EntityFramework and Json storage.
     /// </summary>
-    public static EDatabaseProvider CurrentProvider { get; set; } = EDatabaseProvider.Json;
+    public static EDatabaseProvider CurrentProvider { get; set; } = EDatabaseProvider.EntityFramework;
 }

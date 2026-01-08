@@ -12,7 +12,7 @@ switch (DatabaseConfig.CurrentProvider)
 {
     case EDatabaseProvider.EntityFramework:
     {
-        using var dbContext = GetDbContext();
+        var dbContext = GetDbContext();
         configRepo = new ConfigRepositoryEF(dbContext);
         gameRepo = new GameRepositoryEF(dbContext);
         break;
