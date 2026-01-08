@@ -126,6 +126,7 @@ public class GameBrain
             var (dirX, dirY) = GetDirection(directionIndex);
 
             var count = 1; // Start at 1 to count the current cell
+            var winningCells = new List<(int x, int y)> { (x, y) };
         
             // Check in positive direction
             var nextX = WrapX(x + dirX);
@@ -135,6 +136,7 @@ public class GameBrain
                    count < GameConfiguration.ConnectHow)
             {
                 count++;
+                winningCells.Add((nextX, nextY));
                 nextX = WrapX(nextX + dirX);
                 nextY += dirY;
             }
@@ -148,17 +150,44 @@ public class GameBrain
                    count < GameConfiguration.ConnectHow)
             {
                 count++;
+                winningCells.Add((nextX, nextY));
                 nextX = WrapX(nextX + flipDirX);
                 nextY += flipDirY;
             }
         
             if (count >= GameConfiguration.ConnectHow)
             {
-                return GameBoard[x, y] == ECellState.X ? ECellState.XWin : ECellState.OWin;
+                // Mark all winning cells
+                var winState = GameBoard[x, y] == ECellState.X ? ECellState.XWin : ECellState.OWin;
+                foreach (var (wx, wy) in winningCells)
+                {
+                    GameBoard[wx, wy] = winState;
+                }
+                return winState;
             }
         }
 
         return ECellState.Empty;
+    }
+    
+    // Mark winner by checking all cells (used after a move to detect and mark wins)
+    public ECellState? MarkWinner()
+    {
+        for (int x = 0; x < GameConfiguration.BoardWidth; x++)
+        {
+            for (int y = 0; y < GameConfiguration.BoardHeight; y++)
+            {
+                if (GameBoard[x, y] == ECellState.X || GameBoard[x, y] == ECellState.O)
+                {
+                    var result = GetWinner(x, y);
+                    if (result == ECellState.XWin || result == ECellState.OWin)
+                    {
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     private static ECellState[][] ConvertToJagged(ECellState[,] board)

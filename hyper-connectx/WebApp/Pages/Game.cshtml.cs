@@ -46,14 +46,24 @@ public class GameModel : PageModel
 
         SetupGame(state);
         
-        // Check if game already over
-        if (Winner != null || IsDraw) return Page();
+        // Check if game already over - REJECT move if so
+        if (Winner != null || IsDraw) return RedirectToPage("/Game", new { Id });
 
         // Calculate and execute move
         var moveResult = Brain.CalculateMove(column);
         if (moveResult.IsValid)
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            
+            // Check winner immediately after move
+            var winner = Brain.MarkWinner();
+            if (winner == ECellState.XWin || winner == ECellState.OWin)
+            {
+                GameState = Brain.GetGameState();
+                _gameRepository.Save(GameState);
+                SetupGame(GameState);
+                return Page();
+            }
             SaveAndRefresh();
         }
 
@@ -67,8 +77,8 @@ public class GameModel : PageModel
 
         SetupGame(state);
         
-        // Check if game already over or not AI's turn
-        if (Winner != null || IsDraw || !IsAiTurn) return Page();
+        // Check if game already over or not AI's turn - REJECT move if so
+        if (Winner != null || IsDraw || !IsAiTurn) return RedirectToPage("/Game", new { Id });
 
         // Execute AI move
         var config = state.Configuration ?? new GameConfiguration();
@@ -83,6 +93,16 @@ public class GameModel : PageModel
         if (moveResult.IsValid)
         {
             Brain.ExecuteMove(moveResult.Column, moveResult.FinalRow);
+            
+            // Check winner immediately after move
+            var winner = Brain.MarkWinner();
+            if (winner == ECellState.XWin || winner == ECellState.OWin)
+            {
+                GameState = Brain.GetGameState();
+                _gameRepository.Save(GameState);
+                SetupGame(GameState);
+                return Page();
+            }
             SaveAndRefresh();
         }
 
@@ -141,21 +161,14 @@ public class GameModel : PageModel
         int width = board.GetLength(0);
         int height = board.GetLength(1);
         
-        // Find the last placed piece by scanning from bottom to top
         for (int x = 0; x < width; x++)
         {
-            for (int y = height - 1; y >= 0; y--)
+            for (int y = 0; y < height; y++)
             {
-                if (board[x, y] != ECellState.Empty)
-                {
-                    var winner = Brain.GetWinner(x, y);
-                    if (winner == ECellState.XWin || winner == ECellState.OWin)
-                    {
-                        return winner;
-                    }
-                    // Only check the topmost piece in each column
-                    break;
-                }
+                if (board[x, y] == ECellState.XWin)
+                    return ECellState.XWin;
+                if (board[x, y] == ECellState.OWin)
+                    return ECellState.OWin;
             }
         }
         return null;
