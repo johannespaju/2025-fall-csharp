@@ -524,6 +524,12 @@
         
         // Call animation at the end of DOMContentLoaded
         animateLastMove();
+        
+        // Simple polling: reload page every 3 seconds to check for opponent moves
+        // PRG pattern ensures no duplicate moves on refresh
+        setInterval(function() {
+            window.location.reload();
+        }, 3000);
     });
 </script>
 

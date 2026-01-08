@@ -67,10 +67,12 @@ public class GameModel : PageModel
             {
                 GameState = Brain.GetGameState();
                 _gameRepository.Save(GameState);
-                SetupGame(GameState);
-                return Page();
+                // PRG: Redirect to GET to prevent re-submission on refresh
+                return RedirectToPage("/Game", new { Id });
             }
             SaveAndRefresh();
+            // PRG: Redirect to GET to prevent re-submission on refresh
+            return RedirectToPage("/Game", new { Id });
         }
 
         return Page();
@@ -110,10 +112,12 @@ public class GameModel : PageModel
             {
                 GameState = Brain.GetGameState();
                 _gameRepository.Save(GameState);
-                SetupGame(GameState);
-                return Page();
+                // PRG: Redirect to GET to prevent re-submission on refresh
+                return RedirectToPage("/Game", new { Id });
             }
             SaveAndRefresh();
+            // PRG: Redirect to GET to prevent re-submission on refresh
+            return RedirectToPage("/Game", new { Id });
         }
 
         return Page();
@@ -128,7 +132,9 @@ public class GameModel : PageModel
         _gameRepository.Save(state);
         
         SetupGame(state);
-        return Page();
+        
+        // PRG: Redirect to GET to prevent re-submission on refresh
+        return RedirectToPage("/Game", new { Id });
     }
 
     private void SetupGame(GameState state)
