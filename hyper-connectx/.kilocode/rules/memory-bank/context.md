@@ -35,6 +35,10 @@ Both ConsoleApp and WebApp share the same BLL and DAL layers.
   - Updated [`FindWinner()`](WebApp/Pages/Game.cshtml.cs) to scan for XWin/OWin cells on the board
   - POST handlers now redirect to game page when game is over, preventing additional moves after a win
   - Game now properly highlights winning pieces and ends the game correctly
+- **2026-01-08: IsHidden Feature Added**
+  - Added `IsHidden` property to [`GameConfiguration`](BLL/GameConfiguration.cs) to allow hiding configurations from UI
+  - New database migration `AddIsHiddenToGameConfiguration` adds `IsHidden` column to `GameConfigurations` table
+  - Configurations can be hidden while preserving existing games that use them
 
 ## Active Work Focus
 

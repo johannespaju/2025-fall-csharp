@@ -114,6 +114,7 @@ Configuration entity storing **rules only**:
 - Board dimensions (width/height)
 - Connect requirement
 - Cylindrical mode flag
+- IsHidden flag (for hiding configurations from UI while preserving for existing games)
 
 **Note:** No longer stores GameMode - configurations are now purely game rule templates.
 
