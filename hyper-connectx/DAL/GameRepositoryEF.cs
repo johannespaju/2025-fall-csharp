@@ -85,6 +85,13 @@ public class GameRepositoryEF : IRepository<GameState>
             existing.GameConfigurationId = data.GameConfigurationId;
             existing.BoardJson = data.BoardJson;
             existing.NextMoveByX = data.NextMoveByX;
+            existing.LastMoveColumn = data.LastMoveColumn;
+            existing.LastMoveRow = data.LastMoveRow;
+            existing.Status = data.Status;
+            existing.P1Name = data.P1Name;
+            existing.P2Name = data.P2Name;
+            existing.GameMode = data.GameMode;
+            existing.Difficulty = data.Difficulty;
 
             _dbContext.SaveChanges();
             return existing.Id.ToString();
@@ -164,6 +171,11 @@ public class GameRepositoryEF : IRepository<GameState>
             existing.NextMoveByX = data.NextMoveByX;
             existing.LastMoveColumn = data.LastMoveColumn;
             existing.LastMoveRow = data.LastMoveRow;
+            existing.Status = data.Status;
+            existing.P1Name = data.P1Name;
+            existing.P2Name = data.P2Name;
+            existing.GameMode = data.GameMode;
+            existing.Difficulty = data.Difficulty;
             await _dbContext.SaveChangesAsync();
             return existing.Id.ToString();
         }
