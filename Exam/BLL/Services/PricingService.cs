@@ -40,4 +40,21 @@ public class PricingService : IPricingService
         
         return newPrice - originalPrice;
     }
+
+    public decimal CalculateRentalCost(BikeType bikeType, decimal durationHours)
+    {
+        var dailyRate = GetDailyRate(bikeType);
+        // Pro-rate by hour (Requirements line 299)
+        return dailyRate * (durationHours / 24.0m);
+    }
+
+    private decimal GetDailyRate(BikeType type) => type switch
+    {
+        BikeType.City => 12m,
+        BikeType.Electric => 28m,
+        BikeType.Mountain => 18m,
+        BikeType.Tandem => 22m,
+        BikeType.Children => 8m,
+        _ => 12m
+    };
 }

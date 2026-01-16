@@ -1,6 +1,9 @@
 using BLL.Interfaces;
 using BLL.Services;
+using BLL.Validators;
 using DAL;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +23,12 @@ builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IMaintenanceService, MaintenanceService>();
 builder.Services.AddScoped<IDepositService, DepositService>();
+builder.Services.AddScoped<ITourService, TourService>();
+
+// FluentValidation (Requirements line 6, 215-220)
+builder.Services.AddValidatorsFromAssemblyContaining<BikeValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters(); // Optional: client-side validation
 
 var app = builder.Build();
 
