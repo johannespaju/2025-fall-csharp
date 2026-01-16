@@ -71,6 +71,7 @@ public class CreateModel : PageModel
             MaintenanceRecord.CompletedAt = DateTime.UtcNow;
             bike.Status = BikeStatus.Available;
             bike.LastServiceOdometer = MaintenanceRecord.OdometerAtService;
+            bike.ServiceCosts += MaintenanceRecord.Cost;
         }
 
         await _maintenanceRepository.AddAsync(MaintenanceRecord);

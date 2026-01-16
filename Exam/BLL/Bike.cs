@@ -21,6 +21,7 @@ public class Bike : BaseEntity
     public int ServiceInterval { get; set; } // in kilometers
     public int CurrentOdometer { get; set; } // in kilometers
     public int LastServiceOdometer { get; set; } = 0; // Track service history
+    public decimal ServiceCosts { get; set; } = 0; // in euros
 
     // Calculated property for maintenance status with 50km buffer
     public bool NeedsMaintenance => (CurrentOdometer - LastServiceOdometer) >= (ServiceInterval - 50);
