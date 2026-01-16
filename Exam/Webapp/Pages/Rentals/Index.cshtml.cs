@@ -1,6 +1,7 @@
 using BLL;
 using BLL.Enums;
 using BLL.Interfaces;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,17 +9,20 @@ namespace Webapp.Pages.Rentals;
 
 public class IndexModel : PageModel
 {
-    private readonly IRepository<Rental> _rentalRepository;
+    private readonly IRentalRepository _rentalRepository;
 
-    public IndexModel(IRepository<Rental> rentalRepository)
+    public IndexModel(IRentalRepository rentalRepository)
     {
         _rentalRepository = rentalRepository;
     }
 
     public List<Rental> Rentals { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public RentalStatus? FilterStatus { get; set; }
+
     public async Task OnGetAsync()
     {
-        Rentals = (await _rentalRepository.GetAllAsync("Bike", "Customer")).ToList();
+        Rentals = (await _rentalRepository.SearchRentalsAsync(FilterStatus)).ToList();
     }
 }

@@ -35,6 +35,7 @@ public class DeleteModel : PageModel
         await _bikeRepository.DeleteAsync(Bike);
         await _bikeRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Bike {Bike.BikeNumber} deleted successfully!";
         return RedirectToPage(nameof(Index));
     }
 }

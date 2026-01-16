@@ -11,15 +11,53 @@
     <a asp-page="Create" class="btn btn-primary">Create New Bike</a>
 </p>
 
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Bike Type</label>
+            <select asp-for="FilterType" class="form-select">
+                <option value="">All Types</option>
+                <option value="@BikeType.City">City</option>
+                <option value="@BikeType.Electric">Electric</option>
+                <option value="@BikeType.Mountain">Mountain</option>
+                <option value="@BikeType.Tandem">Tandem</option>
+                <option value="@BikeType.Children">Children</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select asp-for="FilterStatus" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="@BikeStatus.Available">Available</option>
+                <option value="@BikeStatus.Rented">Rented</option>
+                <option value="@BikeStatus.InMaintenance">In Maintenance</option>
+                <option value="@BikeStatus.Damaged">Damaged</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Search</label>
+            <input asp-for="SearchTerm" class="form-control"
+                   placeholder="Search by bike number..." />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="bi bi-search"></i> Filter
+            </button>
+            <a asp-page="./Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Bike Number</th>
                 <th>Type</th>
                 <th>Daily Rate</th>
                 <th>Service Interval (km)</th>
                 <th>Current Odometer (km)</th>
-                <th>Available</th>
+                <th>Status</th>
                 <th>Maintenance Due</th>
                 <th>Actions</th>
             </tr>
@@ -28,12 +66,13 @@
             @foreach (var bike in Model.Bikes)
             {
                 <tr>
+                    <td>@bike.BikeNumber</td>
                     <td>@bike.Type</td>
                     <td>@bike.DailyRate.ToString("C")</td>
                     <td>@bike.ServiceInterval</td>
                     <td>@bike.CurrentOdometer</td>
                     <td>
-                        <span class="badge @(bike.Status == BikeStatus.Available ? "bg-success" : "bg-danger")">
+                        <span class="badge @(bike.Status == BikeStatus.Available ? "bg-success" : bike.Status == BikeStatus.Rented ? "bg-primary" : bike.Status == BikeStatus.InMaintenance ? "bg-warning" : "bg-danger")">
                             @bike.Status
                         </span>
                     </td>

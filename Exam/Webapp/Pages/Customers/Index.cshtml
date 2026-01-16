@@ -10,6 +10,22 @@
     <a asp-page="Create" class="btn btn-primary">Create New Customer</a>
 </p>
 
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label class="form-label">Search</label>
+            <input asp-for="SearchTerm" class="form-control"
+                   placeholder="Search by name, email, or phone..." />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="bi bi-search"></i> Search
+            </button>
+            <a asp-page="./Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>

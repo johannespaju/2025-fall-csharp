@@ -27,12 +27,14 @@ public class CreateModel : PageModel
     {
         if (!ModelState.IsValid)
         {
+            TempData["ErrorMessage"] = "Please correct the errors and try again.";
             return Page();
         }
 
         await _bikeRepository.AddAsync(Bike);
         await _bikeRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Bike {Bike.BikeNumber} created successfully!";
         return RedirectToPage(nameof(Index));
     }
 }

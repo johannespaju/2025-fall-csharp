@@ -2,6 +2,7 @@ using BLL.Interfaces;
 using BLL.Services;
 using BLL.Validators;
 using DAL;
+using DAL.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IBikeRepository, BikeRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IRentalRepository, RentalRepository>();
 
 // Register services
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();

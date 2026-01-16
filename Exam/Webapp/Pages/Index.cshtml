@@ -1,51 +1,131 @@
 ﻿@page
+@using BLL.Enums
 @model IndexModel
 @{
-    ViewData["Title"] = "Bicycle Rental System";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="jumbotron">
-    <h1 class="display-4">Bicycle Rental System</h1>
-    <p class="lead">Manage your bike rental business with ease</p>
-    <hr class="my-4">
-    <p>Welcome to the Bicycle Rental System. Use the navigation menu above to manage bikes, customers, rentals, and tours.</p>
-</div>
+<h1 class="display-4 mb-4">Bicycle Rental Dashboard</h1>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="card text-center">
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Bikes Card -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-primary">
             <div class="card-body">
-                <h5 class="card-title">Bikes</h5>
-                <p class="card-text">Manage your bike inventory</p>
-                <a asp-page="/Bikes/Index" class="btn btn-primary">Manage Bikes</a>
+                <h5 class="card-title">Total Bikes</h5>
+                <h2>@Model.TotalBikes</h2>
+                <small>@Model.AvailableBikes available</small>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-center">
+    
+    <!-- Active Rentals Card -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Active Rentals</h5>
+                <h2>@Model.ActiveRentals</h2>
+                <small>@Model.FutureRentals upcoming</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Maintenance Card -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Maintenance</h5>
+                <h2>@Model.BikesNeedingMaintenance.Count</h2>
+                <small>bikes need service</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customers Card -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-info">
             <div class="card-body">
                 <h5 class="card-title">Customers</h5>
-                <p class="card-text">Manage customer information</p>
-                <a asp-page="/Customers/Index" class="btn btn-primary">Manage Customers</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5 class="card-title">Rentals</h5>
-                <p class="card-text">Create and manage rentals</p>
-                <a asp-page="/Rentals/Index" class="btn btn-primary">Manage Rentals</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5 class="card-title">Tours</h5>
-                <p class="card-text">Manage guided tours</p>
-                <a asp-page="/Tours/Index" class="btn btn-primary">Manage Tours</a>
+                <h2>@Model.TotalCustomers</h2>
+                <small>@Model.TotalTours tours available</small>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Bikes Needing Maintenance -->
+@if (Model.BikesNeedingMaintenance.Any())
+{
+    <div class="alert alert-warning">
+        <h5><i class="bi bi-wrench"></i> Bikes Needing Maintenance</h5>
+        <ul class="mb-0">
+            @foreach (var bike in Model.BikesNeedingMaintenance)
+            {
+                <li>
+                    <strong>@bike.BikeNumber</strong> - 
+                    @bike.CurrentOdometer km 
+                    (@(bike.ServiceInterval - (bike.CurrentOdometer - bike.LastServiceOdometer)) km until threshold)
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h4>Quick Actions</h4>
+        <div class="btn-group" role="group">
+            <a asp-page="/Rentals/Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> New Rental
+            </a>
+            <a asp-page="/Tours/Book" class="btn btn-info">
+                <i class="bi bi-calendar-check"></i> Book Tour
+            </a>
+            <a asp-page="/Customers/Create" class="btn btn-success">
+                <i class="bi bi-person-plus"></i> New Customer
+            </a>
+            <a asp-page="/Bikes/Create" class="btn btn-secondary">
+                <i class="bi bi-bicycle"></i> Add Bike
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Rentals Table -->
+<h4>Recent Rentals</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Bike</th>
+            <th>Customer</th>
+            <th>Start</th>
+            <th>Status</th>
+            <th>Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rental in Model.RecentRentals)
+        {
+            <tr>
+                <td>@rental.Bike?.BikeNumber</td>
+                <td>@rental.Customer?.FirstName @rental.Customer?.LastName</td>
+                <td>@rental.StartDate.ToString("yyyy-MM-dd") @rental.StartTime.ToString("HH:mm")</td>
+                <td><span class="badge bg-@GetStatusColor(rental.Status)">@rental.Status</span></td>
+                <td>€@rental.TotalCost</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@functions {
+    string GetStatusColor(RentalStatus status) => status switch
+    {
+        RentalStatus.Active => "success",
+        RentalStatus.Reserved => "info",
+        RentalStatus.Completed => "secondary",
+        RentalStatus.Cancelled => "danger",
+        _ => "primary"
+    };
+}

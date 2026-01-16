@@ -27,12 +27,14 @@ public class CreateModel : PageModel
     {
         if (!ModelState.IsValid)
         {
+            TempData["ErrorMessage"] = "Please correct the errors and try again.";
             return Page();
         }
 
         await _customerRepository.AddAsync(Customer);
         await _customerRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Customer {Customer.FirstName} {Customer.LastName} created successfully!";
         return RedirectToPage(nameof(Index));
     }
 }

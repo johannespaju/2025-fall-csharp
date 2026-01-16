@@ -11,6 +11,28 @@
     <a asp-page="Create" class="btn btn-primary">Create New Rental</a>
 </p>
 
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Filter by Status</label>
+            <select asp-for="FilterStatus" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="@RentalStatus.Reserved">Reserved</option>
+                <option value="@RentalStatus.Active">Active</option>
+                <option value="@RentalStatus.Completed">Completed</option>
+                <option value="@RentalStatus.Cancelled">Cancelled</option>
+                <option value="@RentalStatus.Extended">Extended</option>
+            </select>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="bi bi-filter"></i> Filter
+            </button>
+            <a asp-page="./Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -29,14 +51,14 @@
             @foreach (var rental in Model.Rentals)
             {
                 <tr>
-                    <td>@rental.Bike?.Type</td>
+                    <td>@rental.Bike?.BikeNumber (@rental.Bike?.Type)</td>
                     <td>@rental.Customer?.FirstName @rental.Customer?.LastName</td>
                     <td>@rental.StartDate.ToString("yyyy-MM-dd") @rental.StartTime.ToString("HH:mm")</td>
                     <td>@rental.EndDate.ToString("yyyy-MM-dd") @rental.EndTime.ToString("HH:mm")</td>
                     <td>@rental.TotalCost.ToString("C")</td>
                     <td>@rental.DepositAmount.ToString("C")</td>
                     <td>
-                        <span class="badge @(rental.Status == RentalStatus.Active ? "bg-success" : "bg-secondary")">
+                        <span class="badge @(rental.Status == RentalStatus.Active ? "bg-success" : rental.Status == RentalStatus.Reserved ? "bg-info" : rental.Status == RentalStatus.Completed ? "bg-secondary" : rental.Status == RentalStatus.Extended ? "bg-warning" : "bg-danger")">
                             @rental.Status
                         </span>
                     </td>

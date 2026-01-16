@@ -5,7 +5,7 @@ namespace DAL;
 
 public class Repository<TData> : IRepository<TData> where TData : class
 {
-    private readonly AppDbContext _context;
+    protected readonly AppDbContext _context;
 
     public Repository(AppDbContext context)
     {

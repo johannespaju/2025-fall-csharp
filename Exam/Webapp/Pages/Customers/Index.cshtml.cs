@@ -1,6 +1,7 @@
 using BLL;
 using BLL.Enums;
 using BLL.Interfaces;
+using DAL.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -8,10 +9,10 @@ namespace Webapp.Pages.Customers;
 
 public class IndexModel : PageModel
 {
-    private readonly IRepository<Customer> _customerRepository;
+    private readonly ICustomerRepository _customerRepository;
     private readonly IDepositService _depositService;
 
-    public IndexModel(IRepository<Customer> customerRepository, IDepositService depositService)
+    public IndexModel(ICustomerRepository customerRepository, IDepositService depositService)
     {
         _customerRepository = customerRepository;
         _depositService = depositService;
@@ -20,9 +21,12 @@ public class IndexModel : PageModel
     public List<Customer> Customers { get; set; } = new();
     public Dictionary<Guid, int> DamageCounts { get; set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public string? SearchTerm { get; set; }
+
     public async Task OnGetAsync()
     {
-        Customers = (await _customerRepository.GetAllAsync()).ToList();
+        Customers = (await _customerRepository.SearchCustomersAsync(SearchTerm)).ToList();
         
         foreach (var customer in Customers)
         {

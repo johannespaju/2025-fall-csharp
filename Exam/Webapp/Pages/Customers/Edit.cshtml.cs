@@ -34,12 +34,14 @@ public class EditModel : PageModel
     {
         if (!ModelState.IsValid)
         {
+            TempData["ErrorMessage"] = "Please correct the errors and try again.";
             return Page();
         }
 
         await _customerRepository.UpdateAsync(Customer);
         await _customerRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Customer {Customer.FirstName} {Customer.LastName} updated successfully!";
         return RedirectToPage(nameof(Index));
     }
 }

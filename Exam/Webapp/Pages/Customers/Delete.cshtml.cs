@@ -35,6 +35,7 @@ public class DeleteModel : PageModel
         await _customerRepository.DeleteAsync(Customer);
         await _customerRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Customer {Customer.FirstName} {Customer.LastName} deleted successfully!";
         return RedirectToPage(nameof(Index));
     }
 }
