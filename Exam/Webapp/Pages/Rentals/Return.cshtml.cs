@@ -10,17 +10,20 @@ public class ReturnModel : PageModel
 {
     private readonly IRepository<Rental> _rentalRepository;
     private readonly IRepository<Bike> _bikeRepository;
+    private readonly IRepository<Customer> _customerRepository;
     private readonly IRepository<DamageRecord> _damageRecordRepository;
     private readonly IMaintenanceService _maintenanceService;
 
     public ReturnModel(
         IRepository<Rental> rentalRepository,
         IRepository<Bike> bikeRepository,
+        IRepository<Customer> customerRepository,
         IRepository<DamageRecord> damageRecordRepository,
         IMaintenanceService maintenanceService)
     {
         _rentalRepository = rentalRepository;
         _bikeRepository = bikeRepository;
+        _customerRepository = customerRepository;
         _damageRecordRepository = damageRecordRepository;
         _maintenanceService = maintenanceService;
     }
@@ -94,6 +97,14 @@ public class ReturnModel : PageModel
                 EstimatedCost = 0 // Placeholder - should be set by staff
             };
             await _damageRecordRepository.AddAsync(damageRecord);
+
+            // Increment customer's damage count
+            var customer = await _customerRepository.GetByIdAsync(Rental.CustomerId);
+            if (customer != null)
+            {
+                customer.DamageIncidentCount++;
+                await _customerRepository.UpdateAsync(customer);
+            }
         }
 
         // Check if maintenance is needed

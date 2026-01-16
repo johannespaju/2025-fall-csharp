@@ -1,0 +1,124 @@
+@page
+@using BLL.Enums
+@model Webapp.Pages.Maintenance.IndexModel
+@{
+    ViewData["Title"] = "Maintenance Records";
+}
+
+<h1>Maintenance Records</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Record New Maintenance</a>
+</p>
+
+@if (Model.BikesNeedingMaintenance.Any())
+{
+    <div class="alert alert-warning mb-4">
+        <h5><i class="bi bi-exclamation-triangle"></i> Bikes Requiring Maintenance</h5>
+        <div class="row">
+            @foreach (var bike in Model.BikesNeedingMaintenance)
+            {
+                <div class="col-md-4 mb-2">
+                    <div class="card">
+                        <div class="card-body py-2">
+                            <strong>@bike.BikeNumber</strong> (@bike.Type)
+                            <br/>
+                            <small class="text-muted">
+                                @bike.CurrentOdometer km - @((bike.CurrentOdometer - bike.LastServiceOdometer)) km since last service
+                            </small>
+                            <br/>
+                            <a asp-page="Create" asp-route-bikeId="@bike.Id" class="btn btn-sm btn-warning mt-1">
+                                Service Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Service Type</label>
+            <select asp-for="FilterServiceType" class="form-select">
+                <option value="">All Types</option>
+                <option value="@ServiceType.Regular">Regular</option>
+                <option value="@ServiceType.Repair">Repair</option>
+                <option value="@ServiceType.Inspection">Inspection</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select asp-for="FilterCompleted" class="form-select">
+                <option value="">All</option>
+                <option value="true">Completed</option>
+                <option value="false">Pending</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Search</label>
+            <input asp-for="SearchTerm" class="form-control" placeholder="Search by bike number..." />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="bi bi-search"></i> Filter
+            </button>
+            <a asp-page="./Index" class="btn btn-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bike</th>
+                <th>Service Type</th>
+                <th>Scheduled Date</th>
+                <th>Odometer (km)</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Completed At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in Model.MaintenanceRecords)
+            {
+                <tr>
+                    <td>@record.Bike?.BikeNumber</td>
+                    <td>
+                        <span class="badge @(record.ServiceType == ServiceType.Regular ? "bg-primary" : record.ServiceType == ServiceType.Repair ? "bg-danger" : "bg-info")">
+                            @record.ServiceType
+                        </span>
+                    </td>
+                    <td>@record.ScheduledDate.ToString("yyyy-MM-dd")</td>
+                    <td>@record.OdometerAtService</td>
+                    <td>@record.Cost.ToString("C")</td>
+                    <td>
+                        @if (record.CompletedAt.HasValue)
+                        {
+                            <span class="badge bg-success">Completed</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                    </td>
+                    <td>@(record.CompletedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                    <td>
+                        <a asp-page="Edit" asp-route-id="@record.Id" class="btn btn-sm btn-secondary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@record.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.MaintenanceRecords.Any())
+{
+    <div class="alert alert-info">No maintenance records found.</div>
+}

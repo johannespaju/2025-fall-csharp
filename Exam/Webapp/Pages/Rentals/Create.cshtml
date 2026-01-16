@@ -1,5 +1,6 @@
 @page
 @model Webapp.Pages.Rentals.CreateModel
+@using BLL
 @using BLL.Enums
 @{
     ViewData["Title"] = "Create Rental";
@@ -13,11 +14,11 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <div class="form-group mb-3">
-                <label asp-for="Rental.BikeId" class="form-label">Bike</label>
-                <select asp-for="Rental.BikeId" class="form-control" asp-items="Model.BikeOptions">
-                    <option value="">Select a bike</option>
+                <label asp-for="SelectedBikeType" class="form-label">Bike Type</label>
+                <select asp-for="SelectedBikeType" class="form-control" asp-items="Html.GetEnumSelectList<BikeType>()">
                 </select>
-                <span asp-validation-for="Rental.BikeId" class="text-danger"></span>
+                <span asp-validation-for="SelectedBikeType" class="text-danger"></span>
+                <small class="form-text text-muted">An available bike of this type will be automatically assigned.</small>
             </div>
             
             <div class="form-group mb-3">

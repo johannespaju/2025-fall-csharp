@@ -1,0 +1,47 @@
+@page "{id}"
+@using BLL.Enums
+@model Webapp.Pages.Maintenance.DeleteModel
+@{
+    ViewData["Title"] = "Delete Maintenance Record";
+}
+
+<h1>Delete Maintenance Record</h1>
+
+<h3>Are you sure you want to delete this maintenance record?</h3>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.MaintenanceRecord.Bike?.BikeNumber</h5>
+        <p class="card-text">
+            <strong>Service Type:</strong>
+            <span class="badge @(Model.MaintenanceRecord.ServiceType == ServiceType.Regular ? "bg-primary" : Model.MaintenanceRecord.ServiceType == ServiceType.Repair ? "bg-danger" : "bg-info")">
+                @Model.MaintenanceRecord.ServiceType
+            </span>
+        </p>
+        <p class="card-text"><strong>Service Date:</strong> @Model.MaintenanceRecord.ScheduledDate.ToString("yyyy-MM-dd")</p>
+        <p class="card-text"><strong>Odometer at Service:</strong> @Model.MaintenanceRecord.OdometerAtService km</p>
+        <p class="card-text"><strong>Cost:</strong> @Model.MaintenanceRecord.Cost.ToString("C")</p>
+        <p class="card-text">
+            <strong>Status:</strong>
+            @if (Model.MaintenanceRecord.CompletedAt.HasValue)
+            {
+                <span class="badge bg-success">Completed</span>
+                <small class="text-muted">(@Model.MaintenanceRecord.CompletedAt.Value.ToString("yyyy-MM-dd HH:mm"))</small>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">Pending</span>
+            }
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.MaintenanceRecord.Description))
+        {
+            <p class="card-text"><strong>Description:</strong> @Model.MaintenanceRecord.Description</p>
+        }
+    </div>
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="MaintenanceRecord.Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>

@@ -42,7 +42,10 @@ public class CreateModel : PageModel
     [BindProperty]
     public Rental Rental { get; set; } = new();
 
-    public List<SelectListItem> BikeOptions { get; set; } = new();
+    [BindProperty]
+    public BikeType SelectedBikeType { get; set; }
+
+    public string? AssignedBikeNumber { get; set; }
     public List<SelectListItem> CustomerOptions { get; set; } = new();
     public List<SelectListItem> StartTimeOptions { get; set; } = new();
     public decimal CalculatedPrice { get; set; }
@@ -63,20 +66,14 @@ public class CreateModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         SetRentalEndFromType();
+
+        // Remove BikeId validation errors since we'll auto-assign
+        ModelState.Remove("Rental.BikeId");
         ModelState.Clear();
         TryValidateModel(Rental);
 
-        Console.WriteLine($"POST received - BikeId: {Rental.BikeId}, CustomerId: {Rental.CustomerId}");
-        Console.WriteLine($"Dates: {Rental.StartDate} {Rental.StartTime} to {Rental.EndDate} {Rental.EndTime}");
-        Console.WriteLine($"RentalType: {Rental.RentalType}, Status: {Rental.Status}");
-        Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
-        
         if (!ModelState.IsValid)
         {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                Console.WriteLine($"ModelState Error: {error.ErrorMessage}");
-            }
             await LoadOptionsAsync();
             LoadStartTimeOptions();
             return Page();
@@ -86,23 +83,30 @@ public class CreateModel : PageModel
         var startTime = Rental.StartDate.ToDateTime(Rental.StartTime);
         var endTime = Rental.EndDate.ToDateTime(Rental.EndTime);
 
-        // Check availability
-        var isAvailable = await _availabilityService.IsBikeAvailableAsync(
-            Rental.BikeId, startTime, endTime);
+        // Find available bikes of the selected type
+        var availableBikeIds = await _availabilityService.GetAvailableBikesAsync(startTime, endTime);
+        var allBikes = await _bikeRepository.GetAllAsync();
 
-        if (!isAvailable)
+        var availableBike = allBikes
+            .Where(b => availableBikeIds.Contains(b.Id) && b.Type == SelectedBikeType)
+            .OrderBy(b => b.BikeNumber)
+            .FirstOrDefault();
+
+        if (availableBike == null)
         {
-            ModelState.AddModelError(string.Empty, "Selected bike is not available for the requested time period.");
+            ModelState.AddModelError(string.Empty, $"No {SelectedBikeType} bikes are available for the requested time period.");
             await LoadOptionsAsync();
             LoadStartTimeOptions();
             return Page();
         }
 
+        // Assign the bike
+        Rental.BikeId = availableBike.Id;
+
         // Calculate price and deposit
-        var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
-        var deposit = await _depositService.CalculateDepositAsync(Rental.BikeId, Rental.CustomerId);
+        var deposit = await _depositService.CalculateDepositAsync(availableBike.Id, Rental.CustomerId);
         var price = _pricingService.CalculateRentalPrice(
-            startTime, endTime, bike!.DailyRate);
+            startTime, endTime, availableBike.DailyRate);
 
         // Create rental
         Rental.TotalCost = price;
@@ -112,6 +116,7 @@ public class CreateModel : PageModel
         await _rentalRepository.AddAsync(Rental);
         await _rentalRepository.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = $"Rental created successfully! Assigned bike: {availableBike.BikeNumber}";
         return RedirectToPage(nameof(Index));
     }
 
@@ -131,13 +136,6 @@ public class CreateModel : PageModel
 
     private async Task LoadOptionsAsync()
     {
-        var bikes = await _bikeRepository.GetAllAsync();
-        BikeOptions = bikes.Select(b => new SelectListItem
-        {
-            Value = b.Id.ToString(),
-            Text = $"{b.BikeNumber} - {b.Type} (€{b.DailyRate}/day)"
-        }).ToList();
-
         var customers = await _customerRepository.GetAllAsync();
         CustomerOptions = customers.Select(c => new SelectListItem
         {
