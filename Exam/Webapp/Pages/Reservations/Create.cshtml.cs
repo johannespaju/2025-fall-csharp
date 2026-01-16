@@ -140,7 +140,14 @@ public class CreateModel : PageModel
             Value = c.Id.ToString(),
             Text = $"{c.FirstName} {c.LastName}"
         }).ToList();
+
+        // Store damage counts for JavaScript
+        CustomerDamageCounts = customers.ToDictionary(
+            c => c.Id.ToString(),
+            c => c.DamageIncidentCount);
     }
+
+    public Dictionary<string, int> CustomerDamageCounts { get; set; } = new();
 
     private void LoadStartTimeOptions()
     {
