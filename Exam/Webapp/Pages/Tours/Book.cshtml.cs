@@ -81,6 +81,16 @@ public class BookModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (TourBooking.TourId == Guid.Empty)
+        {
+            ModelState.AddModelError(string.Empty, "Tour information is missing.");
+        }
+
+        if (!await LoadTourAsync(TourBooking.TourId))
+        {
+            return NotFound();
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadOptionsAsync();
@@ -101,15 +111,12 @@ public class BookModel : PageModel
         }
 
         // Calculate total price (use new TotalCost property)
-        TourBooking.TotalCost = TourBooking.TotalCost;  // Already calculated
+        CalculateTotalPrice();
         TourBooking.TourId = Tour.Id;
-        TourBooking.BookingDate = DateOnly.FromDateTime(DateTime.Now);
         TourBooking.CreatedAt = DateTime.Now;
         TourBooking.Status = TourBookingStatus.Confirmed;
 
-        // Get tour time information - for now using a placeholder time
-        // TODO: Need to use selected TimeSlot from UI
-        var tourStartDateTime = DateTime.Today.AddHours(10); // Placeholder: 10 AM
+        var tourStartDateTime = TourBooking.BookingDate.ToDateTime(TourBooking.TimeSlot);
         var tourEndDateTime = tourStartDateTime.AddHours((double)Tour.DurationHours);
 
         // Get available bikes for the tour
@@ -193,8 +200,19 @@ public class BookModel : PageModel
 
     private void CalculateTotalPrice()
     {
-        // Use base tour pricing - participant count * base cost
-        CalculatedTotalPrice = TourBooking.ParticipantCount * 25m; // Placeholder pricing
+        var pricePerParticipant = Tour.PricePerParticipant;
+        if (TourBooking.BikeUpgradeToElectric)
+        {
+            pricePerParticipant += Tour.UpgradeToElectricFee;
+        }
+
+        CalculatedTotalPrice = TourBooking.ParticipantCount * pricePerParticipant;
         TourBooking.TotalCost = CalculatedTotalPrice;
+    }
+
+    private async Task<bool> LoadTourAsync(Guid tourId)
+    {
+        Tour = await _tourRepository.GetByIdAsync(tourId);
+        return Tour != null;
     }
 }
