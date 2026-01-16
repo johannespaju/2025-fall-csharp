@@ -25,6 +25,21 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        // Auto-populate DailyRate and ServiceInterval based on bike type
+        (Bike.DailyRate, Bike.ServiceInterval) = Bike.Type switch
+        {
+            BikeType.City => (12.00m, 500),
+            BikeType.Electric => (28.00m, 300),
+            BikeType.Mountain => (18.00m, 400),
+            BikeType.Tandem => (22.00m, 500),
+            BikeType.Children => (8.00m, 500),
+            _ => (12.00m, 500)
+        };
+
+        // Remove validation errors for auto-populated fields
+        ModelState.Remove("Bike.DailyRate");
+        ModelState.Remove("Bike.ServiceInterval");
+
         if (!ModelState.IsValid)
         {
             TempData["ErrorMessage"] = "Please correct the errors and try again.";
