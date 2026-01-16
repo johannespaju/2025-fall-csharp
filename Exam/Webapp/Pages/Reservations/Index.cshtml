@@ -1,0 +1,51 @@
+@page
+@using BLL.Enums
+@model Webapp.Pages.Reservations.IndexModel
+@{
+    ViewData["Title"] = "Reservations";
+}
+
+<h1>Reservations</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Reservation</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bike</th>
+                <th>Customer</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Total Price</th>
+                <th>Deposit</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model.Reservations)
+            {
+                <tr>
+                    <td>@reservation.Bike?.BikeNumber (@reservation.Bike?.Type)</td>
+                    <td>@reservation.Customer?.FirstName @reservation.Customer?.LastName</td>
+                    <td>@reservation.StartDate.ToString("yyyy-MM-dd") @reservation.StartTime.ToString("HH:mm")</td>
+                    <td>@reservation.EndDate.ToString("yyyy-MM-dd") @reservation.EndTime.ToString("HH:mm")</td>
+                    <td>@reservation.TotalCost.ToString("C")</td>
+                    <td>@reservation.DepositAmount.ToString("C")</td>
+                    <td>
+                        <span class="badge @(reservation.Status == RentalStatus.Active ? "bg-success" : reservation.Status == RentalStatus.Reserved ? "bg-info" : reservation.Status == RentalStatus.Completed ? "bg-secondary" : reservation.Status == RentalStatus.Extended ? "bg-warning" : "bg-danger")">
+                            @reservation.Status
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-page="Edit" asp-route-id="@reservation.Id" class="btn btn-sm btn-secondary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@reservation.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

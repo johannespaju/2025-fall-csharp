@@ -1,0 +1,29 @@
+@page "{id}"
+@using BLL.Enums
+@model Webapp.Pages.Reservations.DeleteModel
+@{
+    ViewData["Title"] = "Delete Reservation";
+}
+
+<h1>Delete Reservation</h1>
+
+<h3>Are you sure you want to delete this reservation?</h3>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Rental.Bike?.Type - @Model.Rental.Customer?.FirstName @Model.Rental.Customer?.LastName</h5>
+        <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
+        <p class="card-text">End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
+        <p class="card-text">Total Price: @Model.Rental.TotalCost.ToString("C")</p>
+        <p class="card-text">
+            Status: <span class="badge @(Model.Rental.Status == RentalStatus.Active ? "bg-success" : "bg-secondary")">
+                @Model.Rental.Status
+            </span>
+        </p>
+    </div>
+</div>
+
+<form method="post">
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>

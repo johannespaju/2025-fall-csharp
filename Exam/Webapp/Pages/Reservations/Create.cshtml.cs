@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Webapp.Pages.Rentals;
+namespace Webapp.Pages.Reservations;
 
 public class CreateModel : PageModel
 {
@@ -63,30 +63,20 @@ public class CreateModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         SetRentalEndFromType();
+        Rental.Status = RentalStatus.Reserved;
         ModelState.Clear();
         TryValidateModel(Rental);
 
-        Console.WriteLine($"POST received - BikeId: {Rental.BikeId}, CustomerId: {Rental.CustomerId}");
-        Console.WriteLine($"Dates: {Rental.StartDate} {Rental.StartTime} to {Rental.EndDate} {Rental.EndTime}");
-        Console.WriteLine($"RentalType: {Rental.RentalType}, Status: {Rental.Status}");
-        Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
-        
         if (!ModelState.IsValid)
         {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                Console.WriteLine($"ModelState Error: {error.ErrorMessage}");
-            }
             await LoadOptionsAsync();
             LoadStartTimeOptions();
             return Page();
         }
 
-        // Convert DateOnly/TimeOnly to DateTime for availability check
         var startTime = Rental.StartDate.ToDateTime(Rental.StartTime);
         var endTime = Rental.EndDate.ToDateTime(Rental.EndTime);
 
-        // Check availability
         var isAvailable = await _availabilityService.IsBikeAvailableAsync(
             Rental.BikeId, startTime, endTime);
 
@@ -98,16 +88,14 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        // Calculate price and deposit
         var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
         var deposit = await _depositService.CalculateDepositAsync(Rental.BikeId, Rental.CustomerId);
         var price = _pricingService.CalculateRentalPrice(
             startTime, endTime, bike!.DailyRate);
 
-        // Create rental
         Rental.TotalCost = price;
         Rental.DepositAmount = deposit;
-        Rental.Status = RentalStatus.Active;
+        Rental.Status = RentalStatus.Reserved;
 
         await _rentalRepository.AddAsync(Rental);
         await _rentalRepository.SaveChangesAsync();

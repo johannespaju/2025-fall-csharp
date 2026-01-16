@@ -1,0 +1,138 @@
+@page "{id}"
+@using BLL.Enums
+@model Webapp.Pages.Reservations.EditModel
+@{
+    ViewData["Title"] = "Edit Reservation";
+}
+
+<h1>Edit Reservation</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <input type="hidden" asp-for="Rental.Id" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.BikeId" class="form-label">Bike</label>
+                <select asp-for="Rental.BikeId" class="form-control" asp-items="Model.BikeOptions">
+                    <option value="">Select a bike</option>
+                </select>
+                <span asp-validation-for="Rental.BikeId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.CustomerId" class="form-label">Customer</label>
+                <select asp-for="Rental.CustomerId" class="form-control" asp-items="Model.CustomerOptions">
+                    <option value="">Select a customer</option>
+                </select>
+                <span asp-validation-for="Rental.CustomerId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.StartDate" class="form-label"></label>
+                <input asp-for="Rental.StartDate" type="date" class="form-control" />
+                <span asp-validation-for="Rental.StartDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.StartTime" class="form-label"></label>
+                <select asp-for="Rental.StartTime" class="form-control" asp-items="Model.StartTimeOptions">
+                    <option value="">Select a start time</option>
+                </select>
+                <span asp-validation-for="Rental.StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Rental.RentalType" class="form-label">Rental Type</label>
+                <select asp-for="Rental.RentalType" class="form-control" asp-items="Html.GetEnumSelectList<RentalType>()">
+                    <option value="">Select rental type</option>
+                </select>
+                <span asp-validation-for="Rental.RentalType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Calculated End</label>
+                <div class="input-group">
+                    <input id="calculatedEndDate" type="text" class="form-control" value="@Model.Rental.EndDate.ToString("yyyy-MM-dd")" readonly />
+                    <input id="calculatedEndTime" type="text" class="form-control" value="@Model.Rental.EndTime.ToString("HH:mm")" readonly />
+                </div>
+                <small class="form-text text-muted">End time is calculated from start date, start time, and rental type.</small>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.TotalCost" class="form-label">Total Price</label>
+                <input asp-for="Rental.TotalCost" class="form-control" step="0.01" />
+                <span asp-validation-for="Rental.TotalCost" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.DepositAmount" class="form-label">Deposit</label>
+                <input asp-for="Rental.DepositAmount" class="form-control" step="0.01" />
+                <span asp-validation-for="Rental.DepositAmount" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.Status" class="form-label"></label>
+                <select asp-for="Rental.Status" class="form-control" asp-items="Html.GetEnumSelectList<RentalStatus>()">
+                    <option value="">Select status</option>
+                </select>
+                <span asp-validation-for="Rental.Status" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            const fullDayValue = @((int)RentalType.FullDay);
+            const startDateInput = document.getElementById("Rental_StartDate");
+            const startTimeInput = document.getElementById("Rental_StartTime");
+            const rentalTypeInput = document.getElementById("Rental_RentalType");
+            const endDateInput = document.getElementById("calculatedEndDate");
+            const endTimeInput = document.getElementById("calculatedEndTime");
+
+            function parseStartDateTime() {
+                if (!startDateInput?.value || !startTimeInput?.value) {
+                    return null;
+                }
+
+                const [hours, minutes] = startTimeInput.value.split(":").map(Number);
+                const start = new Date(`${startDateInput.value}T00:00:00`);
+                start.setHours(hours, minutes, 0, 0);
+                return start;
+            }
+
+            function updateCalculatedEnd() {
+                const start = parseStartDateTime();
+                if (!start) {
+                    endDateInput.value = "";
+                    endTimeInput.value = "";
+                    return;
+                }
+
+                const rentalTypeValue = parseInt(rentalTypeInput?.value ?? "", 10);
+                const hoursToAdd = rentalTypeValue === fullDayValue ? 24 : 4;
+                const end = new Date(start.getTime() + hoursToAdd * 60 * 60 * 1000);
+                endDateInput.value = end.toISOString().slice(0, 10);
+                endTimeInput.value = end.toTimeString().slice(0, 5);
+            }
+
+            [startDateInput, startTimeInput, rentalTypeInput].forEach((input) => {
+                if (input) {
+                    input.addEventListener("change", updateCalculatedEnd);
+                }
+            });
+
+            updateCalculatedEnd();
+        })();
+    </script>
+}
