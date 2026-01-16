@@ -6,6 +6,7 @@
 - **Database seeded** with 80 bikes (16 per type), 10 customers, 3 tours with realistic test data
 - **All CRUD operations functional** with search/filter capabilities on all index pages
 - **Professional UI polish** complete with toasts, spinners, dark mode, dashboard, keyboard shortcuts
+- **Reservations workflow in Webapp** using rental reservations with auto-assigned bikes and reserved status
 
 ## Recent changes (as of 2026-01-16)
 
@@ -64,6 +65,11 @@
   - Business rules explanation
   - Testing guide
   - Troubleshooting section
+
+### Reservations workflow (COMPLETED)
+- Implemented reservations as rentals with `RentalStatus.Reserved` in [`Webapp.Pages.Reservations`](Webapp/Pages/Reservations/Index.cshtml.cs:1)
+- Auto-assigns available bike by type at creation time in [`Webapp.Pages.Reservations.Create`](Webapp/Pages/Reservations/Create.cshtml.cs:1)
+- Reservation edits set end date/time based on rental type in [`Webapp.Pages.Reservations.Edit`](Webapp/Pages/Reservations/Edit.cshtml.cs:1)
 
 ## Critical issues to address
 **NONE** - All previously identified gaps have been resolved:

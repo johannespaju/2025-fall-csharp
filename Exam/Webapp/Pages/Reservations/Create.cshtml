@@ -15,7 +15,12 @@
             
             <div class="form-group mb-3">
                 <label asp-for="SelectedBikeType" class="form-label">Bike Type</label>
-                <select asp-for="SelectedBikeType" class="form-control" asp-items="Html.GetEnumSelectList<BikeType>()">
+                <select asp-for="SelectedBikeType" class="form-control" id="bikeTypeSelect">
+                    <option value="@((int)BikeType.City)" data-rate="12">City - €12/day (€6 for 4hrs)</option>
+                    <option value="@((int)BikeType.Electric)" data-rate="28">Electric - €28/day (€14 for 4hrs)</option>
+                    <option value="@((int)BikeType.Mountain)" data-rate="18">Mountain - €18/day (€9 for 4hrs)</option>
+                    <option value="@((int)BikeType.Tandem)" data-rate="22">Tandem - €22/day (€11 for 4hrs)</option>
+                    <option value="@((int)BikeType.Children)" data-rate="8">Children - €8/day (€4 for 4hrs)</option>
                 </select>
                 <span asp-validation-for="SelectedBikeType" class="text-danger"></span>
                 <small class="form-text text-muted">An available bike of this type will be automatically assigned.</small>
@@ -62,8 +67,8 @@
             </div>
             
             <div class="form-group mb-3">
-                <label>Calculated Price</label>
-                <input type="text" class="form-control" value="@Model.CalculatedPrice.ToString("C")" readonly />
+                <label>Estimated Price</label>
+                <input type="text" id="calculatedPrice" class="form-control" value="€0.00" readonly />
             </div>
             
             <div class="form-group mb-3">
@@ -87,8 +92,10 @@
             const startDateInput = document.getElementById("Rental_StartDate");
             const startTimeInput = document.getElementById("Rental_StartTime");
             const rentalTypeInput = document.getElementById("Rental_RentalType");
+            const bikeTypeInput = document.getElementById("bikeTypeSelect");
             const endDateInput = document.getElementById("calculatedEndDate");
             const endTimeInput = document.getElementById("calculatedEndTime");
+            const priceInput = document.getElementById("calculatedPrice");
 
             function parseStartDateTime() {
                 if (!startDateInput?.value || !startTimeInput?.value) {
@@ -116,13 +123,30 @@
                 endTimeInput.value = end.toTimeString().slice(0, 5);
             }
 
+            function updateCalculatedPrice() {
+                const selectedOption = bikeTypeInput.options[bikeTypeInput.selectedIndex];
+                const dailyRate = parseFloat(selectedOption.dataset.rate) || 0;
+                const rentalTypeValue = parseInt(rentalTypeInput?.value ?? "", 10);
+
+                // 4-hour rental = 50% of daily rate, full day = 100%
+                const price = rentalTypeValue === fullDayValue ? dailyRate : dailyRate * 0.5;
+                priceInput.value = "€" + price.toFixed(2);
+            }
+
             [startDateInput, startTimeInput, rentalTypeInput].forEach((input) => {
                 if (input) {
                     input.addEventListener("change", updateCalculatedEnd);
                 }
             });
 
+            [bikeTypeInput, rentalTypeInput].forEach((input) => {
+                if (input) {
+                    input.addEventListener("change", updateCalculatedPrice);
+                }
+            });
+
             updateCalculatedEnd();
+            updateCalculatedPrice();
         })();
     </script>
 }
