@@ -28,6 +28,9 @@ public class ReturnModel : PageModel
     public Rental Rental { get; set; } = new();
 
     [BindProperty]
+    public Guid RentalId { get; set; }
+
+    [BindProperty]
     public int OdometerReading { get; set; }
 
     [BindProperty]
@@ -44,6 +47,7 @@ public class ReturnModel : PageModel
             return NotFound();
         }
 
+        RentalId = Rental.Id;
         OdometerReading = Rental.Bike?.CurrentOdometer ?? 0;
         return Page();
     }
@@ -55,9 +59,25 @@ public class ReturnModel : PageModel
             return Page();
         }
 
+        Rental = await _rentalRepository.GetByIdAsync(RentalId);
+        if (Rental == null)
+        {
+            return NotFound();
+        }
+
         // Update bike odometer
         var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
-        bike!.CurrentOdometer = OdometerReading;
+        if (bike == null)
+        {
+            return NotFound();
+        }
+
+        if (OdometerReading <= 0)
+        {
+            OdometerReading = bike.CurrentOdometer;
+        }
+
+        bike.CurrentOdometer = OdometerReading;
         bike.Status = BikeStatus.Available; // Bike becomes available again
         await _bikeRepository.UpdateAsync(bike);
 

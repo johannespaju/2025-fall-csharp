@@ -9,6 +9,14 @@ namespace Webapp.Pages.Rentals;
 
 public class CreateModel : PageModel
 {
+    private static readonly TimeOnly[] ValidStartTimes =
+    {
+        new(9, 0),
+        new(13, 0),
+        new(17, 0),
+        new(21, 0)
+    };
+
     private readonly IRepository<Rental> _rentalRepository;
     private readonly IRepository<Bike> _bikeRepository;
     private readonly IRepository<Customer> _customerRepository;
@@ -37,23 +45,28 @@ public class CreateModel : PageModel
 
     public List<SelectListItem> BikeOptions { get; set; } = new();
     public List<SelectListItem> CustomerOptions { get; set; } = new();
+    public List<SelectListItem> StartTimeOptions { get; set; } = new();
     public decimal CalculatedPrice { get; set; }
     public decimal CalculatedDeposit { get; set; }
 
     public async Task OnGetAsync()
     {
         await LoadOptionsAsync();
+        LoadStartTimeOptions();
         var now = DateTime.Now;
         Rental.StartDate = DateOnly.FromDateTime(now);
-        Rental.StartTime = TimeOnly.FromDateTime(now);
-        Rental.EndDate = DateOnly.FromDateTime(now.AddHours(4));
-        Rental.EndTime = TimeOnly.FromDateTime(now.AddHours(4));
+        Rental.StartTime = GetNextValidStartTime(TimeOnly.FromDateTime(now));
         Rental.RentalType = RentalType.FourHour;
         Rental.Status = RentalStatus.Reserved;
+        SetRentalEndFromType();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        SetRentalEndFromType();
+        ModelState.Clear();
+        TryValidateModel(Rental);
+
         Console.WriteLine($"POST received - BikeId: {Rental.BikeId}, CustomerId: {Rental.CustomerId}");
         Console.WriteLine($"Dates: {Rental.StartDate} {Rental.StartTime} to {Rental.EndDate} {Rental.EndTime}");
         Console.WriteLine($"RentalType: {Rental.RentalType}, Status: {Rental.Status}");
@@ -66,6 +79,7 @@ public class CreateModel : PageModel
                 Console.WriteLine($"ModelState Error: {error.ErrorMessage}");
             }
             await LoadOptionsAsync();
+            LoadStartTimeOptions();
             return Page();
         }
 
@@ -130,5 +144,41 @@ public class CreateModel : PageModel
             Value = c.Id.ToString(),
             Text = $"{c.FirstName} {c.LastName}"
         }).ToList();
+    }
+
+    private void LoadStartTimeOptions()
+    {
+        StartTimeOptions = ValidStartTimes
+            .Select(time => new SelectListItem
+            {
+                Value = time.ToString("HH:mm"),
+                Text = time.ToString("HH:mm")
+            })
+            .ToList();
+    }
+
+    private static TimeOnly GetNextValidStartTime(TimeOnly currentTime)
+    {
+        foreach (var validTime in ValidStartTimes)
+        {
+            if (validTime >= currentTime)
+            {
+                return validTime;
+            }
+        }
+
+        return ValidStartTimes[0];
+    }
+
+    private void SetRentalEndFromType()
+    {
+        var startDateTime = Rental.StartDate.ToDateTime(Rental.StartTime);
+        var duration = Rental.RentalType == RentalType.FullDay
+            ? TimeSpan.FromHours(24)
+            : TimeSpan.FromHours(4);
+
+        var endDateTime = startDateTime.Add(duration);
+        Rental.EndDate = DateOnly.FromDateTime(endDateTime);
+        Rental.EndTime = TimeOnly.FromDateTime(endDateTime);
     }
 }
