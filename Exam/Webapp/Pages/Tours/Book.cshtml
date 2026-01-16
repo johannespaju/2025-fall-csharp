@@ -41,7 +41,9 @@
             
             <div class="form-group mb-3">
                 <label asp-for="TourBooking.TimeSlot" class="form-label">Time Slot</label>
-                <input asp-for="TourBooking.TimeSlot" type="time" class="form-control" />
+                <select asp-for="TourBooking.TimeSlot" class="form-control" asp-items="Model.TimeSlotOptions">
+                    <option value="">Select a time slot</option>
+                </select>
                 <span asp-validation-for="TourBooking.TimeSlot" class="text-danger"></span>
                 <small class="form-text text-muted">Available: @Model.Tour.TimeSlots</small>
             </div>

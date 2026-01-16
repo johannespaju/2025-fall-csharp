@@ -49,6 +49,7 @@ public class BookModel : PageModel
     public TourBooking TourBooking { get; set; } = new();
 
     public List<SelectListItem> CustomerOptions { get; set; } = new();
+    public List<SelectListItem> TimeSlotOptions { get; set; } = new();
     public int AvailableSlots { get; set; }
     public decimal CalculatedTotalPrice { get; set; }
 
@@ -70,7 +71,11 @@ public class BookModel : PageModel
         TourBooking.ParticipantCount = 1;
         TourBooking.TourId = Tour.Id;
         TourBooking.BookingDate = DateOnly.FromDateTime(DateTime.Now);
-        TourBooking.TimeSlot = TimeOnly.FromDateTime(DateTime.Now.AddHours(1)); // Default to 1 hour from now
+        LoadTimeSlots();
+        if (TimeSlotOptions.Count > 0)
+        {
+            TourBooking.TimeSlot = TimeOnly.Parse(TimeSlotOptions[0].Value);
+        }
         TourBooking.Status = TourBookingStatus.Confirmed;
         
         await CalculateAvailableSlotsAsync();
@@ -94,6 +99,7 @@ public class BookModel : PageModel
         if (!ModelState.IsValid)
         {
             await LoadOptionsAsync();
+            LoadTimeSlots();
             await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
@@ -105,6 +111,7 @@ public class BookModel : PageModel
         {
             ModelState.AddModelError(string.Empty, "Not enough available slots for this tour.");
             await LoadOptionsAsync();
+            LoadTimeSlots();
             await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
@@ -128,6 +135,7 @@ public class BookModel : PageModel
         {
             ModelState.AddModelError(string.Empty, "Not enough bikes available for this tour.");
             await LoadOptionsAsync();
+            LoadTimeSlots();
             await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
@@ -213,6 +221,22 @@ public class BookModel : PageModel
     private async Task<bool> LoadTourAsync(Guid tourId)
     {
         Tour = await _tourRepository.GetByIdAsync(tourId);
+        if (Tour != null)
+        {
+            LoadTimeSlots();
+        }
         return Tour != null;
+    }
+
+    private void LoadTimeSlots()
+    {
+        TimeSlotOptions = (Tour.TimeSlots ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(slot => new SelectListItem
+            {
+                Value = slot,
+                Text = slot
+            })
+            .ToList();
     }
 }
