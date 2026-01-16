@@ -27,7 +27,7 @@ public class AvailabilityService : IAvailabilityService
             return false;
 
         var rentals = await _rentalRepository.GetAllAsync();
-        var activeRentals = rentals.Where(r => r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
+        var activeRentals = rentals.Where(r => r.Bike != null && r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
 
         return !activeRentals.Any(r =>
         {
@@ -69,6 +69,7 @@ public class AvailabilityService : IAvailabilityService
         var rentalStart = rental.StartDate.ToDateTime(rental.StartTime);
         
         var overlappingRentals = rentals.Where(r =>
+            r.Bike != null && rental.Bike != null &&
             r.Bike.Id == rental.Bike.Id &&
             r.Status != RentalStatus.Cancelled &&
             r.Id != rentalId)
@@ -86,7 +87,7 @@ public class AvailabilityService : IAvailabilityService
     private async Task<bool> HasActiveRentalsOverlappingAsync(Guid bikeId, DateTime startTime, DateTime endTime)
     {
         var rentals = await _rentalRepository.GetAllAsync();
-        var activeRentals = rentals.Where(r => r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
+        var activeRentals = rentals.Where(r => r.Bike != null && r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
 
         return activeRentals.Any(r =>
         {

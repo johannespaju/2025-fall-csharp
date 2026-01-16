@@ -13,6 +13,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <div class="form-group mb-3">
+                <label asp-for="Bike.BikeNumber" class="form-label"></label>
+                <input asp-for="Bike.BikeNumber" class="form-control" placeholder="e.g., CITY-001, ELECTRIC-015" />
+                <span asp-validation-for="Bike.BikeNumber" class="text-danger"></span>
+                <small class="form-text text-muted">Format: TYPE-XXX (e.g., CITY-001)</small>
+            </div>
+            
+            <div class="form-group mb-3">
                 <label asp-for="Bike.Type" class="form-label"></label>
                 <select asp-for="Bike.Type" class="form-control" asp-items="Html.GetEnumSelectList<BikeType>()">
                     <option value="">Select bike type</option>

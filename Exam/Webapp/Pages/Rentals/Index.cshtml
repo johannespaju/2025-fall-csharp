@@ -29,8 +29,8 @@
             @foreach (var rental in Model.Rentals)
             {
                 <tr>
-                    <td>@rental.Bike.Type</td>
-                    <td>@rental.Customer.FirstName @rental.Customer.LastName</td>
+                    <td>@rental.Bike?.Type</td>
+                    <td>@rental.Customer?.FirstName @rental.Customer?.LastName</td>
                     <td>@rental.StartDate.ToString("yyyy-MM-dd") @rental.StartTime.ToString("HH:mm")</td>
                     <td>@rental.EndDate.ToString("yyyy-MM-dd") @rental.EndTime.ToString("HH:mm")</td>
                     <td>@rental.TotalCost.ToString("C")</td>

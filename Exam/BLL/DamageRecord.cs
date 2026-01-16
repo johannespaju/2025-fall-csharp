@@ -13,7 +13,7 @@ public class DamageRecord : BaseEntity
     public Guid RentalId { get; set; }
 
     // Navigation properties
-    public Bike Bike { get; set; } = null!;
-    public Customer Customer { get; set; } = null!;
-    public Rental Rental { get; set; } = null!;
+    public Bike? Bike { get; set; }
+    public Customer? Customer { get; set; }
+    public Rental? Rental { get; set; }
 }

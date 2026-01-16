@@ -44,7 +44,7 @@ public class ReturnModel : PageModel
             return NotFound();
         }
 
-        OdometerReading = Rental.Bike.CurrentOdometer;
+        OdometerReading = Rental.Bike?.CurrentOdometer ?? 0;
         return Page();
     }
 

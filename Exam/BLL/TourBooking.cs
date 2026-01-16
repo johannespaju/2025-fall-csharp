@@ -18,7 +18,7 @@ public class TourBooking : BaseEntity
     public Guid CustomerId { get; set; }
 
     // Navigation properties
-    public Tour Tour { get; set; } = null!;
-    public Customer Customer { get; set; } = null!;
+    public Tour? Tour { get; set; }
+    public Customer? Customer { get; set; }
     public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
 }

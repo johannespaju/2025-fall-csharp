@@ -54,8 +54,17 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        Console.WriteLine($"POST received - BikeId: {Rental.BikeId}, CustomerId: {Rental.CustomerId}");
+        Console.WriteLine($"Dates: {Rental.StartDate} {Rental.StartTime} to {Rental.EndDate} {Rental.EndTime}");
+        Console.WriteLine($"RentalType: {Rental.RentalType}, Status: {Rental.Status}");
+        Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+        
         if (!ModelState.IsValid)
         {
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"ModelState Error: {error.ErrorMessage}");
+            }
             await LoadOptionsAsync();
             return Page();
         }
@@ -112,7 +121,7 @@ public class CreateModel : PageModel
         BikeOptions = bikes.Select(b => new SelectListItem
         {
             Value = b.Id.ToString(),
-            Text = $"{b.Type} (€{b.DailyRate}/day)"
+            Text = $"{b.BikeNumber} - {b.Type} (€{b.DailyRate}/day)"
         }).ToList();
 
         var customers = await _customerRepository.GetAllAsync();

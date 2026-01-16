@@ -28,7 +28,7 @@ public class Rental : BaseEntity
     public Guid? TourBookingId { get; set; } // Nullable if not part of a tour
 
     // Navigation properties
-    public Bike Bike { get; set; } = null!;
-    public Customer Customer { get; set; } = null!;
+    public Bike? Bike { get; set; }
+    public Customer? Customer { get; set; }
     public TourBooking? TourBooking { get; set; }
 }

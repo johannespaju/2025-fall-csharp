@@ -1,5 +1,6 @@
 @page
 @model Webapp.Pages.Rentals.CreateModel
+@using BLL.Enums
 @{
     ViewData["Title"] = "Create Rental";
 }
@@ -49,6 +50,15 @@
                 <label asp-for="Rental.EndTime" class="form-label"></label>
                 <input asp-for="Rental.EndTime" type="time" class="form-control" />
                 <span asp-validation-for="Rental.EndTime" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Rental.RentalType" class="form-label">Rental Type</label>
+                <select asp-for="Rental.RentalType" class="form-control" asp-items="Html.GetEnumSelectList<RentalType>()">
+                    <option value="">Select rental type</option>
+                </select>
+                <span asp-validation-for="Rental.RentalType" class="text-danger"></span>
+                <small class="form-text text-muted">FourHour: 4-hour block rental | FullDay: 12-hour rental</small>
             </div>
             
             <div class="form-group mb-3">

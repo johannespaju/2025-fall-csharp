@@ -26,6 +26,18 @@ public class MaintenanceService : IMaintenanceService
         return distanceToService <= MaintenanceBuffer;
     }
 
+    public async Task<bool> ShouldFlagForMaintenanceAsync(Guid bikeId)
+    {
+        var bike = await _bikeRepository.GetByIdAsync(bikeId);
+        if (bike == null) return false;
+        
+        const int MAINTENANCE_BUFFER = 50; // Requirements line 32
+        var kmSinceService = bike.CurrentOdometer - bike.LastServiceOdometer;
+        
+        // Flag 50km BEFORE threshold (proactive, not reactive)
+        return kmSinceService >= (bike.ServiceInterval - MAINTENANCE_BUFFER);
+    }
+
     public async Task<int> CalculateRemainingDistanceToServiceAsync(Guid bikeId)
     {
         var bike = await _bikeRepository.GetByIdAsync(bikeId);
@@ -34,7 +46,7 @@ public class MaintenanceService : IMaintenanceService
 
         var maintenanceRecords = await _maintenanceRepository.GetAllAsync();
         var lastMaintenance = maintenanceRecords
-            .Where(m => m.Bike.Id == bikeId)
+            .Where(m => m.Bike != null && m.Bike.Id == bikeId)
             .OrderByDescending(m => m.ScheduledDate)
             .FirstOrDefault();
 

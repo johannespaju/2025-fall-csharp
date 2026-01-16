@@ -1,9 +1,11 @@
 using BLL;
 using BLL.Enums;
 using BLL.Interfaces;
+using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Webapp.Pages.Tours;
 
@@ -17,6 +19,7 @@ public class BookModel : PageModel
     private readonly IAvailabilityService _availabilityService;
     private readonly IPricingService _pricingService;
     private readonly IDepositService _depositService;
+    private readonly AppDbContext _context;
 
     public BookModel(
         IRepository<Tour> tourRepository,
@@ -26,7 +29,8 @@ public class BookModel : PageModel
         IRepository<Bike> bikeRepository,
         IAvailabilityService availabilityService,
         IPricingService pricingService,
-        IDepositService depositService)
+        IDepositService depositService,
+        AppDbContext context)
     {
         _tourRepository = tourRepository;
         _tourBookingRepository = tourBookingRepository;
@@ -36,6 +40,7 @@ public class BookModel : PageModel
         _availabilityService = availabilityService;
         _pricingService = pricingService;
         _depositService = depositService;
+        _context = context;
     }
 
     public Tour Tour { get; set; } = new();
@@ -62,11 +67,13 @@ public class BookModel : PageModel
             Text = $"{c.FirstName} {c.LastName}"
         }).ToList();
 
-        CalculateAvailableSlots();
         TourBooking.ParticipantCount = 1;
         TourBooking.TourId = Tour.Id;
         TourBooking.BookingDate = DateOnly.FromDateTime(DateTime.Now);
+        TourBooking.TimeSlot = TimeOnly.FromDateTime(DateTime.Now.AddHours(1)); // Default to 1 hour from now
         TourBooking.Status = TourBookingStatus.Confirmed;
+        
+        await CalculateAvailableSlotsAsync();
         CalculateTotalPrice();
 
         return Page();
@@ -77,17 +84,18 @@ public class BookModel : PageModel
         if (!ModelState.IsValid)
         {
             await LoadOptionsAsync();
-            CalculateAvailableSlots();
+            await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
         }
 
         // Check if there are available slots
+        await CalculateAvailableSlotsAsync();
         if (TourBooking.ParticipantCount > AvailableSlots)
         {
             ModelState.AddModelError(string.Empty, "Not enough available slots for this tour.");
             await LoadOptionsAsync();
-            CalculateAvailableSlots();
+            await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
         }
@@ -113,7 +121,7 @@ public class BookModel : PageModel
         {
             ModelState.AddModelError(string.Empty, "Not enough bikes available for this tour.");
             await LoadOptionsAsync();
-            CalculateAvailableSlots();
+            await CalculateAvailableSlotsAsync();
             CalculateTotalPrice();
             return Page();
         }
@@ -167,9 +175,19 @@ public class BookModel : PageModel
         }).ToList();
     }
 
-    private void CalculateAvailableSlots()
+    private async Task<int> GetBookedParticipantCountAsync(Guid tourId, DateOnly date, TimeOnly timeSlot)
     {
-        var bookedParticipants = 0; // This should come from existing bookings
+        return await _context.TourBookings
+            .Where(tb => tb.TourId == tourId
+                      && tb.BookingDate == date
+                      && tb.TimeSlot == timeSlot
+                      && tb.Status != TourBookingStatus.Cancelled)
+            .SumAsync(tb => tb.ParticipantCount);
+    }
+
+    private async Task CalculateAvailableSlotsAsync()
+    {
+        var bookedParticipants = await GetBookedParticipantCountAsync(Tour.Id, TourBooking.BookingDate, TourBooking.TimeSlot);
         AvailableSlots = Math.Max(0, Tour.MaxCapacity - bookedParticipants);
     }
 

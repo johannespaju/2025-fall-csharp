@@ -15,5 +15,5 @@ public class MaintenanceRecord : BaseEntity
     public Guid BikeId { get; set; }
 
     // Navigation property
-    public Bike Bike { get; set; } = null!;
+    public Bike? Bike { get; set; }
 }

@@ -11,7 +11,7 @@
 
 <div class="card mb-3">
     <div class="card-body">
-        <h5 class="card-title">@Model.Rental.Bike.Type - @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</h5>
+        <h5 class="card-title">@Model.Rental.Bike?.Type - @Model.Rental.Customer?.FirstName @Model.Rental.Customer?.LastName</h5>
         <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
         <p class="card-text">End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
         <p class="card-text">Total Price: @Model.Rental.TotalCost.ToString("C")</p>

@@ -14,8 +14,8 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">Current Rental</h5>
-                    <p class="card-text">Bike: @Model.Rental.Bike.Type</p>
-                    <p class="card-text">Customer: @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</p>
+                    <p class="card-text">Bike: @Model.Rental.Bike?.Type</p>
+                    <p class="card-text">Customer: @Model.Rental.Customer?.FirstName @Model.Rental.Customer?.LastName</p>
                     <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
                     <p class="card-text">Current End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
                 </div>

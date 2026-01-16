@@ -38,6 +38,6 @@ public class DepositService : IDepositService
     public async Task<int> GetCustomerDamageCountAsync(Guid customerId)
     {
         var damageRecords = await _damageRepository.GetAllAsync();
-        return damageRecords.Count(d => d.Customer.Id == customerId);
+        return damageRecords.Count(d => d.Customer != null && d.Customer.Id == customerId);
     }
 }
