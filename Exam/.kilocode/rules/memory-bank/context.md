@@ -10,6 +10,8 @@
 
 ## Recent changes (as of 2026-01-16)
 
+- Extended dark theme styles to cover navigation, dropdowns, forms, tables, modals, toasts, and utility classes (see [`site.css`](Webapp/wwwroot/css/site.css:1)).
+
 ### Phase 1: Schema Compliance (COMPLETED)
 - Implemented 5 enum types: [`BikeStatus`](BLL/Enums/BikeStatus.cs:1), [`RentalStatus`](BLL/Enums/RentalStatus.cs:1), [`RentalType`](BLL/Enums/RentalType.cs:1), [`TourBookingStatus`](BLL/Enums/TourBookingStatus.cs:1), [`ServiceType`](BLL/Enums/ServiceType.cs:1)
 - Separated Rental date/time fields to DateOnly/TimeOnly (Requirements.MD compliance)
