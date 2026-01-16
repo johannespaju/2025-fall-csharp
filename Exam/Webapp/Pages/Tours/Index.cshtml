@@ -1,0 +1,45 @@
+@page
+@model Webapp.Pages.Tours.IndexModel
+@{
+    ViewData["Title"] = "Tours";
+}
+
+<h1>Tours</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Tour</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Start Time</th>
+                <th>Duration</th>
+                <th>Capacity</th>
+                <th>Price Per Participant</th>
+                <th>Bookings</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (tour, count) in Model.ToursWithCounts)
+            {
+                <tr>
+                    <td>@tour.Type</td>
+                    <td>@tour.StartTime.ToString("g")</td>
+                    <td>@tour.Duration.TotalHours.ToString("0.##") hours</td>
+                    <td>@tour.Capacity participants</td>
+                    <td>@tour.PricePerParticipant.ToString("C")</td>
+                    <td>@count bookings</td>
+                    <td>
+                        <a asp-page="Book" asp-route-id="@tour.Id" class="btn btn-sm btn-success">Book</a>
+                        <a asp-page="Edit" asp-route-id="@tour.Id" class="btn btn-sm btn-secondary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@tour.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

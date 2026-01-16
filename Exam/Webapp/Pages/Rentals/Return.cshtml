@@ -1,0 +1,52 @@
+@page "{id}"
+@model Webapp.Pages.Rentals.ReturnModel
+@{
+    ViewData["Title"] = "Return Bike";
+}
+
+<h1>Return Bike</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Rental Details</h5>
+                    <p class="card-text">Bike: @Model.Rental.Bike.Type</p>
+                    <p class="card-text">Customer: @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</p>
+                    <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
+                    <p class="card-text">End Time: @Model.Rental.EndTime.ToString("g")</p>
+                    <p class="card-text">Current Odometer: @Model.Rental.Bike.CurrentOdometer km</p>
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="OdometerReading" class="form-label">Odometer Reading (km)</label>
+                <input asp-for="OdometerReading" type="number" class="form-control" min="@Model.Rental.Bike.CurrentOdometer" />
+                <span asp-validation-for="OdometerReading" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="HasDamage" class="form-label">Bike has damage?</label>
+                <input asp-for="HasDamage" type="checkbox" class="form-check-input" />
+                <span asp-validation-for="HasDamage" class="text-danger"></span>
+            </div>
+            
+            @if (Model.HasDamage)
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="DamageDescription" class="form-label">Damage Description</label>
+                    <textarea asp-for="DamageDescription" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="DamageDescription" class="text-danger"></span>
+                </div>
+            }
+            
+            <div class="form-group">
+                <input type="submit" value="Return Bike" class="btn btn-primary" />
+                <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

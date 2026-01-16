@@ -16,4 +16,3 @@
    - `dotnet ef database update --project DAL`
 
 **Notes:** Commands may need `--startup-project Webapp` once `Webapp` references `DAL` and configures DI.
-

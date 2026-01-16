@@ -1,0 +1,57 @@
+@page
+@model Webapp.Pages.Rentals.IndexModel
+@{
+    ViewData["Title"] = "Rentals";
+}
+
+<h1>Rentals</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Rental</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bike</th>
+                <th>Customer</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+                <th>Total Price</th>
+                <th>Deposit</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rental in Model.Rentals)
+            {
+                <tr>
+                    <td>@rental.Bike.Type</td>
+                    <td>@rental.Customer.FirstName @rental.Customer.LastName</td>
+                    <td>@rental.StartTime.ToString("g")</td>
+                    <td>@rental.EndTime.ToString("g")</td>
+                    <td>@rental.Duration.TotalHours.ToString("0.##") hours</td>
+                    <td>@rental.TotalPrice.ToString("C")</td>
+                    <td>@rental.Deposit.ToString("C")</td>
+                    <td>
+                        <span class="badge @(rental.IsActive ? "bg-success" : "bg-secondary")">
+                            @(rental.IsActive ? "Active" : "Completed")
+                        </span>
+                    </td>
+                    <td>
+                        @if (rental.IsActive)
+                        {
+                            <a asp-page="Extend" asp-route-id="@rental.Id" class="btn btn-sm btn-warning">Extend</a>
+                            <a asp-page="Return" asp-route-id="@rental.Id" class="btn btn-sm btn-info">Return</a>
+                        }
+                        <a asp-page="Edit" asp-route-id="@rental.Id" class="btn btn-sm btn-secondary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@rental.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

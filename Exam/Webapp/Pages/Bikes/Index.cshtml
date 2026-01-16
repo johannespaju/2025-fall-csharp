@@ -1,0 +1,57 @@
+@page
+@model Webapp.Pages.Bikes.IndexModel
+@{
+    ViewData["Title"] = "Bikes";
+}
+
+<h1>Bikes</h1>
+
+<p>
+    <a asp-page="Create" class="btn btn-primary">Create New Bike</a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Daily Rate</th>
+                <th>Service Interval (km)</th>
+                <th>Current Odometer (km)</th>
+                <th>Available</th>
+                <th>Maintenance Due</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bike in Model.Bikes)
+            {
+                <tr>
+                    <td>@bike.Type</td>
+                    <td>@bike.DailyRate.ToString("C")</td>
+                    <td>@bike.ServiceInterval</td>
+                    <td>@bike.CurrentOdometer</td>
+                    <td>
+                        <span class="badge @(bike.IsAvailable ? "bg-success" : "bg-danger")">
+                            @(bike.IsAvailable ? "Available" : "Not Available")
+                        </span>
+                    </td>
+                    <td>
+                        @if (Model.MaintenanceDueBikes.Contains(bike.Id))
+                        {
+                            <span class="badge bg-warning text-dark">Due Soon</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-page="Edit" asp-route-id="@bike.Id" class="btn btn-sm btn-secondary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@bike.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

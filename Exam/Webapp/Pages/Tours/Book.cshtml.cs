@@ -1,0 +1,170 @@
+using BLL;
+using BLL.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Webapp.Pages.Tours;
+
+public class BookModel : PageModel
+{
+    private readonly IRepository<Tour> _tourRepository;
+    private readonly IRepository<TourBooking> _tourBookingRepository;
+    private readonly IRepository<Customer> _customerRepository;
+    private readonly IRepository<Rental> _rentalRepository;
+    private readonly IRepository<Bike> _bikeRepository;
+    private readonly IAvailabilityService _availabilityService;
+    private readonly IPricingService _pricingService;
+    private readonly IDepositService _depositService;
+
+    public BookModel(
+        IRepository<Tour> tourRepository,
+        IRepository<TourBooking> tourBookingRepository,
+        IRepository<Customer> customerRepository,
+        IRepository<Rental> rentalRepository,
+        IRepository<Bike> bikeRepository,
+        IAvailabilityService availabilityService,
+        IPricingService pricingService,
+        IDepositService depositService)
+    {
+        _tourRepository = tourRepository;
+        _tourBookingRepository = tourBookingRepository;
+        _customerRepository = customerRepository;
+        _rentalRepository = rentalRepository;
+        _bikeRepository = bikeRepository;
+        _availabilityService = availabilityService;
+        _pricingService = pricingService;
+        _depositService = depositService;
+    }
+
+    public Tour Tour { get; set; } = new();
+
+    [BindProperty]
+    public TourBooking TourBooking { get; set; } = new();
+
+    public List<SelectListItem> CustomerOptions { get; set; } = new();
+    public int AvailableSlots { get; set; }
+    public decimal CalculatedTotalPrice { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(Guid id)
+    {
+        Tour = await _tourRepository.GetByIdAsync(id);
+        if (Tour == null)
+        {
+            return NotFound();
+        }
+
+        var customers = await _customerRepository.GetAllAsync();
+        CustomerOptions = customers.Select(c => new SelectListItem
+        {
+            Value = c.Id.ToString(),
+            Text = $"{c.FirstName} {c.LastName}"
+        }).ToList();
+
+        // Debug log to check if customers are being retrieved
+        Console.WriteLine($"Number of customers: {customers.Count()}");
+
+        CalculateAvailableSlots();
+        TourBooking.ParticipantCount = 1;
+        CalculateTotalPrice();
+
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadOptionsAsync();
+            CalculateAvailableSlots();
+            CalculateTotalPrice();
+            return Page();
+        }
+
+        // Check if there are available slots
+        if (TourBooking.ParticipantCount > AvailableSlots)
+        {
+            ModelState.AddModelError(string.Empty, "Not enough available slots for this tour.");
+            await LoadOptionsAsync();
+            CalculateAvailableSlots();
+            CalculateTotalPrice();
+            return Page();
+        }
+
+        // Calculate total price
+        TourBooking.TotalPrice = _pricingService.CalculateTourPrice(
+            TourBooking.ParticipantCount, Tour.PricePerParticipant);
+        TourBooking.TourId = Tour.Id;
+
+        // Get available bikes for the tour
+        var availableBikeIds = await _availabilityService.GetAvailableBikesAsync(
+            Tour.StartTime, Tour.StartTime.Add(Tour.Duration));
+
+        // If not enough bikes available, reject booking
+        if (availableBikeIds.Count() < TourBooking.ParticipantCount)
+        {
+            ModelState.AddModelError(string.Empty, "Not enough bikes available for this tour.");
+            await LoadOptionsAsync();
+            CalculateAvailableSlots();
+            CalculateTotalPrice();
+            return Page();
+        }
+
+        // Create tour booking
+        await _tourBookingRepository.AddAsync(TourBooking);
+        await _tourBookingRepository.SaveChangesAsync();
+
+        // Create individual rentals for each participant
+        var bikes = await _bikeRepository.GetAllAsync();
+        foreach (var bikeId in availableBikeIds.Take(TourBooking.ParticipantCount))
+        {
+            var bike = bikes.First(b => b.Id == bikeId);
+            var deposit = await _depositService.CalculateDepositAsync(bikeId, TourBooking.CustomerId);
+            var price = _pricingService.CalculateRentalPrice(
+                Tour.StartTime, Tour.StartTime.Add(Tour.Duration), bike.DailyRate);
+
+            var rental = new Rental
+            {
+                BikeId = bikeId,
+                CustomerId = TourBooking.CustomerId,
+                TourBookingId = TourBooking.Id,
+                StartTime = Tour.StartTime,
+                EndTime = Tour.StartTime.Add(Tour.Duration),
+                TotalPrice = price,
+                Deposit = deposit,
+                IsActive = true
+            };
+
+            await _rentalRepository.AddAsync(rental);
+            bike.IsAvailable = false;
+            await _bikeRepository.UpdateAsync(bike);
+        }
+
+        await _rentalRepository.SaveChangesAsync();
+        await _bikeRepository.SaveChangesAsync();
+
+        return RedirectToPage(nameof(Index));
+    }
+
+    private async Task LoadOptionsAsync()
+    {
+        var customers = await _customerRepository.GetAllAsync();
+        CustomerOptions = customers.Select(c => new SelectListItem
+        {
+            Value = c.Id.ToString(),
+            Text = $"{c.FirstName} {c.LastName}"
+        }).ToList();
+    }
+
+    private void CalculateAvailableSlots()
+    {
+        var bookedParticipants = 0; // This should come from existing bookings
+        AvailableSlots = Math.Max(0, Tour.Capacity - bookedParticipants);
+    }
+
+    private void CalculateTotalPrice()
+    {
+        CalculatedTotalPrice = _pricingService.CalculateTourPrice(
+            TourBooking.ParticipantCount, Tour.PricePerParticipant);
+    }
+}

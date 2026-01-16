@@ -7,6 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BLL\BLL.csproj" />
+      <ProjectReference Include="..\DAL\DAL.csproj" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
         <PrivateAssets>all</PrivateAssets>

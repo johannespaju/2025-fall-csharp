@@ -23,4 +23,3 @@ This is an exam project to demonstrate building a production-style ASP.NET Core 
 - Clear availability feedback (why a bike cannot be rented/extended).
 - Admin-friendly overview dashboards (fleet status, bikes due for maintenance, upcoming tours).
 - Low-risk data entry (validation, sensible defaults, minimal required fields).
-

@@ -1,0 +1,42 @@
+@page "{id}"
+@model Webapp.Pages.Rentals.ExtendModel
+@{
+    ViewData["Title"] = "Extend Rental";
+}
+
+<h1>Extend Rental</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Current Rental</h5>
+                    <p class="card-text">Bike: @Model.Rental.Bike.Type</p>
+                    <p class="card-text">Customer: @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</p>
+                    <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
+                    <p class="card-text">Current End Time: @Model.Rental.EndTime.ToString("g")</p>
+                    <p class="card-text">Duration: @Model.Rental.Duration.TotalHours.ToString("0.##") hours</p>
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="NewEndTime" class="form-label">New End Time</label>
+                <input asp-for="NewEndTime" type="datetime-local" class="form-control" />
+                <span asp-validation-for="NewEndTime" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label>Additional Cost</label>
+                <input type="text" class="form-control" value="@Model.AdditionalCost.ToString("C")" readonly />
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Extend" class="btn btn-primary" />
+                <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

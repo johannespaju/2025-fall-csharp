@@ -1,0 +1,28 @@
+@page "{id}"
+@model Webapp.Pages.Rentals.DeleteModel
+@{
+    ViewData["Title"] = "Delete Rental";
+}
+
+<h1>Delete Rental</h1>
+
+<h3>Are you sure you want to delete this rental?</h3>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Rental.Bike.Type - @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</h5>
+        <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
+        <p class="card-text">End Time: @Model.Rental.EndTime.ToString("g")</p>
+        <p class="card-text">Total Price: @Model.Rental.TotalPrice.ToString("C")</p>
+        <p class="card-text">
+            Status: <span class="badge @(Model.Rental.IsActive ? "bg-success" : "bg-secondary")">
+                @(Model.Rental.IsActive ? "Active" : "Completed")
+            </span>
+        </p>
+    </div>
+</div>
+
+<form method="post">
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
