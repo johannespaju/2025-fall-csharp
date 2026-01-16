@@ -1,6 +1,6 @@
 using BLL;
-using BLL.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using BLL.Enums;
+using BLL.Interfaces;using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Webapp.Pages.Tours;
@@ -19,10 +19,12 @@ public class CreateModel : PageModel
 
     public IActionResult OnGet()
     {
-        Tour.StartTime = DateTime.Now.AddDays(1); // Default to tomorrow
-        Tour.Duration = TimeSpan.FromHours(2); // Default 2 hours
-        Tour.Capacity = 10; // Default capacity
-        Tour.PricePerParticipant = 25; // Default price per participant
+        Tour.DurationHours = 2; // Default 2 hours
+        Tour.MaxCapacity = 10; // Default capacity
+        Tour.IncludedBikeType = BikeType.City; // Default bike type
+        Tour.UpgradeToElectricFee = 10; // Default upgrade fee
+        Tour.IsActive = true;
+        Tour.TimeSlots = "09:00,14:00"; // Initialize with default time slots (comma-separated)
         return Page();
     }
 

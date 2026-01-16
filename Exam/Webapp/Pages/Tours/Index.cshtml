@@ -14,11 +14,12 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Name</th>
                 <th>Type</th>
-                <th>Start Time</th>
                 <th>Duration</th>
                 <th>Capacity</th>
-                <th>Price Per Participant</th>
+                <th>Included Bike</th>
+                <th>Price</th>
                 <th>Bookings</th>
                 <th>Actions</th>
             </tr>
@@ -27,10 +28,11 @@
             @foreach (var (tour, count) in Model.ToursWithCounts)
             {
                 <tr>
+                    <td>@tour.Name</td>
                     <td>@tour.Type</td>
-                    <td>@tour.StartTime.ToString("g")</td>
-                    <td>@tour.Duration.TotalHours.ToString("0.##") hours</td>
-                    <td>@tour.Capacity participants</td>
+                    <td>@tour.DurationHours.ToString("0.##") hours</td>
+                    <td>@tour.MaxCapacity participants</td>
+                    <td>@tour.IncludedBikeType</td>
                     <td>@tour.PricePerParticipant.ToString("C")</td>
                     <td>@count bookings</td>
                     <td>

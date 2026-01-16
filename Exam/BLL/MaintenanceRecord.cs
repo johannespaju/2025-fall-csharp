@@ -1,8 +1,12 @@
-﻿namespace BLL;
+﻿using BLL.Enums;
+
+namespace BLL;
 
 public class MaintenanceRecord : BaseEntity
 {
-    public DateTime Date { get; set; }
+    public ServiceType ServiceType { get; set; } = ServiceType.Regular;
+    public DateTime ScheduledDate { get; set; }
+    public DateTime? CompletedAt { get; set; } // Nullable - may not be completed yet
     public decimal Cost { get; set; }
     public int OdometerAtService { get; set; } // in kilometers
     public string? Description { get; set; }

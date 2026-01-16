@@ -1,4 +1,5 @@
 using BLL;
+using BLL.Enums;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -57,7 +58,7 @@ public class ReturnModel : PageModel
         // Update bike odometer
         var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
         bike!.CurrentOdometer = OdometerReading;
-        bike.IsAvailable = true; // Bike becomes available again
+        bike.Status = BikeStatus.Available; // Bike becomes available again
         await _bikeRepository.UpdateAsync(bike);
 
         // Create damage record if needed
@@ -67,8 +68,10 @@ public class ReturnModel : PageModel
             {
                 BikeId = Rental.BikeId,
                 CustomerId = Rental.CustomerId,
-                Date = DateTime.Now,
-                Description = DamageDescription
+                RentalId = Rental.Id,
+                ReportedDate = DateTime.Now,
+                Description = DamageDescription ?? string.Empty,
+                EstimatedCost = 0 // Placeholder - should be set by staff
             };
             await _damageRecordRepository.AddAsync(damageRecord);
         }
@@ -76,13 +79,15 @@ public class ReturnModel : PageModel
         // Check if maintenance is needed
         if (await _maintenanceService.IsBikeDueForMaintenanceAsync(Rental.BikeId))
         {
-            bike.IsAvailable = false; // Flag as unavailable for maintenance
+            bike.Status = BikeStatus.InMaintenance; // Flag as unavailable for maintenance
             await _maintenanceService.FlagBikeForMaintenanceAsync(Rental.BikeId);
             await _bikeRepository.UpdateAsync(bike);
         }
 
         // Mark rental as completed
-        Rental.IsActive = false;
+        Rental.Status = RentalStatus.Completed;
+        Rental.ActualReturnDate = DateOnly.FromDateTime(DateTime.Now);
+        Rental.ReturnOdometer = OdometerReading;
         await _rentalRepository.UpdateAsync(Rental);
         await _rentalRepository.SaveChangesAsync();
 

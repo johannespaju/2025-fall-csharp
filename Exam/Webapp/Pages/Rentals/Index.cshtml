@@ -1,4 +1,5 @@
 @page
+@using BLL.Enums
 @model Webapp.Pages.Rentals.IndexModel
 @{
     ViewData["Title"] = "Rentals";
@@ -16,12 +17,11 @@
             <tr>
                 <th>Bike</th>
                 <th>Customer</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Duration</th>
+                <th>Start</th>
+                <th>End</th>
                 <th>Total Price</th>
                 <th>Deposit</th>
-                <th>Active</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -31,18 +31,17 @@
                 <tr>
                     <td>@rental.Bike.Type</td>
                     <td>@rental.Customer.FirstName @rental.Customer.LastName</td>
-                    <td>@rental.StartTime.ToString("g")</td>
-                    <td>@rental.EndTime.ToString("g")</td>
-                    <td>@rental.Duration.TotalHours.ToString("0.##") hours</td>
-                    <td>@rental.TotalPrice.ToString("C")</td>
-                    <td>@rental.Deposit.ToString("C")</td>
+                    <td>@rental.StartDate.ToString("yyyy-MM-dd") @rental.StartTime.ToString("HH:mm")</td>
+                    <td>@rental.EndDate.ToString("yyyy-MM-dd") @rental.EndTime.ToString("HH:mm")</td>
+                    <td>@rental.TotalCost.ToString("C")</td>
+                    <td>@rental.DepositAmount.ToString("C")</td>
                     <td>
-                        <span class="badge @(rental.IsActive ? "bg-success" : "bg-secondary")">
-                            @(rental.IsActive ? "Active" : "Completed")
+                        <span class="badge @(rental.Status == RentalStatus.Active ? "bg-success" : "bg-secondary")">
+                            @rental.Status
                         </span>
                     </td>
                     <td>
-                        @if (rental.IsActive)
+                        @if (rental.Status == RentalStatus.Active)
                         {
                             <a asp-page="Extend" asp-route-id="@rental.Id" class="btn btn-sm btn-warning">Extend</a>
                             <a asp-page="Return" asp-route-id="@rental.Id" class="btn btn-sm btn-info">Return</a>

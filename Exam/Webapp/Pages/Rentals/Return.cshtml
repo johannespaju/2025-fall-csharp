@@ -16,8 +16,8 @@
                     <h5 class="card-title">Rental Details</h5>
                     <p class="card-text">Bike: @Model.Rental.Bike.Type</p>
                     <p class="card-text">Customer: @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</p>
-                    <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
-                    <p class="card-text">End Time: @Model.Rental.EndTime.ToString("g")</p>
+                    <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
+                    <p class="card-text">End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
                     <p class="card-text">Current Odometer: @Model.Rental.Bike.CurrentOdometer km</p>
                 </div>
             </div>

@@ -1,9 +1,16 @@
-﻿namespace BLL;
+﻿using BLL.Enums;
+
+namespace BLL;
 
 public class TourBooking : BaseEntity
 {
+    public DateOnly BookingDate { get; set; }
+    public TimeOnly TimeSlot { get; set; }
     public int ParticipantCount { get; set; }
-    public decimal TotalPrice { get; set; }
+    public bool BikeUpgradeToElectric { get; set; } = false;
+    public decimal TotalCost { get; set; }
+    public TourBookingStatus Status { get; set; } = TourBookingStatus.Confirmed;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? SpecialRequests { get; set; }
 
     // Foreign keys

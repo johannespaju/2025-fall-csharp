@@ -10,11 +10,14 @@
 
 <div class="card mb-3">
     <div class="card-body">
-        <h5 class="card-title">@Model.Tour.Type</h5>
-        <p class="card-text">Start Time: @Model.Tour.StartTime.ToString("g")</p>
-        <p class="card-text">Duration: @Model.Tour.Duration.TotalHours.ToString("0.##") hours</p>
-        <p class="card-text">Capacity: @Model.Tour.Capacity participants</p>
-        <p class="card-text">Price per participant: @Model.Tour.PricePerParticipant.ToString("C")</p>
+        <h5 class="card-title">@Model.Tour.Name</h5>
+        <p class="card-text"><strong>Type:</strong> @Model.Tour.Type</p>
+        <p class="card-text"><strong>Description:</strong> @Model.Tour.Description</p>
+        <p class="card-text"><strong>Duration:</strong> @Model.Tour.DurationHours.ToString("0.##") hours</p>
+        <p class="card-text"><strong>Capacity:</strong> @Model.Tour.MaxCapacity participants</p>
+        <p class="card-text"><strong>Included Bike Type:</strong> @Model.Tour.IncludedBikeType</p>
+        <p class="card-text"><strong>Price per participant:</strong> @Model.Tour.PricePerParticipant.ToString("C")</p>
+        <p class="card-text"><strong>Time Slots:</strong> @Model.Tour.TimeSlots</p>
     </div>
 </div>
 

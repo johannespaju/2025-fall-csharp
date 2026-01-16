@@ -7,18 +7,20 @@
 <h1>Book Tour</h1>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">@Model.Tour.Type</h5>
-                    <p class="card-text">Start Time: @Model.Tour.StartTime.ToString("g")</p>
-                    <p class="card-text">Duration: @Model.Tour.Duration.TotalHours.ToString("0.##") hours</p>
-                    <p class="card-text">Capacity: @Model.Tour.Capacity participants</p>
-                    <p class="card-text">Price per participant: @Model.Tour.PricePerParticipant.ToString("C")</p>
-                    <p class="card-text">Available: @Model.AvailableSlots participants</p>
+                    <h5 class="card-title">@Model.Tour.Name</h5>
+                    <p class="card-text"><strong>Type:</strong> @Model.Tour.Type</p>
+                    <p class="card-text"><strong>Description:</strong> @Model.Tour.Description</p>
+                    <p class="card-text"><strong>Duration:</strong> @Model.Tour.DurationHours.ToString("0.##") hours</p>
+                    <p class="card-text"><strong>Capacity:</strong> @Model.Tour.MaxCapacity participants</p>
+                    <p class="card-text"><strong>Included Bike:</strong> @Model.Tour.IncludedBikeType</p>
+                    <p class="card-text"><strong>Price per participant:</strong> @Model.Tour.PricePerParticipant.ToString("C")</p>
+                    <p class="card-text"><strong>Available Slots:</strong> @Model.AvailableSlots participants</p>
                 </div>
             </div>
             
@@ -28,6 +30,19 @@
                     <option value="">Select a customer</option>
                 </select>
                 <span asp-validation-for="TourBooking.CustomerId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="TourBooking.BookingDate" class="form-label">Booking Date</label>
+                <input asp-for="TourBooking.BookingDate" type="date" class="form-control" />
+                <span asp-validation-for="TourBooking.BookingDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="TourBooking.TimeSlot" class="form-label">Time Slot</label>
+                <input asp-for="TourBooking.TimeSlot" type="time" class="form-control" />
+                <span asp-validation-for="TourBooking.TimeSlot" class="text-danger"></span>
+                <small class="form-text text-muted">Available: @Model.Tour.TimeSlots</small>
             </div>
             
             <div class="form-group mb-3">
@@ -65,7 +80,7 @@
                 var participantCount = $(this).val();
                 var pricePerParticipant = @Model.Tour.PricePerParticipant;
                 var totalPrice = participantCount * pricePerParticipant;
-                $('#calculatedTotalPrice').text(totalPrice.toFixed(2));
+                $('#calculatedTotalPrice').val(totalPrice.toFixed(2));
             });
         });
     </script>

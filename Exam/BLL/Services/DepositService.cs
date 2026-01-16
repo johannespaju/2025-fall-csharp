@@ -1,4 +1,5 @@
 using BLL.Interfaces;
+using BLL.Enums;
 
 namespace BLL.Services;
 
@@ -37,6 +38,6 @@ public class DepositService : IDepositService
     public async Task<int> GetCustomerDamageCountAsync(Guid customerId)
     {
         var damageRecords = await _damageRepository.GetAllAsync();
-        return damageRecords.Count(d => d.CustomerId == customerId);
+        return damageRecords.Count(d => d.Customer.Id == customerId);
     }
 }

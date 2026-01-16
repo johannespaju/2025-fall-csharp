@@ -1,4 +1,5 @@
 @page "{id}"
+@using BLL.Enums
 @model Webapp.Pages.Rentals.DeleteModel
 @{
     ViewData["Title"] = "Delete Rental";
@@ -11,12 +12,12 @@
 <div class="card mb-3">
     <div class="card-body">
         <h5 class="card-title">@Model.Rental.Bike.Type - @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</h5>
-        <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
-        <p class="card-text">End Time: @Model.Rental.EndTime.ToString("g")</p>
-        <p class="card-text">Total Price: @Model.Rental.TotalPrice.ToString("C")</p>
+        <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
+        <p class="card-text">End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
+        <p class="card-text">Total Price: @Model.Rental.TotalCost.ToString("C")</p>
         <p class="card-text">
-            Status: <span class="badge @(Model.Rental.IsActive ? "bg-success" : "bg-secondary")">
-                @(Model.Rental.IsActive ? "Active" : "Completed")
+            Status: <span class="badge @(Model.Rental.Status == RentalStatus.Active ? "bg-success" : "bg-secondary")">
+                @Model.Rental.Status
             </span>
         </p>
     </div>

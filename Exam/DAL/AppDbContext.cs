@@ -63,5 +63,18 @@ public class AppDbContext : DbContext
             .HasOne(dr => dr.Customer)
             .WithMany(c => c.DamageRecords)
             .HasForeignKey(dr => dr.CustomerId);
+
+        modelBuilder.Entity<DamageRecord>()
+            .HasOne(dr => dr.Rental)
+            .WithMany()
+            .HasForeignKey(dr => dr.RentalId);
+
+        // Indexes for performance
+        modelBuilder.Entity<Bike>()
+            .HasIndex(b => b.BikeNumber)
+            .IsUnique();
+
+        modelBuilder.Entity<TourBooking>()
+            .HasIndex(tb => new { tb.TourId, tb.BookingDate, tb.TimeSlot });
     }
 }

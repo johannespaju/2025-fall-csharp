@@ -1,4 +1,5 @@
 using BLL.Interfaces;
+using BLL.Enums;
 
 namespace BLL.Services;
 
@@ -33,8 +34,8 @@ public class MaintenanceService : IMaintenanceService
 
         var maintenanceRecords = await _maintenanceRepository.GetAllAsync();
         var lastMaintenance = maintenanceRecords
-            .Where(m => m.BikeId == bikeId)
-            .OrderByDescending(m => m.Date)
+            .Where(m => m.Bike.Id == bikeId)
+            .OrderByDescending(m => m.ScheduledDate)
             .FirstOrDefault();
 
         if (lastMaintenance == null)
@@ -49,7 +50,7 @@ public class MaintenanceService : IMaintenanceService
         var bike = await _bikeRepository.GetByIdAsync(bikeId);
         if (bike != null)
         {
-            bike.IsAvailable = false;
+            bike.Status = BikeStatus.InMaintenance;
             await _bikeRepository.UpdateAsync(bike);
             await _bikeRepository.SaveChangesAsync();
         }
@@ -57,10 +58,16 @@ public class MaintenanceService : IMaintenanceService
 
     public async Task RecordMaintenanceAsync(Guid bikeId, DateTime date, decimal cost, int odometerAtService, string? description)
     {
+        // Note: BikeId is int in MaintenanceRecord, need to find the bike first to get its int ID
+        var bike = await _bikeRepository.GetByIdAsync(bikeId);
+        if (bike == null)
+            return;
+
         var maintenanceRecord = new MaintenanceRecord
         {
-            BikeId = bikeId,
-            Date = date,
+            Bike = bike,
+            ScheduledDate = date,
+            CompletedAt = DateTime.UtcNow,
             Cost = cost,
             OdometerAtService = odometerAtService,
             Description = description
@@ -69,13 +76,10 @@ public class MaintenanceService : IMaintenanceService
         await _maintenanceRepository.AddAsync(maintenanceRecord);
         await _maintenanceRepository.SaveChangesAsync();
 
-        var bike = await _bikeRepository.GetByIdAsync(bikeId);
-        if (bike != null)
-        {
-            bike.IsAvailable = true;
-            await _bikeRepository.UpdateAsync(bike);
-            await _bikeRepository.SaveChangesAsync();
-        }
+        bike.Status = BikeStatus.Available;
+        bike.LastServiceOdometer = odometerAtService;
+        await _bikeRepository.UpdateAsync(bike);
+        await _bikeRepository.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<Guid>> GetBikesDueForMaintenanceAsync()

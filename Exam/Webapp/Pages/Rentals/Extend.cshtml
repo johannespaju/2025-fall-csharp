@@ -16,15 +16,20 @@
                     <h5 class="card-title">Current Rental</h5>
                     <p class="card-text">Bike: @Model.Rental.Bike.Type</p>
                     <p class="card-text">Customer: @Model.Rental.Customer.FirstName @Model.Rental.Customer.LastName</p>
-                    <p class="card-text">Start Time: @Model.Rental.StartTime.ToString("g")</p>
-                    <p class="card-text">Current End Time: @Model.Rental.EndTime.ToString("g")</p>
-                    <p class="card-text">Duration: @Model.Rental.Duration.TotalHours.ToString("0.##") hours</p>
+                    <p class="card-text">Start: @Model.Rental.StartDate.ToString("yyyy-MM-dd") @Model.Rental.StartTime.ToString("HH:mm")</p>
+                    <p class="card-text">Current End: @Model.Rental.EndDate.ToString("yyyy-MM-dd") @Model.Rental.EndTime.ToString("HH:mm")</p>
                 </div>
             </div>
             
             <div class="form-group mb-3">
+                <label asp-for="NewEndDate" class="form-label">New End Date</label>
+                <input asp-for="NewEndDate" type="date" class="form-control" />
+                <span asp-validation-for="NewEndDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
                 <label asp-for="NewEndTime" class="form-label">New End Time</label>
-                <input asp-for="NewEndTime" type="datetime-local" class="form-control" />
+                <input asp-for="NewEndTime" type="time" class="form-control" />
                 <span asp-validation-for="NewEndTime" class="text-danger"></span>
             </div>
             

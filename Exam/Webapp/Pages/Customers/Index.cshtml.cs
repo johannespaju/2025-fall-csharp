@@ -1,4 +1,5 @@
 using BLL;
+using BLL.Enums;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

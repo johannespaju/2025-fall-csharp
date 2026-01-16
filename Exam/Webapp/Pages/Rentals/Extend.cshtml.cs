@@ -1,4 +1,5 @@
 using BLL;
+using BLL.Enums;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,7 +28,10 @@ public class ExtendModel : PageModel
     public Rental Rental { get; set; } = new();
 
     [BindProperty]
-    public DateTime NewEndTime { get; set; }
+    public DateOnly NewEndDate { get; set; }
+    
+    [BindProperty]
+    public TimeOnly NewEndTime { get; set; }
 
     public decimal AdditionalCost { get; set; }
 
@@ -39,7 +43,11 @@ public class ExtendModel : PageModel
             return NotFound();
         }
 
-        NewEndTime = Rental.EndTime.AddHours(4); // Default: extend by 4 hours
+        // Default: extend by 4 hours
+        var currentEnd = Rental.EndDate.ToDateTime(Rental.EndTime);
+        var newEnd = currentEnd.AddHours(4);
+        NewEndDate = DateOnly.FromDateTime(newEnd);
+        NewEndTime = TimeOnly.FromDateTime(newEnd);
         CalculateAdditionalCost();
 
         return Page();
@@ -52,8 +60,11 @@ public class ExtendModel : PageModel
             return Page();
         }
 
+        // Convert to DateTime for service calls
+        var newEndTime = NewEndDate.ToDateTime(NewEndTime);
+
         // Check if extension is possible
-        var isExtendable = await _availabilityService.IsRentalExtendableAsync(Rental.Id, NewEndTime);
+        var isExtendable = await _availabilityService.IsRentalExtendableAsync(Rental.Id, newEndTime);
         if (!isExtendable)
         {
             ModelState.AddModelError(string.Empty, "Cannot extend rental - bike is not available for the requested time.");
@@ -62,13 +73,15 @@ public class ExtendModel : PageModel
 
         // Calculate additional cost
         var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
+        var startTime = Rental.StartDate.ToDateTime(Rental.StartTime);
         var totalPrice = _pricingService.CalculateRentalPrice(
-            Rental.StartTime, NewEndTime, bike!.DailyRate);
-        var additionalCost = totalPrice - Rental.TotalPrice;
+            startTime, newEndTime, bike!.DailyRate);
+        var additionalCost = totalPrice - Rental.TotalCost;
 
         // Update rental
+        Rental.EndDate = NewEndDate;
         Rental.EndTime = NewEndTime;
-        Rental.TotalPrice = totalPrice;
+        Rental.TotalCost = totalPrice;
         await _rentalRepository.UpdateAsync(Rental);
         await _rentalRepository.SaveChangesAsync();
 

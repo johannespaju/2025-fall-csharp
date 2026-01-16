@@ -1,4 +1,5 @@
 using BLL.Interfaces;
+using BLL.Enums;
 
 namespace BLL.Services;
 
@@ -19,16 +20,21 @@ public class AvailabilityService : IAvailabilityService
     public async Task<bool> IsBikeAvailableAsync(Guid bikeId, DateTime startTime, DateTime endTime)
     {
         var bike = await _bikeRepository.GetByIdAsync(bikeId);
-        if (bike == null || !bike.IsAvailable)
+        if (bike == null || bike.Status != BikeStatus.Available)
             return false;
 
         if (await _maintenanceService.IsBikeDueForMaintenanceAsync(bikeId))
             return false;
 
         var rentals = await _rentalRepository.GetAllAsync();
-        var activeRentals = rentals.Where(r => r.BikeId == bikeId && r.IsActive);
+        var activeRentals = rentals.Where(r => r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
 
-        return !activeRentals.Any(r => DoTimeIntervalsOverlap(r.StartTime, r.EndTime, startTime, endTime));
+        return !activeRentals.Any(r =>
+        {
+            var rentalStart = r.StartDate.ToDateTime(r.StartTime);
+            var rentalEnd = r.EndDate.ToDateTime(r.EndTime);
+            return DoTimeIntervalsOverlap(rentalStart, rentalEnd, startTime, endTime);
+        });
     }
 
     public async Task<IEnumerable<Guid>> GetAvailableBikesAsync(DateTime startTime, DateTime endTime)
@@ -36,7 +42,7 @@ public class AvailabilityService : IAvailabilityService
         var bikes = await _bikeRepository.GetAllAsync();
         var availableBikes = new List<Guid>();
 
-        foreach (var bike in bikes.Where(b => b.IsAvailable))
+        foreach (var bike in bikes.Where(b => b.Status == BikeStatus.Available))
         {
             if (!await _maintenanceService.IsBikeDueForMaintenanceAsync(bike.Id) &&
                 !await HasActiveRentalsOverlappingAsync(bike.Id, startTime, endTime))
@@ -53,14 +59,26 @@ public class AvailabilityService : IAvailabilityService
         var rentals = await _rentalRepository.GetAllAsync();
         var rental = rentals.FirstOrDefault(r => r.Id == rentalId);
         
-        if (rental == null || !rental.IsActive || newEndTime <= rental.EndTime)
+        if (rental == null || rental.Status != RentalStatus.Active)
             return false;
 
-        var overlappingRentals = rentals.Where(r => 
-            r.BikeId == rental.BikeId && 
-            r.IsActive && 
-            r.Id != rentalId && 
-            DoTimeIntervalsOverlap(rental.StartTime, newEndTime, r.StartTime, r.EndTime));
+        var currentEndTime = rental.EndDate.ToDateTime(rental.EndTime);
+        if (newEndTime <= currentEndTime)
+            return false;
+
+        var rentalStart = rental.StartDate.ToDateTime(rental.StartTime);
+        
+        var overlappingRentals = rentals.Where(r =>
+            r.Bike.Id == rental.Bike.Id &&
+            r.Status != RentalStatus.Cancelled &&
+            r.Id != rentalId)
+            .Select(r => new
+            {
+                Rental = r,
+                Start = r.StartDate.ToDateTime(r.StartTime),
+                End = r.EndDate.ToDateTime(r.EndTime)
+            })
+            .Where(r => DoTimeIntervalsOverlap(rentalStart, newEndTime, r.Start, r.End));
 
         return !overlappingRentals.Any();
     }
@@ -68,9 +86,14 @@ public class AvailabilityService : IAvailabilityService
     private async Task<bool> HasActiveRentalsOverlappingAsync(Guid bikeId, DateTime startTime, DateTime endTime)
     {
         var rentals = await _rentalRepository.GetAllAsync();
-        var activeRentals = rentals.Where(r => r.BikeId == bikeId && r.IsActive);
+        var activeRentals = rentals.Where(r => r.Bike.Id == bikeId && r.Status != RentalStatus.Cancelled);
 
-        return activeRentals.Any(r => DoTimeIntervalsOverlap(r.StartTime, r.EndTime, startTime, endTime));
+        return activeRentals.Any(r =>
+        {
+            var rentalStart = r.StartDate.ToDateTime(r.StartTime);
+            var rentalEnd = r.EndDate.ToDateTime(r.EndTime);
+            return DoTimeIntervalsOverlap(rentalStart, rentalEnd, startTime, endTime);
+        });
     }
 
     private bool DoTimeIntervalsOverlap(DateTime start1, DateTime end1, DateTime start2, DateTime end2)

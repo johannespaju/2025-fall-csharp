@@ -1,4 +1,5 @@
 using BLL;
+using BLL.Enums;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -42,8 +43,13 @@ public class CreateModel : PageModel
     public async Task OnGetAsync()
     {
         await LoadOptionsAsync();
-        Rental.StartTime = DateTime.Now;
-        Rental.EndTime = DateTime.Now.AddHours(4);
+        var now = DateTime.Now;
+        Rental.StartDate = DateOnly.FromDateTime(now);
+        Rental.StartTime = TimeOnly.FromDateTime(now);
+        Rental.EndDate = DateOnly.FromDateTime(now.AddHours(4));
+        Rental.EndTime = TimeOnly.FromDateTime(now.AddHours(4));
+        Rental.RentalType = RentalType.FourHour;
+        Rental.Status = RentalStatus.Reserved;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -54,9 +60,13 @@ public class CreateModel : PageModel
             return Page();
         }
 
+        // Convert DateOnly/TimeOnly to DateTime for availability check
+        var startTime = Rental.StartDate.ToDateTime(Rental.StartTime);
+        var endTime = Rental.EndDate.ToDateTime(Rental.EndTime);
+
         // Check availability
         var isAvailable = await _availabilityService.IsBikeAvailableAsync(
-            Rental.BikeId, Rental.StartTime, Rental.EndTime);
+            Rental.BikeId, startTime, endTime);
 
         if (!isAvailable)
         {
@@ -69,12 +79,12 @@ public class CreateModel : PageModel
         var bike = await _bikeRepository.GetByIdAsync(Rental.BikeId);
         var deposit = await _depositService.CalculateDepositAsync(Rental.BikeId, Rental.CustomerId);
         var price = _pricingService.CalculateRentalPrice(
-            Rental.StartTime, Rental.EndTime, bike!.DailyRate);
+            startTime, endTime, bike!.DailyRate);
 
         // Create rental
-        Rental.TotalPrice = price;
-        Rental.Deposit = deposit;
-        Rental.IsActive = true;
+        Rental.TotalCost = price;
+        Rental.DepositAmount = deposit;
+        Rental.Status = RentalStatus.Active;
 
         await _rentalRepository.AddAsync(Rental);
         await _rentalRepository.SaveChangesAsync();

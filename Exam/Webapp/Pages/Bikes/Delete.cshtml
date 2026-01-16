@@ -1,4 +1,5 @@
 @page "{id}"
+@using BLL.Enums
 @model Webapp.Pages.Bikes.DeleteModel
 @{
     ViewData["Title"] = "Delete Bike";
@@ -15,8 +16,8 @@
         <p class="card-text">Service Interval: @Model.Bike.ServiceInterval km</p>
         <p class="card-text">Current Odometer: @Model.Bike.CurrentOdometer km</p>
         <p class="card-text">
-            Status: <span class="badge @(Model.Bike.IsAvailable ? "bg-success" : "bg-danger")">
-                @(Model.Bike.IsAvailable ? "Available" : "Not Available")
+            Status: <span class="badge @(Model.Bike.Status == BikeStatus.Available ? "bg-success" : "bg-danger")">
+                @Model.Bike.Status
             </span>
         </p>
     </div>

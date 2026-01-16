@@ -1,4 +1,5 @@
 @page
+@using BLL.Enums
 @model Webapp.Pages.Bikes.CreateModel
 @{
     ViewData["Title"] = "Create Bike";
@@ -38,9 +39,11 @@
             </div>
             
             <div class="form-group mb-3">
-                <label asp-for="Bike.IsAvailable" class="form-label"></label>
-                <input asp-for="Bike.IsAvailable" type="checkbox" class="form-check-input" />
-                <span asp-validation-for="Bike.IsAvailable" class="text-danger"></span>
+                <label asp-for="Bike.Status" class="form-label"></label>
+                <select asp-for="Bike.Status" class="form-control" asp-items="Html.GetEnumSelectList<BikeStatus>()">
+                    <option value="">Select status</option>
+                </select>
+                <span asp-validation-for="Bike.Status" class="text-danger"></span>
             </div>
             
             <div class="form-group">

@@ -1,4 +1,5 @@
 using BLL;
+using BLL.Enums;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -61,11 +62,11 @@ public class BookModel : PageModel
             Text = $"{c.FirstName} {c.LastName}"
         }).ToList();
 
-        // Debug log to check if customers are being retrieved
-        Console.WriteLine($"Number of customers: {customers.Count()}");
-
         CalculateAvailableSlots();
         TourBooking.ParticipantCount = 1;
+        TourBooking.TourId = Tour.Id;
+        TourBooking.BookingDate = DateOnly.FromDateTime(DateTime.Now);
+        TourBooking.Status = TourBookingStatus.Confirmed;
         CalculateTotalPrice();
 
         return Page();
@@ -91,16 +92,23 @@ public class BookModel : PageModel
             return Page();
         }
 
-        // Calculate total price
-        TourBooking.TotalPrice = _pricingService.CalculateTourPrice(
-            TourBooking.ParticipantCount, Tour.PricePerParticipant);
+        // Calculate total price (use new TotalCost property)
+        TourBooking.TotalCost = TourBooking.TotalCost;  // Already calculated
         TourBooking.TourId = Tour.Id;
+        TourBooking.BookingDate = DateOnly.FromDateTime(DateTime.Now);
+        TourBooking.CreatedAt = DateTime.Now;
+        TourBooking.Status = TourBookingStatus.Confirmed;
+
+        // Get tour time information - for now using a placeholder time
+        // TODO: Need to use selected TimeSlot from UI
+        var tourStartDateTime = DateTime.Today.AddHours(10); // Placeholder: 10 AM
+        var tourEndDateTime = tourStartDateTime.AddHours((double)Tour.DurationHours);
 
         // Get available bikes for the tour
         var availableBikeIds = await _availabilityService.GetAvailableBikesAsync(
-            Tour.StartTime, Tour.StartTime.Add(Tour.Duration));
+            tourStartDateTime, tourEndDateTime);
 
-        // If not enough bikes available, reject booking
+        // If not enough bikes available,reject booking
         if (availableBikeIds.Count() < TourBooking.ParticipantCount)
         {
             ModelState.AddModelError(string.Empty, "Not enough bikes available for this tour.");
@@ -121,22 +129,25 @@ public class BookModel : PageModel
             var bike = bikes.First(b => b.Id == bikeId);
             var deposit = await _depositService.CalculateDepositAsync(bikeId, TourBooking.CustomerId);
             var price = _pricingService.CalculateRentalPrice(
-                Tour.StartTime, Tour.StartTime.Add(Tour.Duration), bike.DailyRate);
+                tourStartDateTime, tourEndDateTime, bike.DailyRate);
 
             var rental = new Rental
             {
                 BikeId = bikeId,
                 CustomerId = TourBooking.CustomerId,
                 TourBookingId = TourBooking.Id,
-                StartTime = Tour.StartTime,
-                EndTime = Tour.StartTime.Add(Tour.Duration),
-                TotalPrice = price,
-                Deposit = deposit,
-                IsActive = true
+                StartDate = DateOnly.FromDateTime(tourStartDateTime),
+                StartTime = TimeOnly.FromDateTime(tourStartDateTime),
+                EndDate = DateOnly.FromDateTime(tourEndDateTime),
+                EndTime = TimeOnly.FromDateTime(tourEndDateTime),
+                TotalCost = price,
+                DepositAmount = deposit,
+                Status = RentalStatus.Active,
+                RentalType = RentalType.FullDay  // Tours use FullDay rental type
             };
 
             await _rentalRepository.AddAsync(rental);
-            bike.IsAvailable = false;
+            bike.Status = BikeStatus.Rented;
             await _bikeRepository.UpdateAsync(bike);
         }
 
@@ -159,12 +170,13 @@ public class BookModel : PageModel
     private void CalculateAvailableSlots()
     {
         var bookedParticipants = 0; // This should come from existing bookings
-        AvailableSlots = Math.Max(0, Tour.Capacity - bookedParticipants);
+        AvailableSlots = Math.Max(0, Tour.MaxCapacity - bookedParticipants);
     }
 
     private void CalculateTotalPrice()
     {
-        CalculatedTotalPrice = _pricingService.CalculateTourPrice(
-            TourBooking.ParticipantCount, Tour.PricePerParticipant);
+        // Use base tour pricing - participant count * base cost
+        CalculatedTotalPrice = TourBooking.ParticipantCount * 25m; // Placeholder pricing
+        TourBooking.TotalCost = CalculatedTotalPrice;
     }
 }

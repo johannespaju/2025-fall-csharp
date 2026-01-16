@@ -1,4 +1,5 @@
 @page
+@using BLL.Enums
 @model Webapp.Pages.Bikes.IndexModel
 @{
     ViewData["Title"] = "Bikes";
@@ -32,8 +33,8 @@
                     <td>@bike.ServiceInterval</td>
                     <td>@bike.CurrentOdometer</td>
                     <td>
-                        <span class="badge @(bike.IsAvailable ? "bg-success" : "bg-danger")">
-                            @(bike.IsAvailable ? "Available" : "Not Available")
+                        <span class="badge @(bike.Status == BikeStatus.Available ? "bg-success" : "bg-danger")">
+                            @bike.Status
                         </span>
                     </td>
                     <td>

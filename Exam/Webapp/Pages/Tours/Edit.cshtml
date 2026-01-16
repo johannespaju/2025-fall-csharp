@@ -7,11 +7,23 @@
 <h1>Edit Tour</h1>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
             <input type="hidden" asp-for="Tour.Id" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="Tour.Name" class="form-label"></label>
+                <input asp-for="Tour.Name" class="form-control" />
+                <span asp-validation-for="Tour.Name" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Tour.Description" class="form-label"></label>
+                <textarea asp-for="Tour.Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Tour.Description" class="text-danger"></span>
+            </div>
             
             <div class="form-group mb-3">
                 <label asp-for="Tour.Type" class="form-label"></label>
@@ -21,31 +33,42 @@
                 <span asp-validation-for="Tour.Type" class="text-danger"></span>
             </div>
             
-            <div class="form-group mb-3">
-                <label asp-for="Tour.StartTime" class="form-label"></label>
-                <input asp-for="Tour.StartTime" type="datetime-local" class="form-control" />
-                <span asp-validation-for="Tour.StartTime" class="text-danger"></span>
+            <div class="form-group mb3">
+                <label asp-for="Tour.DurationHours" class="form-label">Duration (hours)</label>
+                <input asp-for="Tour.DurationHours" type="number" class="form-control" min="0.5" step="0.5" />
+                <span asp-validation-for="Tour.DurationHours" class="text-danger"></span>
             </div>
             
             <div class="form-group mb-3">
-                <label asp-for="Tour.Duration" class="form-label">Duration (hours)</label>
-                <input type="number" class="form-control" min="1" step="0.5" 
-                       value="@Model.Tour.Duration.TotalHours" 
-                       onchange="document.getElementById('Tour_Duration').value = this.value * 60" />
-                <input type="hidden" asp-for="Tour.Duration" />
-                <span asp-validation-for="Tour.Duration" class="text-danger"></span>
+                <label asp-for="Tour.MaxCapacity" class="form-label"></label>
+                <input asp-for="Tour.MaxCapacity" type="number" class="form-control" min="1" />
+                <span asp-validation-for="Tour.MaxCapacity" class="text-danger"></span>
             </div>
             
             <div class="form-group mb-3">
-                <label asp-for="Tour.Capacity" class="form-label"></label>
-                <input asp-for="Tour.Capacity" type="number" class="form-control" min="1" />
-                <span asp-validation-for="Tour.Capacity" class="text-danger"></span>
+                <label asp-for="Tour.IncludedBikeType" class="form-label"></label>
+                <select asp-for="Tour.IncludedBikeType" class="form-control" asp-items="Html.GetEnumSelectList<BikeType>()">
+                    <option value="">Select bike type</option>
+                </select>
+                <span asp-validation-for="Tour.IncludedBikeType" class="text-danger"></span>
             </div>
             
             <div class="form-group mb-3">
                 <label asp-for="Tour.PricePerParticipant" class="form-label">Price Per Participant</label>
                 <input asp-for="Tour.PricePerParticipant" class="form-control" step="0.01" />
                 <span asp-validation-for="Tour.PricePerParticipant" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Tour.UpgradeToElectricFee" class="form-label">Upgrade to Electric Fee</label>
+                <input asp-for="Tour.UpgradeToElectricFee" class="form-control" step="0.01" />
+                <span asp-validation-for="Tour.UpgradeToElectricFee" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Tour.TimeSlots" class="form-label">Time Slots (comma-separated, e.g. 10:00,15:00)</label>
+                <input asp-for="Tour.TimeSlots" class="form-control" />
+                <span asp-validation-for="Tour.TimeSlots" class="text-danger"></span>
             </div>
             
             <div class="form-group">
