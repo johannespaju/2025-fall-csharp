@@ -462,3 +462,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /hyper-connectx/.idea/
+
+# Rider/IntelliJ IDEA folders
+**/.idea/
