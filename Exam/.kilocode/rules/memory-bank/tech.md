@@ -5,7 +5,9 @@
 - **Web**: ASP.NET Core Razor Pages (see [`Webapp.Program`](Webapp/Program.cs:1)).
 - **ORM**: Entity Framework Core 10.0.2 (see [`DAL/DAL.csproj`](DAL/DAL.csproj:1)).
 - **Database**: SQLite intended (design-time factory uses `UseSqlite`), with SQL Server provider referenced as well.
-- **Frontend**: Bootstrap (scaffolded layout) + jQuery (see [`Webapp/Pages/Shared/_Layout.cshtml`](Webapp/Pages/Shared/_Layout.cshtml:1)).
+- **Validation**: FluentValidation.AspNetCore 11.3.0 for comprehensive input validation (see [`BLL/BLL.csproj`](BLL/BLL.csproj:1)).
+- **Frontend**: Bootstrap 5 responsive design + Bootstrap Icons + jQuery (see [`Webapp/Pages/Shared/_Layout.cshtml`](Webapp/Pages/Shared/_Layout.cshtml:1)).
+- **UI Features**: Dark mode with CSS variables, toast notifications, loading spinners, keyboard shortcuts.
 
 ## Development setup and workflow
 - Build entire solution:
@@ -58,6 +60,25 @@
   - Flags bikes for service
   - Manages bike availability during maintenance
 
+### Tour Service
+- **Location**: [`BLL.Services.TourService`](BLL/Services/TourService.cs:1)
+- **Functionality**:
+  - Checks tour capacity and availability
+  - Creates tour bookings with participant management
+  - Generates rental records for each tour participant
+  - Validates tour capacity limits
+
+## Validation Layer
+
+### FluentValidation Integration
+- **Package**: FluentValidation.AspNetCore 11.3.0
+- **Registration**: Validators registered in [`Webapp.Program`](Webapp/Program.cs:1) with `AddValidatorsFromAssemblyContaining`
+- **Validators**:
+  - [`BikeValidator`](BLL/Validators/BikeValidator.cs:1) - bike number format (B-XXX), pricing rules, odometer validation
+  - [`CustomerValidator`](BLL/Validators/CustomerValidator.cs:1) - email format, phone format, name length validation
+  - [`RentalValidator`](BLL/Validators/RentalValidator.cs:1) - date/time logic, pricing validation, status rules
+  - [`TourBookingValidator`](BLL/Validators/TourBookingValidator.cs:1) - participant count, pricing validation, status rules
+
 ## Database Design
 
 ### Entities and Relationships
@@ -69,6 +90,27 @@
 - **MaintenanceRecords**: Bike maintenance history
 - **DamageRecords**: Customer damage history
 
+### Enum Types
+- **BikeStatus**: Available, Rented, InMaintenance, Retired
+- **RentalStatus**: Active, Completed, Cancelled, Extended
+- **RentalType**: FourHour, FullDay
+- **TourBookingStatus**: Confirmed, Cancelled, Completed
+- **ServiceType**: Routine, Repair, Inspection
+
+### Repository Pattern
+- **Generic Repository**: [`DAL.Repository`](DAL/Repository.cs:1) - base CRUD operations
+- **Specialized Repositories**:
+  - [`BikeRepository`](DAL/Repositories/BikeRepository.cs:1) - search by number/type, filter by status/maintenance
+  - [`CustomerRepository`](DAL/Repositories/CustomerRepository.cs:1) - search by name/email/phone
+  - [`RentalRepository`](DAL/Repositories/RentalRepository.cs:1) - filter by status/type/date range
+
+### Database Seeding
+- **Location**: [`DAL.DbInitializer`](DAL/DbInitializer.cs:1)
+- **Seed Data**:
+  - 80 bikes (16 per type) with realistic odometer values
+  - 10 customers with varied profiles
+  - 3 tours (City, Park, Coastal) with different capacities and pricing
+
 ## UI Features
 
 ### Rental Management
@@ -77,20 +119,44 @@
 - Availability checking
 - Rental extension functionality
 - Return and damage reporting
+- Search/filter on rentals index page
 
 ### Tour Management
 - Tour creation and booking
 - Capacity management
 - Automatic rental generation for tour participants
 - Price calculation per participant
+- Search/filter on tours index page
 
 ### Bike Management
 - Bike inventory tracking
 - Odometer and maintenance status monitoring
 - Maintenance scheduling
 - Bike availability management
+- Search/filter on bikes index page (by number, type, status)
 
 ### Customer Management
 - Customer database
 - Rental and damage history tracking
 - Deposit calculation based on history
+- Search/filter on customers index page (by name, email, phone)
+
+### Dashboard Features
+- **Location**: [`Webapp/Pages/Index.cshtml`](Webapp/Pages/Index.cshtml:1)
+- Fleet statistics (total bikes, available, in maintenance, rented)
+- Maintenance alerts for bikes needing service
+- Upcoming tours display
+- Real-time data updates
+
+### UI Enhancements
+- **Toast Notifications**: Success/error messages with auto-dismiss
+- **Loading Spinners**: Visual feedback for async operations
+- **Dark Mode**: Toggle with CSS variables for theme switching
+- **Keyboard Shortcuts**:
+  - Ctrl+K: Focus search
+  - Ctrl+N: Create new item
+  - Ctrl+D: Toggle dark mode
+- **Bootstrap Icons**: Professional iconography throughout
+- **Responsive Design**: Mobile-first approach with Bootstrap 5
+- **JavaScript Features**: Implemented in [`site.js`](Webapp/wwwroot/js/site.js:1)
+- **CSS Styling**: Custom styles and dark mode in [`site.css`](Webapp/wwwroot/css/site.css:1)
