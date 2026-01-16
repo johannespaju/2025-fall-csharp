@@ -1,4 +1,5 @@
 @page "{id}"
+@using System.Globalization
 @model Webapp.Pages.Tours.BookModel
 @{
     ViewData["Title"] = "Book Tour";
@@ -51,7 +52,9 @@
             <div class="form-group mb-3">
                 <label asp-for="TourBooking.ParticipantCount" class="form-label">Participant Count</label>
                 <input asp-for="TourBooking.ParticipantCount" type="number" class="form-control" 
-                       min="1" max="@Model.AvailableSlots" />
+                       min="1" max="@Model.AvailableSlots"
+                       data-price-per-participant="@Model.Tour.PricePerParticipant.ToString("0.##", CultureInfo.InvariantCulture)"
+                       data-upgrade-fee="@Model.Tour.UpgradeToElectricFee.ToString("0.##", CultureInfo.InvariantCulture)" />
                 <span asp-validation-for="TourBooking.ParticipantCount" class="text-danger"></span>
             </div>
             
@@ -77,14 +80,32 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        $(document).ready(function() {
-            // Recalculate total price when participant count changes
-            $('#TourBooking_ParticipantCount').change(function() {
-                var participantCount = $(this).val();
-                var pricePerParticipant = @Model.Tour.PricePerParticipant;
-                var totalPrice = participantCount * pricePerParticipant;
-                $('#calculatedTotalPrice').val(totalPrice.toFixed(2));
+        document.addEventListener('DOMContentLoaded', () => {
+            const currencyFormatter = new Intl.NumberFormat(undefined, {
+                style: 'currency',
+                currency: 'EUR'
             });
+
+            const participantInput = document.getElementById('TourBooking_ParticipantCount');
+            const upgradeCheckbox = document.getElementById('TourBooking_BikeUpgradeToElectric');
+            const totalPriceInput = document.getElementById('calculatedTotalPrice');
+
+            function recalculateTotalPrice() {
+                const participantCount = Number(participantInput?.value || 0);
+                const pricePerParticipant = Number(participantInput?.dataset.pricePerParticipant || 0);
+                const upgradeFee = Number(participantInput?.dataset.upgradeFee || 0);
+                const upgradeSelected = upgradeCheckbox ? upgradeCheckbox.checked : false;
+                const effectivePrice = upgradeSelected ? (pricePerParticipant + upgradeFee) : pricePerParticipant;
+                const totalPrice = participantCount * effectivePrice;
+                if (totalPriceInput) {
+                    totalPriceInput.value = currencyFormatter.format(totalPrice);
+                }
+            }
+
+            participantInput?.addEventListener('input', recalculateTotalPrice);
+            participantInput?.addEventListener('change', recalculateTotalPrice);
+            upgradeCheckbox?.addEventListener('change', recalculateTotalPrice);
+            recalculateTotalPrice();
         });
     </script>
 }
