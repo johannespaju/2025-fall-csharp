@@ -20,7 +20,7 @@ Develop a full-featured **ASP.NET Core** web application for managing bicycle re
 - **Framework**: ASP.NET Core 10.0 with Razor Pages
 - **ORM**: Entity Framework Core with SQLite database
 - **Frontend**: Bootstrap 5 responsive design with mobile-first approach
-- **Validation**: FluentValidation for complex business rules
+- **Validation**: Currently basic model validation (FluentValidation not yet implemented)
 - **Architecture**: Repository pattern, service layer for business logic, separation of concerns
 
 ## 🧮 Core Business Logic

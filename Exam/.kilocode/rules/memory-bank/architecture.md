@@ -59,13 +59,21 @@ The solution is split into three projects (see [`Exam.sln`](Exam.sln)):
 - EF Core with SQLite backend (configurable via appsettings)
 - Generic repository pattern with DI injection
 - Service layer abstraction with DI
-- Razor Pages for UI with Bootstrap styling
-- Migrations and database initialization implemented
+- Razor Pages for UI with Bootstrap 5 styling
+- Migrations implemented (initial migration completed)
+- TestConsole project for testing services and database initialization
 
 ## Critical implementation paths (completed)
-1. **Availability checking** - Implemented in AvailabilityService
-2. **Return workflow** - Implemented in Rentals/Return.cshtml.cs
-3. **Tour booking workflow** - Implemented in Tours/Book.cshtml.cs
-4. **Pricing calculation** - Implemented in PricingService
-5. **Deposit calculation** - Implemented in DepositService
-6. **Maintenance tracking** - Implemented in MaintenanceService
+1. **Availability checking** - Implemented in [`BLL.Services.AvailabilityService`](BLL/Services/AvailabilityService.cs:1)
+2. **Return workflow** - Implemented in [`Webapp.Pages.Rentals.Return`](Webapp/Pages/Rentals/Return.cshtml.cs:1)
+3. **Tour booking workflow** - Implemented in [`Webapp.Pages.Tours.Book`](Webapp/Pages/Tours/Book.cshtml.cs:1)
+4. **Pricing calculation** - Implemented in [`BLL.Services.PricingService`](BLL/Services/PricingService.cs:1)
+5. **Deposit calculation** - Implemented in [`BLL.Services.DepositService`](BLL/Services/DepositService.cs:1)
+6. **Maintenance tracking** - Implemented in [`BLL.Services.MaintenanceService`](BLL/Services/MaintenanceService.cs:1)
+
+## Known gaps
+- **ITourService**: Interface referenced in TestConsole but not yet created
+- **TourService**: Implementation referenced in TestConsole but not yet created
+- **DbInitializer**: Class referenced in TestConsole line 41 but not yet created
+- **Validators**: Empty folder exists in BLL but no actual validator implementations
+- ITourService not registered in [`Webapp.Program`](Webapp/Program.cs:23) DI configuration

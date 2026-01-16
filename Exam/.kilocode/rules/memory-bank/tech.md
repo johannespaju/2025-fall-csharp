@@ -12,6 +12,8 @@
   - `dotnet build` (from repo root)
 - Run web app:
   - `dotnet run --project Webapp`
+- Run test console:
+  - `dotnet run --project TestConsole`
 
 ## EF Core tooling notes
 - Migrations use the design-time factory [`DAL.AppDbContextFactory.CreateDbContext()`](DAL/AppDbContextFactory.cs:8).
