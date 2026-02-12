@@ -1,148 +1,95 @@
-# Bicycle Rental Management System
+# Bicycle Rental System (Exam Project)
 
-Full-featured ASP.NET Core web application for managing bicycle rentals, guided tours, and fleet maintenance.
+## Exam task
 
-## 🎯 Features
+**Exam task text is in** [`task.md`](task.md:1).
 
-### Core Functionality
-- **Fleet Management**: 80-bike inventory across 5 categories (City, Electric, Mountain, Tandem, Children's)
-- **Rental System**: 4-hour blocks and full-day rentals with real-time availability checking
-- **Guided Tours**: 3 tour types with capacity management and automatic rental generation
-- **Predictive Maintenance**: 50km proactive buffer before service thresholds
-- **Dynamic Deposits**: €50-€150 based on bike type + customer damage history
-- **Damage Tracking**: Complete incident history with deposit adjustments
+## Overview
 
-### Business Rules
-- **Rental Periods**: 09:00-13:00, 13:00-17:00, 17:00-21:00 (4-hour), 09:00-21:00 (full day)
-- **Pricing**: €8-€28 per day depending on bike type
-- **Maintenance Intervals**: City 500km, Electric 300km, Mountain 400km (flagged 50km early)
-- **Tour Capacity**: 6-12 participants per tour with overflow prevention
-- **Deposits**: Base €50/€150 + €10 per past damage incident
+This repository contains an ASP.NET Core Razor Pages application for managing a bicycle rental business in a tourist city.
 
-## 🛠️ Technology Stack
+Main workflows:
+- Bike fleet management (types, pricing, status, odometer)
+- Rentals (4-hour blocks / full-day) with availability checks and overlap prevention
+- Rental extensions with conflict detection
+- Reservations (pre-booked rentals)
+- Guided tours with capacity management and participant rentals
+- Returns with damage reporting
+- Predictive maintenance tracking and maintenance records
+- Deposit calculation based on bike type and customer damage history
 
-- **Framework**: ASP.NET Core 10.0 with Razor Pages
-- **ORM**: Entity Framework Core 10.0.2
-- **Database**: SQLite (production-ready, file-based)
-- **Frontend**: Bootstrap 5 with responsive design
-- **Validation**: FluentValidation for complex business rules
-- **Architecture**: Layered (BLL → DAL → Webapp) with repository pattern
+Solution file: [`Exam.sln`](Exam.sln:1)
 
-### Installation
+## Tech stack
 
-1. **Clone repository**
-   ```bash
-   git clone <repo-url>
-   cd Exam
-   ```
+- .NET / C# (ASP.NET Core Razor Pages)
+- Entity Framework Core + SQLite
+- FluentValidation (server-side validation)
+- Bootstrap 5 + Bootstrap Icons (UI)
 
-2. **Restore packages**
-   ```bash
-   dotnet restore
-   ```
+Entry point / DI setup: [`Webapp.Program`](Webapp/Program.cs:1)
 
-3. **Run migrations**
-   ```bash
-   dotnet ef migrations add InitialCreate --project DAL --startup-project Webapp
-   dotnet ef database update --project DAL --startup-project Webapp
-   ```
+## Solution structure
 
-4. **Run application**
-   ```bash
-   dotnet run --project Webapp
-   ```
+- [`Webapp/`](Webapp:1) — Razor Pages UI (CRUD pages, dashboards, workflows)
+- [`BLL/`](BLL:1) — domain entities, business services, validators
+- [`DAL/`](DAL:1) — EF Core persistence (DbContext, repositories, migrations, seeding)
+- [`TestConsole/`](TestConsole:1) — small console runner for testing services/DB initialization
 
-5. **Navigate to** https://localhost:5001
+Key files:
+- DbContext: [`DAL.AppDbContext`](DAL/AppDbContext.cs:1)
+- Design-time factory (migrations): [`DAL.AppDbContextFactory.CreateDbContext()`](DAL/AppDbContextFactory.cs:8)
+- Seeding: [`DAL.DbInitializer`](DAL/DbInitializer.cs:1)
 
-## 📐 Architecture
+## Run locally
 
-```
-Exam/
-├── BLL/                    # Business Logic Layer
-│   ├── Entities/          # Domain models (Bike, Rental, Customer, Tour, etc.)
-│   ├── Enums/             # BikeStatus, RentalStatus, etc.
-│   ├── Services/          # Business logic (Availability, Pricing, Deposit, Maintenance)
-│   ├── Interfaces/        # Service and repository contracts
-│   └── Validators/        # FluentValidation rules
-│
-├── DAL/                    # Data Access Layer
-│   ├── AppDbContext.cs    # EF Core DbContext
-│   ├── Repository.cs      # Generic repository implementation
-│   ├── DbInitializer.cs   # Seed data
-│   └── Migrations/        # EF Core migrations
-│
-└── Webapp/                 # Presentation Layer
-    ├── Pages/             # Razor Pages (Bikes, Rentals, Customers, Tours)
-    ├── wwwroot/           # Static files (CSS, JS, images)
-    └── Program.cs         # DI configuration and startup
+### Prerequisites
+
+- .NET SDK (see target frameworks in [`Webapp/Webapp.csproj`](Webapp/Webapp.csproj:1))
+
+### Restore + build
+
+```bash
+dotnet restore
+dotnet build
 ```
 
-## 🧪 Testing Scenarios
+### Run the web app
 
-- ✅ Create bike → appears in filtered list
-- ✅ Rent available bike → status updates to Rented
-- ✅ Return bike at 450km (city bike) → auto-flags for maintenance
-- ✅ Customer with 2 damages → deposit increases by €20
-- ✅ Book tour for 3 → creates 1 TourBooking + 3 Rentals
-- ✅ Book tour at capacity → rejected with error
-- ✅ Extend rental with conflict → rejected
-- ✅ Search bikes by type/status → correct results
-
-## 📝 Key Implementation Details
-
-### Maintenance Flagging
-```csharp
-// Bikes flagged 50km BEFORE threshold (proactive)
-kmSinceService >= (serviceInterval - 50)
-// Example: City bike flags at 450km, not 500km
+```bash
+dotnet run --project Webapp
 ```
 
-### Tour Booking Process
-1. Validate capacity available
-2. Create TourBooking record
-3. Get N available bikes (City or Electric if upgraded)
-4. Create N Rental records (one per participant)
-5. Link all rentals via TourBookingId
-6. Set TourBooking.TotalCost = sum of rental costs
+Open the URL printed in the console.
 
-### Deposit Calculation
-```csharp
-deposit = (bikeType == Electric ? 150 : 50) + (damageCount × 10)
+## Database notes (SQLite)
+
+- Default database is SQLite.
+- EF Core migrations live in [`DAL/Migrations/`](DAL/Migrations:1).
+- Migrations use the design-time factory [`DAL.AppDbContextFactory.CreateDbContext()`](DAL/AppDbContextFactory.cs:8).
+- Seed data is created by [`DAL.DbInitializer`](DAL/DbInitializer.cs:1) (bikes, customers, tours).
+
+### Database file location
+
+EF tooling / default setup uses:
+- `%USERPROFILE%\exam\app.db` (Windows example: `C:\Users\<user>\exam\app.db`)
+
+### Reset the database
+
+1. Stop the app.
+2. Delete the SQLite file: `%USERPROFILE%\exam\app.db`.
+3. Start the app again (seeding will recreate data if enabled).
+
+### (Optional) Apply migrations manually
+
+```bash
+dotnet ef database update --project DAL --startup-project Webapp
 ```
 
-## 🎨 UI Features
+## (Optional) Run TestConsole
 
-- **Toast Notifications**: Success/error feedback
-- **Loading Spinners**: Async operation indicators
-- **Delete Confirmations**: Prevent accidental deletions
-- **Dark Mode**: Toggle with localStorage persistence
-- **Responsive Design**: Mobile-first Bootstrap 5 layout
-- **Search/Filter**: All entity lists filterable
-- **Dashboard**: Statistics and quick actions
+```bash
+dotnet run --project TestConsole
+```
 
-## 📚 API & Services
-
-### Core Services
-- **IAvailabilityService**: Bike availability checking and conflict detection
-- **IPricingService**: Rental and tour cost calculation
-- **IDepositService**: Dynamic deposit calculation
-- **IMaintenanceService**: Predictive maintenance flagging
-- **ITourService**: Tour capacity and booking management
-
-## 🔒 Business Logic Validation
-
-- **Date/Time Separation**: StartDate + StartTime (not combined DateTime)
-- **Time Block Enforcement**: Only 09:00, 13:00, 17:00, 21:00 for 4-hour rentals
-- **Overlap Detection**: Prevents double-booking bikes
-- **Extension Validation**: Checks for future reservation conflicts
-- **Capacity Limits**: Prevents tour overbooking across time slots
-
-## 📊 Database Schema
-
-**7 Core Entities**: Bike, Customer, Rental, Tour, TourBooking, MaintenanceRecord, DamageRecord
-
-**Key Relationships**:
-- Customer 1:N Rental N:1 Bike
-- Tour 1:N TourBooking 1:N Rental (via TourBookingId FK)
-- Bike 1:N MaintenanceRecord
-- Bike/Customer/Rental 1:N DamageRecord
+Console entry point: [`TestConsole.Program`](TestConsole/Program.cs:1)
